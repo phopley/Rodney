@@ -1,0 +1,13 @@
+#!/bin/bash
+# script to create symbolic links from git folders to catkin_ws for Rodney Robot project
+# run ./creatlinks
+ln -s ~/git/rodney ~/robotics/catkin_ws/src
+ln -s ~/git/face_recognition ~/robotics/catkin_ws/src
+ln -s ~/git/face_recognition_msgs ~/robotics/catkin_ws/src
+ln -s ~/git/head_control ~/robotics/catkin_ws/src
+ln -s ~/git/pan_tilt ~/robotics/catkin_ws/src
+ln -s ~/git/servo_msgs ~/robotics/catkin_ws/src
+ln -s ~/git/ros-keyboard ~/robotics/catkin_ws/src
+
+
+
