@@ -21,7 +21,7 @@ To get the pan and tilt functionality I need to do four things:
 - Write the ROS node containing the pan/tilt functionality
 
 To install the ROS serial package on my develoment PC and on the Raspberry Pi `sudo apt-get install ros-kinetic-rosserial`
-The user must also have permission to open he port `sudo adduser <username> dialout`. With the roscore already running the serial node can be started with the command `rosrun rosserial_python serial_node.py /dev/ttyUSB0`
+The user must also have permission to open the port `sudo adduser <username> dialout`. With the roscore already running the serial node can be started with the command `rosrun rosserial_python serial_node.py /dev/ttyUSB0`
 
 In order to be able to compile an Arduino sketch to use this node you need to install the ros serial arduino package, `sudo apt-get install ros-kinetic-rosserial-arduino`. Note I'm using the Arduino IDE installed on my Linux box. The library also needs building. 
 
