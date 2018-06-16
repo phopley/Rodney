@@ -32,7 +32,7 @@ rosrun rosserial_arduino make_libraries.py .
 
 The code for the Arduino sketch will accept a ROS message which will contain an index value indicating which servo is to me moved and a value for the angle that the servo should be moved to. Before we can compile the sketch you have to recompile the Arduino library to include this ROS message.
 
-My ROS package containing this message also contain a second message which you be used by the pan tilt node. The ROS package is available in the GitHub Repository https://github.com/phopley/servo_msgs See the README.md file for package details.
+My ROS package containing this message also contain a second message which you be used by the pan tilt node. The ROS package is available in the GitHub Repository https://github.com/phopley/servo_msgs See the package documentation for details..
 
 With the servo_msgs packages built as part of the Catkin workspace catkin_ws, rebuld the Arduino library 
 ```
@@ -46,7 +46,7 @@ You can now compile an Arduino sketch that will use the `servo_array.msg` which 
 
 This sketch accepts a topic servo of type servo_msgs::servo_array and moves the selected servo to the given positon.
 
-The final part of the pan and tilt functionality is the pan_tilt package which makes up the pan tilt node. This package is available in the GitHub Repository https://github.com/phopley/pan_tilt See the README.md file for package details.
+The final part of the pan and tilt functionality is the pan_tilt package which makes up the pan tilt node. This package is available in the GitHub Repository https://github.com/phopley/pan_tilt See the package documentation for details.
 This node can control two pan/tilt devices, one is expected to move the head/camera and the other for a LIDAR.
 
 The package contains a launch file to test the pan_tilt_node and the Arduino sketch. The launch file will launch the pan_tilt_node, the serial_node and remaps the pan_tilt_node/index0_position topic to be the pan_tilt_node/head_position.
@@ -60,9 +60,22 @@ The package contains a launch file to test the pan_tilt_node and the Arduino ske
   <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen" args="/dev/ttyUSB0" />
 </launch>
 ```
-If the packages have been built in the workspace catkin_ws launch the nodes with
+If the packages have been built in the workspace catkin_ws and the Arduino is programmed and connected, launch the nodes with
 ```
 cd ~/catkin_ws
 source devel/setup.bash
 roslaunch pan_tilt pan_tilt_test.launch
 ```
+The following ROS Graph depicts the pan tilt part of the system.
+
+![alt text](https://github.com/phopley/rodney/blob/master/docs/images/rosgraph_pantilt.png "Pan tilt graph")
+
+With the system running as shown in the graph above change the pan tilt servo positions using rosstopic and the following command
+`rostopic pub -1 /pan_tilt_node/head_position servo_msgs/pan_tilt {45,45}`
+
+This will command the pan and tilt servos of the first pan and tilt device to both be 45 degrees. There are parameter server values available in the pan_tilt package to configure which servo is connected to which servo and which device and to limit the range of a servo as well as to trim the servo. See the package documentation for details.
+### Head Control
+TBA
+### Face Recognition
+TBA
+### Rodney Control
