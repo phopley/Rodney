@@ -14,3 +14,5 @@ The plan is to use the screen for passing status information to a user, web cont
 The following images show the 7" display with the Raspberry Pi and camera mounted on the rear of the screen. The camera is mounted using a 3D printed bracket. The stl file for the bracket is available [here]( https://github.com/phopley/rodney/blob/master/docs/3D%20Prints/camera%20bracketV2.stl "Camera bracket")
 
 <img src="https://github.com/phopley/rodney/blob/master/docs/images/IMG_0380.JPG" width="427" height="284" title="7inch screen"> <img src="https://github.com/phopley/rodney/blob/master/docs/images/IMG_0381.JPG" width="427" height="284" title="7inch screen and camera">
+
+The ROS system will run across a distributed network, I have therefore also installed ROS on a Ubuntu desktop I have available. This PC will be used to develop the nodes for the system and to run some of the ROS tools available to test the system.
