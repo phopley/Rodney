@@ -1,7 +1,7 @@
 # Design Goals
 The robot project will be developed using a number of design goals.
 
-Note: In this article I'm going to explain functionality for my ROS nodes not how you write ROS nodes or compile them, there is plenty of resources out there on the internet for that.
+Note: In this article I'm going to explain functionality for my ROS nodes not how you write ROS nodes or compile them, there is plenty of resources out there on the internet for that. To fully understand the node functionality read the README.md file for each package.
 ## Design Goal 1
 Use Case - On power up look around using the camera, search for faces, attempt to identify any seen and display a message for any identified. This will require:
 - Control of head/camera using RC servos
@@ -27,5 +27,42 @@ In order to be able to compile an Arduino sketch to use this node you need to in
 
 ```
 cd Arduino/libraries
-rosrun rosserial_arduino make_libraries.py
+rosrun rosserial_arduino make_libraries.py .
+```
+
+The code for the Arduino sketch will accept a ROS message which will contain an index value indicating which servo is to me moved and a value for the angle that the servo should be moved to. Before we can compile the sketch you have to recompile the Arduino library to include this ROS message.
+
+My ROS package containing this message also contain a second message which you be used by the pan tilt node. The ROS package is available in the GitHub Repository https://github.com/phopley/servo_msgs See the README.md file for package details.
+
+With the servo_msgs packages built as part of the Catkin workspace catkin_ws, rebuld the Arduino library 
+```
+cd ~/catkin_ws
+source devel/setup.bash
+cd Arduino/libraries
+rosrun rosserial_arduino make_libraries.py .
+```
+
+You can now compile an Arduino sketch that will use the `servo_array.msg` which is part of the servo_msgs package. The Arduino sketch is available in the GitHub Repository folder https://github.com/phopley/arduino-projects/tree/master/ServoControl4Channel See the README.md file for sketch details.
+
+This sketch accepts a topic servo of type servo_msgs::servo_array and moves the selected servo to the given positon.
+
+The final part of the pan and tilt functionality is the pan_tilt package which makes up the pan tilt node. This package is available in the GitHub Repository https://github.com/phopley/pan_tilt See the README.md file for package details.
+This node can control two pan/tilt devices, one is expected to move the head/camera and the other for a LIDAR.
+
+The package contains a launch file to test the pan_tilt_node and the Arduino sketch. The launch file will launch the pan_tilt_node, the serial_node and remaps the pan_tilt_node/index0_position topic to be the pan_tilt_node/head_position.
+```
+<?xml version="1.0" ?>
+<launch>
+  <rosparam command="load" file="$(find pan_tilt)/config/config.yaml" />
+  <node pkg="pan_tilt" type="pan_tilt_node" name="pan_tilt_node" output="screen">
+    <remap from="pan_tilt_node/index0_position" to="pan_tilt_node/head_position" />
+  </node>
+  <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen" args="/dev/ttyUSB0" />
+</launch>
+```
+If the packages have been built in the workspace catkin_ws launch the nodes with
+```
+cd ~/catkin_ws
+source devel/setup.bash
+roslaunch pan_tilt pan_tilt_test.launch
 ```
