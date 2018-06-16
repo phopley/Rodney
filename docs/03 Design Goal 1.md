@@ -30,7 +30,7 @@ cd Arduino/libraries
 rosrun rosserial_arduino make_libraries.py .
 ```
 
-The code for the Arduino sketch will accept a ROS message which will contain an index value indicating which servo is to me moved and a value for the angle that the servo should be moved to. Before we can compile the sketch you have to recompile the Arduino library to include this ROS message.
+The code for the Arduino sketch will accept a ROS message which will contain an index value indicating which servo is to be moved and a value for the angle that the servo should be moved to. Before we can compile the sketch you have to recompile the Arduino library to include this ROS message.
 
 My ROS package containing this message also contain a second message which you be used by the pan tilt node. The ROS package is available in the GitHub Repository https://github.com/phopley/servo_msgs See the package documentation for details..
 
