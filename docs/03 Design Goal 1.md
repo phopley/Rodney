@@ -70,10 +70,10 @@ The following ROS Graph depicts the pan tilt part of the system.
 
 ![alt text](https://github.com/phopley/rodney/blob/master/docs/images/rosgraph_pantilt.png "Pan tilt graph")
 
-With the system running as shown in the graph above change the pan tilt servo positions using rosstopic and the following command
+With the system running as shown in the graph above change the pan tilt servo positions using rostopic and the following command
 `rostopic pub -1 /pan_tilt_node/head_position servo_msgs/pan_tilt {45,45}`
 
-This will command the pan and tilt servos of the first pan and tilt device to both be 45 degrees. There are parameter server values available in the pan_tilt package to configure which servo is connected to which servo and which device and to limit the range of a servo as well as to trim the servo. See the package documentation for details.
+This will command the pan and tilt servos of the first pan and tilt device to be both 45 degrees. There are parameter server values available in the pan_tilt package to configure which servo index is connected to which servo and which device and also to limit the range of a servo as well as to trim the servo. See the package documentation for details.
 ### Head Control
 TBA
 ### Face Recognition
