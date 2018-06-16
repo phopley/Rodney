@@ -12,7 +12,7 @@ To control the head/camera we need a pan and tilt device which will require two 
 
 You could use a purpose built board like one available from PiBorg, the [UltraBorg](https://www.piborg.org/sensors-1136/ultraborg "UltraBorg"). Using this board you can connect up to four servos and four HC-SR04 ultrasonic devices to the Raspberry Pi using an I2C bus.
 
-However, since I have a number of Arduino Nano's available from a previous project I'm going to make use of one of those. To attach and control the Arduino I'm also going to make use of a ROS package designed to communicate with an Arduino its USB serial port. This is our first example of being able to take advantage of a ROS package written by some else and made available from the ROS Wiki website [rosserial_arduino](http://wiki.ros.org/rosserial_arduino "rosserial_arduino")
+However, since I have a number of Arduino Nano's available from a previous project I'm going to make use of one of those. To attach and control the Arduino I'm also going to make use of a ROS package designed to communicate with an Arduino over its USB serial port. This is our first example of being able to take advantage of a ROS package written by some else and made available from the ROS Wiki website [rosserial_arduino](http://wiki.ros.org/rosserial_arduino "rosserial_arduino")
 
 To get the pan and tilt functionality I need to do four things:
 - Install the rossserial package
