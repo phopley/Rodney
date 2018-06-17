@@ -1,56 +1,44 @@
 # Design Goals
 The robot project will be developed using a number of design goals.
 
-Note: In this article I'm going to explain functionality for my ROS nodes not how you write ROS nodes or compile them, there is plenty of resources out there on the internet for that. To fully understand the node functionality read the README.md file for each package.
+Note: In this article I'm going to explain the basic functionality for my ROS nodes not how you write ROS nodes or compile them, there is plenty of resources out there on the internet for that. To fully understand the node functionality please read the documentation for each package available in its GitHub repository.
 ## Design Goal 1
-Use Case - On power up look around using the camera, search for faces, attempt to identify any seen and display a message for any identified. This will require:
+Use Case - to be able to look around using the camera, search for faces, attempt to identify any seen and display a message for any identified. This will require:
 - Control of head/camera using RC servos
 - Access to Pi Camera
 - Facial detections and recognition
 ### Pan & Tilt
 To control the head/camera we need a pan and tilt device which will require two RC servos. I expect that the project will also in the future require a second device for a LIDAR (Light Detection and Ranging) sensor. We therefore straight away require four PWM outputs, not to mention any required for motors in the future. The Raspberry Pi only has one hardware PWM, although software PWMs could be used, so I'm going to pass the control of the servos off to a second board.
 
-You could use a purpose built board like one available from PiBorg, the [UltraBorg](https://www.piborg.org/sensors-1136/ultraborg "UltraBorg"). Using this board you can connect up to four servos and four HC-SR04 ultrasonic devices to the Raspberry Pi using an I2C bus.
+I could have used a purpose built board like one available from PiBorg, the [UltraBorg](https://www.piborg.org/sensors-1136/ultraborg "UltraBorg"). Using this board you can connect up to four servos and four HC-SR04 ultrasonic devices to the Raspberry Pi using an I2C bus.
 
-However, since I have a number of Arduino Nano's available from a previous project I'm going to make use of one of those. To attach and control the Arduino I'm also going to make use of a ROS package designed to communicate with an Arduino over its USB serial port. This is our first example of being able to take advantage of a ROS package written by some else and made available from the ROS Wiki website [rosserial_arduino](http://wiki.ros.org/rosserial_arduino "rosserial_arduino")
+However, since I have a number of Arduino Nano's available, from a previous project, I'm going to make use of one of those. To control the Arduino I'm going to use an already available ROS package that includes a node for communicating with the Arduino over the serial port and an Arduino library for use in the Arduino sketch. This is our first example of being able to take advantage of a ROS package written by some else and made available from the ROS Wiki website [rosserial_arduino](http://wiki.ros.org/rosserial_arduino "rosserial_arduino")
 
-To get the pan and tilt functionality I need to do four things:
-- Install the rossserial package
-- Install the rosserial libiary for the Arduino IDE
-- Write the code that will run on the Arduino
-- Write the ROS node containing the pan/tilt functionality
+In order to be able to make use of this package I need to install the package on the ROS workstation, install the library in the Arduino IDE environment. This will also include rebuilding this Arduino library if we use any user defined ROS messages (which we will). How to do this and much more is covered on the Wiki in [rosserial arduino tutorials](http://wiki.ros.org/rosserial_arduino/Tutorials "Tutorials")
 
-To install the ROS serial package on my develoment PC and on the Raspberry Pi `sudo apt-get install ros-kinetic-rosserial`
-The user must also have permission to open the port `sudo adduser <username> dialout`. With the roscore already running the serial node can be started with the command `rosrun rosserial_python serial_node.py /dev/ttyUSB0`
+To be able to make use of the rosserial_arduino package I will need to write code (a sketch) for the Arduino that controls the servos and a ROS node for the functionality of a Pan/Tilt device. The rosserial node will sit between these two items. Also as indicated above I'll use a user defined ROS message to communicate between them.
 
-In order to be able to compile an Arduino sketch to use this node you need to install the ros serial arduino package, `sudo apt-get install ros-kinetic-rosserial-arduino`. Note I'm using the Arduino IDE installed on my Linux box. The library also needs building. 
+The code for the Arduino sketch will accept a ROS message which will contain an index value, indicating which servo is to be moved, and a value for the angle that the servo should be moved to. As I'll have to recompile the Arduino library to include my user defined message the first ROS package to write is the one containing this message. This package also contains a second message which will be used by the pan and tilt node. This package is available in the GitHub Repository https://github.com/phopley/servo_msgs See the package documentation for full details.
 
+Next I needed to write the Arduino sketch that will accept the message and move the servos. This sketch is available in the GitHub Repository folder https://github.com/phopley/arduino-projects/tree/master/ServoControl4Channel See the README.md file for sketch details.
+
+In the sketch I map the four servo outputs to the physical pins where the servos are connected. 
+``` C++
+/* Define the PWM pins that the servos are connected to */
+#define SERVO_0 9
+#define SERVO_1 6
+#define SERVO_2 5
+#define SERVO_3 3
 ```
-cd Arduino/libraries
-rosrun rosserial_arduino make_libraries.py .
-```
-
-The code for the Arduino sketch will accept a ROS message which will contain an index value indicating which servo is to be moved and a value for the angle that the servo should be moved to. Before we can compile the sketch you have to recompile the Arduino library to include this ROS message.
-
-My ROS package containing this message also contain a second message which you be used by the pan tilt node. The ROS package is available in the GitHub Repository https://github.com/phopley/servo_msgs See the package documentation for details..
-
-With the servo_msgs packages built as part of the Catkin workspace catkin_ws, rebuld the Arduino library 
-```
-cd ~/catkin_ws
-source devel/setup.bash
-cd Arduino/libraries
-rosrun rosserial_arduino make_libraries.py .
-```
-
-You can now compile an Arduino sketch that will use the `servo_array.msg` which is part of the servo_msgs package. The Arduino sketch is available in the GitHub Repository folder https://github.com/phopley/arduino-projects/tree/master/ServoControl4Channel See the README.md file for sketch details.
-
-This sketch accepts a topic servo of type servo_msgs::servo_array and moves the selected servo to the given positon.
+Later the pan and tilt node will allow configuration to map a servo to either pan or tilt on a particular pan/tilt device. 
 
 The final part of the pan and tilt functionality is the pan_tilt package which makes up the pan tilt node. This package is available in the GitHub Repository https://github.com/phopley/pan_tilt See the package documentation for details.
 This node can control two pan/tilt devices, one is expected to move the head/camera and the other for a LIDAR.
 
-The package contains a launch file to test the pan_tilt_node and the Arduino sketch. The launch file will launch the pan_tilt_node, the serial_node and remaps the pan_tilt_node/index0_position topic to be the pan_tilt_node/head_position.
-```
+The package includes a configuration file which maps the servos to a pan/tilt device and also position within the device, the range of a servo can be constrained and trim values for each servo included.
+
+The package also contains a launch file to test the pan_tilt_node and the Arduino sketch. The launch file will launch the pan_tilt_node, the serial_node and remaps the pan_tilt_node/index0_position topic to be the pan_tilt_node/head_position.
+``` XML
 <?xml version="1.0" ?>
 <launch>
   <rosparam command="load" file="$(find pan_tilt)/config/config.yaml" />
@@ -60,7 +48,7 @@ The package contains a launch file to test the pan_tilt_node and the Arduino ske
   <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen" args="/dev/ttyUSB0" />
 </launch>
 ```
-If the packages have been built in the workspace catkin_ws and the Arduino is programmed and connected, launch the nodes with
+To run the nodes using the launch file, `cd` to the workspace where the packages were built, source the setup bash file and call roslaunch.
 ```
 cd ~/catkin_ws
 source devel/setup.bash
@@ -73,9 +61,6 @@ The following ROS Graph depicts the pan tilt part of the system.
 With the system running as shown in the graph above change the pan tilt servo positions using rostopic and the following command
 `rostopic pub -1 /pan_tilt_node/head_position servo_msgs/pan_tilt {45,45}`
 
-This will command the pan and tilt servos of the first pan and tilt device to be both 45 degrees. There are parameter server values available in the pan_tilt package to configure which servo index is connected to which servo and which device and also to limit the range of a servo as well as to trim the servo. See the package documentation for details.
-### Head Control
-TBA
-### Face Recognition
-TBA
-### Rodney Control
+This will command the pan and tilt servos of the first pan and tilt device to be both 45 degrees.
+
+In the next part of the design goal 1 I'll look at the face recognition package.
