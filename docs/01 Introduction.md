@@ -11,7 +11,7 @@ Both books gave names to their robots “Rodney” and “Mike”. For that reas
 ![alt text](https://github.com/phopley/rodney/blob/master/docs/images/book1.jpg "How to build your own self-programming robot")
 ![alt text](https://github.com/phopley/rodney/blob/master/docs/images/book2.jpg "How to build a computer-controlled robot")
 
-As a software engineer I subscribe to the Code Project site https://www.codeproject.com/ and there are two robotic projects on the site which I taken some inspiration from.
+As a software engineer I subscribe to the Code Project site https://www.codeproject.com/ and there are two robotic projects on the site which I have taken some inspiration from.
 
 The first article [Let's build a robot!](https://www.codeproject.com/Articles/1115414/Lets-build-a-robot "Let's build a robot!") has got some good ideas, although from the article I'm not sure if the robot ever got built. Using a small display for the robot head is one of the main ideas I have taken away from the article and it also introduced me to the PiBorg hardware which includes UltraBorg and Thunderborg boards, I'm now not so sure if I'm going to use them in the project but may I may use them in the future. One of the most useful things I found in this article is a link to the [Pi Robot blog](http://www.pirobot.org/blog/0015/ "Pi Robot"). This was most useful as it introduced me to the [Robot Operating System](http://wiki.ros.org/ "ROS") (ROS). This is a de facto standard for robot programming. As it states on the ROS Wiki:
 
