@@ -36,13 +36,17 @@ The following ROS Graph depicts the face recognition part of the system.
 ![alt text](https://github.com/phopley/rodney/blob/master/docs/images/rosgraph_face_rec.png "face recognition graph")
 
 With the system running as shown in the graph above do the following:
-- Start an instance of `rqt_image_view`
+- Start an instance of `rqt_image_view` and select the `/face_recognition_node/adjusted_image` topic for viewing
 - Set up a teminal window to echo any results `rostopic echo /face_recognition_node/result`
 - In another terminal trigger a face recognition scan with using rostopic and the following command `rostopic pub -1 /face_recognition_node/start std_msgs/Empty`
 
 As the scan was started I was looking at the camera and obtained the following results. The terminal running the rostopic echo reported
-```
+```![alt text](
 ids_detected:[1]
 names_detected: [Phil]
 ---
 ```
+The rqt_image_view application showed the following image:
+![alt text](https://github.com/phopley/rodney/blob/master/docs/images/image_face_rec.png "face recognition image")
+
+Note that during this test raspicam_node, republish and face_recognition_node were all running on the Raspberry Pi but the debug tools, rostopic and rqt_image_view were running on a PC running Ubuntu. For a tutorial on running a distributed system see the [following tutorial](http://wiki.ros.org/ROS/Tutorials/MultipleMachines "Multiple Machines") 
