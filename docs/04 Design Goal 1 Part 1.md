@@ -1,9 +1,9 @@
-# Design Goals
-The robot project will be developed using a number of design goals.
+# Mission 1
+The robot project will be developed using a number of design goals to build up the system to be able to accomplish the missions.
 
 Note: In this article I'm going to explain the basic functionality for my ROS nodes not how you write ROS nodes or compile them, there is plenty of resources out there on the internet for that. To fully understand the node functionality please read the documentation for each package available in its GitHub repository.
 ## Design Goal 1
-Use Case - to be able to look around using the camera, search for faces, attempt to identify any seen and display a message for any identified. This will require:
+To be able to look around using the camera, search for faces, attempt to identify any seen and display a message for any identified. This will require:
 - Control of head/camera using RC servos
 - Access to Pi Camera
 - Facial detections and recognition
