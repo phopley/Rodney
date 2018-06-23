@@ -55,13 +55,14 @@ The following ROS Graph depicts the system for design goal 1 of the "Take a mess
 
 ![alt text](https://github.com/phopley/rodney/blob/master/docs/images/rosgraph_m1dg1.png "Mission1, Design goal 1")
 
-With the system running as shown in the graph above on a Raspberry Pi do the following on a PC running Linux:
+With the system running as shown in the graph above on a Raspberry Pi do the following on a PC running Linux having setup the master (see link on running a distributed system below):
 - Start the keyboard node, `rosrun keyboard keyboard`
-- Start an instance of `???logger`
+- Start an instance of console with  `rqt_console`
 - With the keyboard node having the focus press the 's' key.
 
-Any faces recognised will be logged to ???
-TBC Add image of logging with corresponding messages
+Any faces recognised will be logged to the console.
+
+![alt text](https://github.com/phopley/rodney/blob/master/docs/images/Screenshot%20from%202018-06-23%2018-49-47.png "Console output")
 
 Notes:
 - For a tutorial on running a distributed system see the [following tutorial](http://wiki.ros.org/ROS/Tutorials/MultipleMachines "Multiple Machines") 
