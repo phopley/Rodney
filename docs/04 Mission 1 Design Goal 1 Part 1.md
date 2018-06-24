@@ -20,7 +20,7 @@ To be able to make use of the rosserial_arduino package I will need to write cod
 
 The code for the Arduino sketch will accept a ROS message which will contain an index value, indicating which servo is to be moved, and a value for the angle that the servo should be moved to. As I'll have to recompile the Arduino library to include my user defined message the first ROS package to write is the one containing this message. This package also contains a second message which will be used by the pan and tilt node. This package is available in the GitHub Repository https://github.com/phopley/servo_msgs See the package documentation for full details.
 
-Next I needed to write the Arduino sketch that will accept the message and move the servos. This sketch is available in the GitHub Repository folder https://github.com/phopley/arduino-projects/tree/master/ServoControl4Channel See the README.md file for sketch details.
+Next I needed to write the Arduino sketch that will accept the message and move the servos. This sketch is available in a folder in this repository https://github.com/phopley/rodney/tree/master/arduino See the README.md file for sketch details.
 
 In the sketch I map the four servo outputs to the physical pins where the servos are connected. 
 ``` C++

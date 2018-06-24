@@ -5,9 +5,11 @@ This node is the main control node of the robot. Currently it is activated by us
 - 's' results in the robot moving its head to scan for known faces, if a face is recognised a welcome message is sent to the log system.
 - 'c' results in any current scan being cancelled.
 - 'x' clears the list of faces already recognised.
-## Executable
+### Executable
 rodney_node
-## Subscribed topics
+### Subscribed topics
 - keyboard/keydown of type keyboard::Key
-## Action client
+### Action client
 - face_recognition_msgs::scan_for_faces
+## Arduino Sketch
+The arduino directory contains an Arduino sketch `rodney_control.ino` which controls 4 RC servos.
