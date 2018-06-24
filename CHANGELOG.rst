@@ -2,9 +2,10 @@
 Changelog for package rodney
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Unreleased
+0.2.0 (2018-06-24)
 ------------------
-* Updates to repository have only been related to documentation
+* Moved Arduino sketch into package
+* Updates to documentation
 
 0.1.0 (2018-06-14)
 ------------------
