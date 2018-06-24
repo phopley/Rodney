@@ -67,14 +67,13 @@ Any faces recognised will be logged to the console.
 Notes:
 - For a tutorial on running a distributed system see the [following tutorial](http://wiki.ros.org/ROS/Tutorials/MultipleMachines "Multiple Machines") 
 - The package versions used to test design goal 1 here were:
-  - rodney v???
-  - face_recognition v???
-  - face_recognition_msgs v???
-  - head_control v???
-  - pan_tilt v???
-  - servo_msgs v???
-  - ?arduino code? v???
-  - ros-keyboard v???
-  - raspicam v0.2.2 is this the correct version?
-  - rosserial_python v???
-  - image_transport v???
+  - rodney 0.2.0
+  - face_recognition 0.1.1
+  - face_recognition_msgs 0.1.0
+  - head_control 0.1.0
+  - pan_tilt 0.1.0
+  - servo_msgs 0.1.0
+  - ros-keyboard 0.1.1
+  - raspicam 0.2.2
+  - rosserial_python 0.7.7
+  - image_transport 1.11.13
