@@ -30,6 +30,10 @@ In the sketch I map the four servo outputs to the physical pins where the servos
 #define SERVO_2 5
 #define SERVO_3 3
 ```
+To test this part of the system I connected two servo to the Arduino nano as shown in the following diagrams. The nano is powered through the USB connection from the Raspberry Pi
+
+![alt text](https://github.com/phopley/rodney/blob/master/docs/images/Nano%20prototpe_bb.png "prototpe_bb") ![alt text](https://github.com/phopley/rodney/blob/master/docs/images/Nano%20prototpe_schem.png "prototpe_schem")
+
 Later the pan and tilt node will allow configuration to map a servo to either pan or tilt on a particular pan/tilt device. 
 
 The final part of the pan and tilt functionality is the pan_tilt package which makes up the pan tilt node. This package is available in the GitHub Repository https://github.com/phopley/pan_tilt See the package documentation for details.
