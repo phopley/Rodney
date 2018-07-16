@@ -5,7 +5,7 @@ To accomplish this design goal we will need to
 * Access images from the Raspberry Pi Camera
 * Detect and recognize faces
 * Control the order of these actions
-
+## Pan and Tilt
 To control the head/camera we need a pan and tilt device which will require two RC servos. I expect that the project will also in the future require a second pan/tilt device for a LIDAR (Light Detection and Ranging) sensor. We therefore straight away require four PWM outputs to control the servos, not to mention any required for motors in the future. The Raspberry Pi only has one hardware PWM and although we could make use of software PWMs, I'm goind to avoid that overhead by passing control of the servos off to a second board.
 
 We could use a purpose built board like the one available from [PiBorg, the UltraBorg](https://www.piborg.org/sensors-1136/ultraborg "PiBorg, the UltraBorg"). Using this board you can connect up to four servos and four HC-SR04 ultrasonic devices to the Raspberry Pi using an I2C bus. However, since I have a number of Arduino Nano's available from a previous project, I'm going to make use of one of those.
