@@ -1,8 +1,6 @@
 # Introduction
 ## Purpose
-This document is intended as a hardware and software design document to capture the development of the robot. That said, although it will capture those things it will be written more like a blog.
-## Overview
-The Rodney Robot project is a hobbyist robotic project to design and build an autonomous house-bot. This article is the first in a series describing the project. In this part I'll introduce the concept, choose the single board computer, install ROS (Robot Operating System) and write the first part of the control software. 
+The Rodney Robot project is a hobbyist robotic project to design and build an autonomous house-bot. These document are intended as a hardware and software design document to capture the development of the robot. That said, although it will capture those things it will be written more like a blog.
 ## Background
 Back sometime in the late 1970’s early 1980’s I brought the following books: “How to build your own self-programming robot” by David L. Heiserman and “How to build a computer-controlled robot” by Tod Loofbourrow. The plan was to build my own processor board based on a Z80 processor and then move on to build the robot around this board. It never really got off the ground. All these years later with modern small boards like the Raspberry Pi and Arduino the task of getting a home robot up and working is much easier, although the expectation of what it will be capable of doing is much greater.
 
