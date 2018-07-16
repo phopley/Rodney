@@ -22,7 +22,7 @@ So to complete the pan/tilt functionality we are going to write two ROS packages
 
 We will call the first of these packages *servo_msgs* and it will define our messages. When built it will produce .h files for use by C++ code and will automatically create Python scripts. We will also recompile the Arduino library to produce .h files that will be used by our sketch.
 
-The files that make up this first package are available in the *servo_message folder*. The root of this folder contains a readme file documenting the package and two files that are required to always be present in a ROS package. These are the CmakeList.txt and the package.xml files, information about these files can be found in the tutorial on [creating ROS packages](http://wiki.ros.org/ROS/Tutorials/CreatingPackage "creating ROS packages").
+The files that make up this first package are available in the [servo_msgs repository](https://github.com/phopley/servo_msgs "servo_msgs repository"). The root of this folder contains a readme file documenting the package and two files that are required to always be present in a ROS package. These are the CmakeList.txt and the package.xml files, information about these files can be found in the tutorial on [creating ROS packages](http://wiki.ros.org/ROS/Tutorials/CreatingPackage "creating ROS packages").
 
 The msg folder within the package contains the definition files for our messages. The first of these is *servo_array.msg*
 
@@ -35,7 +35,7 @@ uint16 angle
 
 You can think of this as a C like structure. This is the message which will be sent as a ROS topic to the Arduino. The message contains two elements, __index__ indicates which of the servos is to be moved and __angle__ is the angle to move the servo to in degrees.
 
-The second message type will be sent as two topics to the pan and tilt node and is the *pan_tilt.msg*. One topic will relate to the head/camera pan tilt device and the other will be used later for the LIDAR pan tilt device.
+The second message type will be sent as two topics to the pan and tilt node and is the *pan_tilt.msg*. One topic will relate to the head/camera pan tilt device and the other will be used later for possibly the LIDAR pan tilt device.
 
 ``` Python
 int16 pan   # the angle for the pan servo
@@ -44,7 +44,7 @@ int16 tilt  # the angle for the tilt servo
 
 Here the __pan__ element is the angle in degrees for the pan servo and the __tilt__ element is the angle in degrees for the tilt servo.
 
-That completes our first simple ROS package, our second package is the *pan_tilt* package. This package is available in the *pan_tilt* folder and contains executable code which will form the *pan_tilt_node*.
+That completes our first simple ROS package, our second package is the *pan_tilt* package. This package is available in the [pan_tilt repository](https://github.com/phopley/pan_tilt "pan_tilt repository") and contains executable code which will form the *pan_tilt_node*.
 
 The root folder of this package again includes a documentation file and the CmakeList.txt and package.xml files. This package includes a number of sub folders which I'll briefly describe. The *config* folder contains the file *config.yaml*. This file will be used by the launch file (see below) to set the given parameters in the parameter server. This will allow us to configure the system without having to recompile the code.
 
@@ -62,7 +62,7 @@ servo:
     tilt_servo: 3
 ```
 
-In this config file, __index0__ gives parameters for the head pan and tilt device and __index1__ for the LIDAR pan and tilt device. The ___max__ and ___min__ allow us to restrict the travel of a servo and the ___servo__ parameters identify which servo (0-3) is attached to which pan/tilt device and in which position.
+In this config file, __index0__ gives parameters for the head pan and tilt device and __index1__ for the possible LIDAR pan and tilt device. The ___max__ and ___min__ allow us to restrict the travel of a servo and the ___servo__ parameters identify which servo (0-3) is attached to which pan/tilt device and in which position.
 
 The *cfg* folder contains the file *pan_tilt.cfg*. This file is used by the dynamic reconfiguration server so that we can adjust the trim of the servos on the fly. As you can see the file is actually a Python script.
 
