@@ -1,5 +1,5 @@
 # ROS and the Raspberry Pi
-In this document I’ll explain how I have utilised ROS on the project and describe how I have used some of the tools available in ROS to test my code. It is not a tutorial on ROS, there are plenty of tutorials available online that do a much better job than I ever could. From time to time I’ll include links to relevant tutorials on the ROS Wiki but for now, to aid a first read through of the document or the casual reader, here are some ROS terms that you may find useful.
+In the document I’ll explain how I have utilised ROS on the project and describe how I have used some of the tools available in ROS to test my code. It is not a tutorial on ROS, there are plenty of tutorials available online that do a much better job than I ever could. From time to time I’ll include links to relevant tutorials on the ROS Wiki but for now, to aid a first read through of the document or the casual reader, here are some ROS terms that you may find useful.
 * It’s a distributed system and the robot code can run on multiple machines communicating over a network
 * A __node__ is a single purpose executable
 * Nodes are organised into __packages__ which is a term used for a collection of folders and files
@@ -27,7 +27,7 @@ Other Raspberry Pi peripherals that I intend to use on the Rodney project are:
 
 The plan is to use the display for passing status information, web content to the user and also for displaying an animated robot face. The camera will be the eyes of the robot initially being used for facial recognition.
 
-The following images show the 7" display with the Raspberry Pi and camera mounted on the rear of the screen. The camera is mounted using a 3D printed bracket. The stl file for the bracket is available [here]( https://github.com/phopley/rodney/blob/master/docs/3D%20Prints/camera%20bracketV2.stl "Camera bracket")
+The following images show the 7" display with the Raspberry Pi and camera mounted on the rear of the screen. The camera is mounted using a 3D printed bracket. The stl file for the bracket is available [here]( https://github.com/phopley/rodney/blob/master/hardware/3D%20Prints/camera%20bracketV2.stl "Camera bracket")
 
 <img src="https://github.com/phopley/rodney/blob/master/docs/images/IMG_0380.JPG" width="427" height="284" title="7inch screen"> <img src="https://github.com/phopley/rodney/blob/master/docs/images/IMG_0381.JPG" width="427" height="284" title="7inch screen and camera">
 
