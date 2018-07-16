@@ -376,7 +376,13 @@ When we construct Rodney we will need to give some thought about power. For now 
 For now to test the software I'm going to build the circuit on a bread board and only connecting the servos for the head pan and tilt device.
 <img src="https://github.com/phopley/rodney/blob/master/docs/images/Optimized-IMG_0387.JPG" title="Test Circuit bread board">
 ### Running the code
-Now we are ready to run our code. With the Arduino connected to a USB port use the launch file to start the nodes with the following commands. If no master node is running in a system the launch command will also launch the master node, roscore.
+Now we are ready to run our code.
+
+The package versions used in this test were:
+* pan_tilt V0.1.2
+* servo_msgs V0.1.1
+
+With the Arduino connected to a USB port use the launch file to start the nodes with the following commands. If no master node is running in a system the launch command will also launch the master node, roscore.
 ```
 $ cd ~/rodney_ws/
 $ source devel/setup.bash
