@@ -1,5 +1,5 @@
 # rodney
-ROS package for the main control node for Rodney robot
+ROS package for the main control node for Rodney robot. Full documentation on the Rodney project is [available here](https://phopley.github.io/rodney "Rodney project documentation ")
 ## Description
 This node is the main control node of the robot. Currently it is activated by use of a keyboard with the following key commands:
 - 's' results in the robot moving its head to scan for known faces, if a face is recognised a welcome message is sent to the log system.
