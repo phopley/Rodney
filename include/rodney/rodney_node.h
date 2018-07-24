@@ -2,15 +2,8 @@
 #define RODNEY_NODE_H_
 
 #include <ros/ros.h>
-#include <actionlib/client/simple_action_client.h>
-#include <face_recognition_msgs/scan_for_facesAction.h>
 #include <keyboard/Key.h>
-
-struct FaceSeen
-{
-    unsigned int id;
-    std::string name;
-};
+#include <std_msgs/String.h>
 
 class RodneyNode
 {
@@ -19,17 +12,15 @@ public:
     
 private:
     ros::NodeHandle nh_;
-    ros::Subscriber key_sub_;
-    actionlib::SimpleActionClient<face_recognition_msgs::scan_for_facesAction> ac_;    
-    std::list<FaceSeen> seen_list_; // List of faces seen recently
-    bool scanning_ = false;
-    
-    bool haveWeSeenThisPerson(FaceSeen face_detected);
+    ros::Publisher mission_pub_;        // Topic to start a mission or small task
+    ros::Publisher cancel_pub_;         // Topic to cancel a mission
+    ros::Subscriber key_sub_;           // Topic for keyboard entry
+    ros::Subscriber mission_sub_;       // Topic for mission complete indication   
+            
+    bool mission_running_;        
+                
     void keyboardCallBack(const keyboard::Key::ConstPtr& msg);
-    void doneCB(const actionlib::SimpleClientGoalState& state,
-                const face_recognition_msgs::scan_for_facesResultConstPtr& result);
-    void activeCB();
-    void feedbackCB(const face_recognition_msgs::scan_for_facesFeedbackConstPtr& feedback);
+    void completeCallBack(const std_msgs::String::ConstPtr& msg);    
 };
 
 #endif // RODNEY_NODE_H_

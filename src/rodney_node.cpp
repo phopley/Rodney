@@ -1,41 +1,18 @@
 #include <rodney/rodney_node.h>
-#include <algorithm>
-#include <actionlib/client/terminal_state.h>
+#include <std_msgs/Empty.h>
 
 // Constructor 
-RodneyNode::RodneyNode(ros::NodeHandle n) : ac_("head_control_node", true)
+RodneyNode::RodneyNode(ros::NodeHandle n)
 {
     nh_ = n;
     
-    // Subscribe to receive keyboard input
+    // Subscribe to receive keyboard input and mission complete
     key_sub_ = nh_.subscribe("keyboard/keydown", 100, &RodneyNode::keyboardCallBack, this);
+    mission_sub_ = nh_.subscribe("/missions/mission_complete", 5, &RodneyNode::completeCallBack, this);
 
-    ROS_INFO("RodneyNode: Waiting for action server to start");
-
-    // wait for the action server to start
-    ac_.waitForServer(); //will wait for infinite time
-
-    ROS_INFO("RodneyNode: Action server started"); 
-}
-//---------------------------------------------------------------------------
-
-bool RodneyNode::haveWeSeenThisPerson(FaceSeen face_detected)
-{
-    bool ret_val = true;
-
-    // Is this person already in our list of people seen
-    std::list<FaceSeen>::iterator it = std::find_if(seen_list_.begin(), seen_list_.end(),
-    boost::bind(&FaceSeen::id, _1) == face_detected.id);
-
-    if(it == seen_list_.end())
-    {
-        // Not seen before, add to seen list
-        seen_list_.insert(it, face_detected);
-
-        ret_val = false;
-    }
-
-    return ret_val;
+    // Advertise the topics we publish
+    mission_pub_ = nh_.advertise<std_msgs::String>("/missions/mission_request", 5);
+    cancel_pub_ = nh_.advertise<std_msgs::Empty>("/missions/mission_cancel", 5);
 }
 //---------------------------------------------------------------------------
 
@@ -45,35 +22,23 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
     if((msg->modifiers & ~keyboard::Key::MODIFIER_NUM) == 0)
     {
         // Lower case
-        if(msg->code == keyboard::Key::KEY_s)
+        if(msg->code == keyboard::Key::KEY_2)
         {            
-            // Lower case 's', start a complete scan looking for faces
-            // Send a goal to the action
-            face_recognition_msgs::scan_for_facesGoal goal;
-        
-            // Need boost::bind to pass in the 'this' pointer
-            ac_.sendGoal(goal,
-                boost::bind(&RodneyNode::doneCB, this, _1, _2),
-                boost::bind(&RodneyNode::activeCB, this),                
-                boost::bind(&RodneyNode::feedbackCB, this, _1));
+            // '2', start a complete scan looking for faces (mission 2)
+            std_msgs::String mission_msg;
+            mission_msg.data = "M2";
+            mission_pub_.publish(mission_msg);
                     
-            scanning_ = true;        
+            mission_running_ = true;        
         }
         else if(msg->code == keyboard::Key::KEY_c)
         {          
-            // Lower case 'c', cancel scan if one is running
-            if(scanning_ == true)
+            // Lower case 'c', cancel missions if one is running
+            if(mission_running_ == true)
             {
-                ac_.cancelGoal();
+                std_msgs::Empty empty_msg;
+                cancel_pub_.publish(empty_msg);
             }        
-        }
-        else if(msg->code == keyboard::Key::KEY_x)
-        {
-            // Lower case 'x', clear the stores names and id's seen if not running
-            if(scanning_ == false)
-            {                
-                seen_list_.clear();
-            }                
         }
         else
         {
@@ -83,58 +48,9 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
 }
 //---------------------------------------------------------------------------
 
-// Called once when the goal completes
-void RodneyNode::doneCB(const actionlib::SimpleClientGoalState& state,
-                        const face_recognition_msgs::scan_for_facesResultConstPtr& result)                 
+void RodneyNode::completeCallBack(const std_msgs::String::ConstPtr& msg)
 {
-    ROS_DEBUG("RodneyNode: Finished in state [%s]", state.toString().c_str());
-    scanning_ = false;    
-
-    if(result->detected.ids_detected.size() > 0)
-    {  
-        for(unsigned long x = 0; x < result->detected.ids_detected.size(); x++)
-        {
-            FaceSeen face_detected;
-            face_detected.id = result->detected.ids_detected[x];
-            face_detected.name = result->detected.names_detected[x];
-
-            if(haveWeSeenThisPerson(face_detected) == false)
-            {
-                // Log we have seen you now!
-                ROS_INFO("RodneyNode: Hello %s, how are you?", result->detected.names_detected[x].c_str());
-            }
-        }            
-    }
-}
-//---------------------------------------------------------------------------
-
-// Called once when the goal becomes active
-void RodneyNode::activeCB()
-{
-    ROS_DEBUG("RodneyNode: Goal just went active");
-}
-//---------------------------------------------------------------------------
-
-// Called every time feedback is received for the goal
-void RodneyNode::feedbackCB(const face_recognition_msgs::scan_for_facesFeedbackConstPtr& feedback)
-{
-    ROS_DEBUG("Got Feedback percentage complete %f", feedback->progress);    
-    
-    if(feedback->detected.ids_detected.size() > 0)
-    {  
-        for(unsigned long x = 0; x < feedback->detected.ids_detected.size(); x++)
-        {
-            FaceSeen face_detected;
-            face_detected.id = feedback->detected.ids_detected[x];
-            face_detected.name = feedback->detected.names_detected[x];             
-
-            if(haveWeSeenThisPerson(face_detected) == false)
-            {
-                // Log we have seen you now!
-                ROS_INFO("RodneyNode: Hello %s, how are you?", feedback->detected.names_detected[x].c_str());
-            }
-        }          
-    }
+    mission_running_ = false;
 }
 //---------------------------------------------------------------------------
 
