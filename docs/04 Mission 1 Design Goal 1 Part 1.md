@@ -56,7 +56,7 @@ servo:
     pan_servo: 2
     tilt_servo: 3
 ```
-In this config file, __index0__ gives parameters for the head pan and tilt device and __index1__ for the possible LIDAR pan and tilt device. The ___max__ and ___min__ allow us to restrict the travel of a servo and the ___servo__ parameters identify which servo (0-3) is attached to which pan/tilt device and in which position.
+In this config file, __index0__ gives parameters for the head pan and tilt device and __index1__ for the possible 2nd pan and tilt device. The ___max__ and ___min__ allow us to restrict the travel of a servo and the ___servo__ parameters identify which servo (0-3) is attached to which pan/tilt device and in which position.
 
 The *cfg* folder contains the file *pan_tilt.cfg*. This file is used by the dynamic reconfiguration server so that we can adjust the trim of the servos on the fly. As you can see the file is actually a Python script.
 ``` Python
