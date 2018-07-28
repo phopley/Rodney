@@ -159,7 +159,7 @@ PanTiltNode::PanTiltNode()
     pan_tilt_sub_[0] = n_.subscribe("pan_tilt_node/index0_position", 10, &PanTiltNode::panTilt0CB, this);
     pan_tilt_sub_[1] = n_.subscribe("pan_tilt_node/index1_position", 10, &PanTiltNode::panTilt1CB, this);
 
-    servo_array_pub_ = n_.advertise<servo_msgs::servo_array>("servo", 10);
+    servo_array_pub_ = n_.advertise<servo_msgs::servo_array>("servo", 10, true);
 }
 ```
 The calls to __param__ will read the parameter from the server if it is available, otherwise the default value will be used.
@@ -329,6 +329,10 @@ void setup(){
   servo1.attach(SERVO_1);
   servo2.attach(SERVO_2);
   servo3.attach(SERVO_3);
+  
+  // Defaults
+  servo0.write(90);
+  servo1.write(40);
 }
 
 void loop(){
