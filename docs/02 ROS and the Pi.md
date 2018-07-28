@@ -9,7 +9,7 @@ In the document I’ll explain how I have utilised ROS on the project and descri
 * Standard messages are available from ROS and you can also create user defined messages
 * Nodes can also communicate with each other using __Services__, a server/client blocking protocol
 * Nodes can also communicate using __Actions__, a non-blocking goal orientated task protocol
-* There is a master node, roscore, which all the other nodes register with. Only one master nodes exist, even when using a distributed system
+* There is a master node, roscore, which all the other nodes register with. Only one master node exists, even when using a distributed system
 * Uses a catkin build system
 * Individual nodes can be run using the rosrun command or you can use the launch tool to start many nodes from the same command terminal
 * It includes a __parameter server__. Nodes can store and retrieve parameters during runtime
