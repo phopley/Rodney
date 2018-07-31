@@ -383,7 +383,7 @@ For now to test the software I'm going to build the circuit on a bread board and
 Now we are ready to run our code.
 
 The package versions used in this test were:
-* pan_tilt V0.1.3 [pan_tilt repository](https://github.com/phopley/pan_tilt "pan_tilt repository")
+* pan_tilt V0.1.4 [pan_tilt repository](https://github.com/phopley/pan_tilt "pan_tilt repository")
 * servo_msgs V0.1.2 [servo_msgs repository](https://github.com/phopley/servo_msgs "servo_msgs repository")
 
 With the Arduino connected to a USB port use the launch file to start the nodes with the following commands. If no master node is running in a system the launch command will also launch the master node, roscore.
