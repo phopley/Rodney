@@ -14,6 +14,8 @@
   <node pkg="face_recognition" type="face_recognition_node.py" name="face_recognition_node" output="screen"/>
   <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen" args="/dev/ttyUSB0"/>
   <node pkg="head_control" type="head_control_node" name="head_control_node" output="screen"/>
-  <node pkg="rodney_missions" type="rodney_missions_node.py" name="rodney_missions_node" output="screen"/>
+  <node pkg="homer_robot_face" type="RobotFace" name="RobotFace" output="screen"/>
+  <node pkg="speech" type="speech_node" name="speech_node" output="screen"/>
+  <node pkg="rodney_missions" type="rodney_missions_node.py" name="rodney_missions" output="screen"/>
   <node pkg="rodney" type="rodney_node" name="rodney_node" output="screen" />
 </launch>

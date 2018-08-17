@@ -5,6 +5,7 @@ Changelog for package rodney
 Out standing changes
 ------------------
 * Moved the scaning for faces action client to rondey_missions package
+* Added use of speech and facial expression
 
 0.2.0 (2018-06-24)
 ------------------

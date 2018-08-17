@@ -70,13 +70,12 @@ void setup(){
 
   nh.initNode();
   nh.subscribe(sub);
-  
-  
+    
   servo0.attach(SERVO_0); //attach it to the pin
   servo1.attach(SERVO_1);
   servo2.attach(SERVO_2);
   servo3.attach(SERVO_3);
- 
+
   // Defaults
   servo0.write(90);
   servo1.write(40);

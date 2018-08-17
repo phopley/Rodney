@@ -8,5 +8,6 @@ ln -s ~/git/head_control ~/rodney_ws/src
 ln -s ~/git/pan_tilt ~/rodney_ws/src
 ln -s ~/git/servo_msgs ~/rodney_ws/src
 ln -s ~/git/rodney_missions ~/rodney_ws/src
+ln -s ~/git/speech ~/rodney_ws/src
 ln -s ~/git/ros-keyboard ~/rodney_ws/src
 
