@@ -376,6 +376,35 @@
     <child link="head_tilt_arm"/>
     <origin rpy="0 0 0" xyz="0.0 -0.01 0.035"/>
   </joint>           
-          
+      
+  <link name="display_bracket">
+    <visual>      
+      <geometry>        
+        <mesh filename="package://rodney/meshes/displayBracket.dae"/>
+      </geometry>            
+    </visual>
+  </link>    
+
+  <joint name="head_tilt_arm_to_display_bracket" type="fixed">
+    <parent link="head_tilt_arm"/>
+    <child link="display_bracket"/>
+    <origin rpy="0 0 0" xyz="0.059 0.008 0.0"/>
+  </joint> 
+
+  <link name="display">
+    <visual>      
+      <geometry>        
+        <box size="0.005 0.192 0.110"/>
+      </geometry>      
+      <material name="black"/>           
+    </visual>
+  </link>    
+
+  <joint name="display_bracket_to_display" type="fixed">
+    <parent link="display_bracket"/>
+    <child link="display"/>
+    <origin rpy="0 0 0" xyz="0.0025 0.0 0.06"/>
+  </joint> 
+              
 </robot>
  
