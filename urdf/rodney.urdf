@@ -1,0 +1,349 @@
+<?xml version="1.0"?>
+<robot name="Rodney">
+
+  <material name="blue">
+    <color rgba="0 0 0.8 1"/>
+  </material>
+  
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+  
+  <material name="black">
+    <color rgba="0 0 0 1"/>
+  </material>  
+  
+  <material name="silver">
+    <color rgba="0.75 0.75 0.75 1"/>
+  </material>   
+  
+  <material name="bronze">
+    <color rgba="0.8 0.498 0.196 1"/>
+  </material>  
+  
+  <link name="base_link">
+    <visual>      
+      <geometry>        
+        <mesh filename="package://rodney/meshes/rodneyBase.dae"/>
+      </geometry>      
+    </visual>
+  </link>
+
+  <!-- Motors and wheels -->
+  
+  <!-- Front left -->
+  
+  <link name="front_left_motor_bracket">
+    <visual>
+      <geometry>
+        <box size="0.042 0.049 0.002"/>
+      </geometry>      
+      <material name="bronze"/>
+    </visual>
+  </link>
+
+  <joint name="base_to_fl_motor_brk" type="fixed">
+    <parent link="base_link"/>
+    <child link="front_left_motor_bracket"/>
+    <origin rpy="1.58 0 0" xyz="0.075 0.091 -0.0245"/>
+  </joint>
+        
+  <link name="front_left_motor">
+    <visual>
+      <geometry>
+        <cylinder length="0.056" radius="0.0185"/>
+      </geometry>      
+      <material name="silver"/>
+    </visual>
+  </link>
+  
+  <joint name="fl_brk_to_fl_motor" type="fixed">
+    <parent link="front_left_motor_bracket"/>
+    <child link="front_left_motor"/>
+    <origin rpy="0 0 0" xyz="0.0 -0.0055 0.028"/>
+  </joint>
+   
+  <link name="front_left_wheel">
+    <visual>
+      <geometry>
+        <cylinder length="0.050" radius="0.053"/>
+      </geometry>      
+      <material name="black"/>
+    </visual>
+  </link>
+  
+  <joint name="fl_brk_to_wheel" type="continuous">
+    <axis xyz="0 0 1"/>
+    <parent link="front_left_motor_bracket"/>
+    <child link="front_left_wheel"/>
+    <origin rpy="0 0 0" xyz="0.0 -0.0055 -0.025"/>
+  </joint>
+  
+  <!-- Front right -->
+  
+  <link name="front_right_motor_bracket">
+    <visual>
+      <geometry>
+        <box size="0.042 0.049 0.002"/>
+      </geometry>      
+      <material name="bronze"/>
+    </visual>
+  </link>
+
+  <joint name="base_to_fr_motor_brk" type="fixed">
+    <parent link="base_link"/>
+    <child link="front_right_motor_bracket"/>
+    <origin rpy="1.58 0 0" xyz="0.075 -0.091 -0.0245"/>
+  </joint>
+        
+  <link name="front_right_motor">
+    <visual>
+      <geometry>
+        <cylinder length="0.056" radius="0.0185"/>
+      </geometry>      
+      <material name="silver"/>
+    </visual>
+  </link>
+  
+  <joint name="fr_brk_to_fr_motor" type="fixed">
+    <parent link="front_right_motor_bracket"/>
+    <child link="front_right_motor"/>
+    <origin rpy="0 0 0" xyz="0.0 -0.0055 -0.028"/>
+  </joint>
+   
+  <link name="front_right_wheel">
+    <visual>
+      <geometry>
+        <cylinder length="0.050" radius="0.053"/>
+      </geometry>      
+      <material name="black"/>
+    </visual>
+  </link>
+  
+  <joint name="fr_brk_to_wheel" type="continuous">
+    <axis xyz="0 0 1"/>
+    <parent link="front_right_motor_bracket"/>
+    <child link="front_right_wheel"/>
+    <origin rpy="0 0 0" xyz="0.0 -0.0055 0.025"/>
+  </joint>
+
+  <!-- Rear left -->
+  
+  <link name="rear_left_motor_bracket">
+    <visual>
+      <geometry>
+        <box size="0.042 0.049 0.002"/>
+      </geometry>      
+      <material name="bronze"/>
+    </visual>
+  </link>
+
+  <joint name="base_to_rl_motor_brk" type="fixed">
+    <parent link="base_link"/>
+    <child link="rear_left_motor_bracket"/>
+    <origin rpy="1.58 0 0" xyz="-0.075 0.091 -0.0245"/>
+  </joint>
+      
+  <link name="rear_left_motor">
+    <visual>
+      <geometry>
+        <cylinder length="0.056" radius="0.0185"/>
+      </geometry>      
+      <material name="silver"/>
+    </visual>
+  </link>
+  
+  <joint name="rl_brk_to_rl_motor" type="fixed">
+    <parent link="rear_left_motor_bracket"/>
+    <child link="rear_left_motor"/>
+    <origin rpy="0 0 0" xyz="0.0 -0.0055 0.028"/>
+  </joint>
+   
+  <link name="rear_left_wheel">
+    <visual>
+      <geometry>
+        <cylinder length="0.050" radius="0.053"/>
+      </geometry>      
+      <material name="black"/>
+    </visual>
+  </link>
+  
+  <joint name="rl_brk_to_wheel" type="continuous">
+    <axis xyz="0 0 1"/>
+    <parent link="rear_left_motor_bracket"/>
+    <child link="rear_left_wheel"/>
+    <origin rpy="0 0 0" xyz="0.0 -0.0055 -0.025"/>
+  </joint>
+
+  <!-- Rear right -->
+  
+  <link name="rear_right_motor_bracket">
+    <visual>
+      <geometry>
+        <box size="0.042 0.049 0.002"/>
+      </geometry>      
+      <material name="bronze"/>
+    </visual>
+  </link>
+
+  <joint name="base_to_rr_motor_brk" type="fixed">
+    <parent link="base_link"/>
+    <child link="rear_right_motor_bracket"/>
+    <origin rpy="1.58 0 0" xyz="-0.075 -0.091 -0.0245"/>
+  </joint>
+        
+  <link name="rear_right_motor">
+    <visual>
+      <geometry>
+        <cylinder length="0.056" radius="0.0185"/>
+      </geometry>      
+      <material name="silver"/>
+    </visual>
+  </link>
+  
+  <joint name="rr_brk_to_rr_motor" type="fixed">
+    <parent link="rear_right_motor_bracket"/>
+    <child link="rear_right_motor"/>
+    <origin rpy="0 0 0" xyz="0.0 -0.0055 -0.028"/>
+  </joint>
+   
+  <link name="rear_right_wheel">
+    <visual>
+      <geometry>
+        <cylinder length="0.050" radius="0.053"/>
+      </geometry>      
+      <material name="black"/>
+    </visual>
+  </link>
+  
+  <joint name="rr_brk_to_wheel" type="continuous">
+    <axis xyz="0 0 1"/>
+    <parent link="rear_right_motor_bracket"/>
+    <child link="rear_right_wheel"/>
+    <origin rpy="0 0 0" xyz="0.0 -0.0055 0.025"/>
+  </joint>
+       
+  <!-- Rear platform -->
+  
+  <link name="post_1">
+    <visual>
+      <geometry>
+        <cylinder length="0.05" radius="0.005"/>
+      </geometry>      
+      <material name="blue"/>
+    </visual>
+  </link>
+  
+  <joint name="base_to_post_1" type="fixed">
+    <parent link="base_link"/>
+    <child link="post_1"/>
+    <origin xyz="-0.06 0.08 0.033"/>
+  </joint>
+ 
+  <link name="post_2">
+    <visual>
+      <geometry>
+        <cylinder length="0.05" radius="0.005"/>
+      </geometry>      
+      <material name="blue"/>
+    </visual>
+  </link>
+  
+  <joint name="base_to_post_2" type="fixed">
+    <parent link="base_link"/>
+    <child link="post_2"/>
+    <origin xyz="-0.14 0.08 0.033"/>
+  </joint>
+  
+  <link name="post_3">
+    <visual>
+      <geometry>
+        <cylinder length="0.05" radius="0.005"/>
+      </geometry>      
+      <material name="blue"/>
+    </visual>
+  </link>
+  
+  <joint name="base_to_post_3" type="fixed">
+    <parent link="base_link"/>
+    <child link="post_3"/>
+    <origin xyz="-0.06 -0.08 0.033"/>
+  </joint>    
+ 
+  <link name="post_4">
+    <visual>
+      <geometry>
+        <cylinder length="0.05" radius="0.005"/>
+      </geometry>      
+      <material name="blue"/>
+    </visual>
+  </link>
+  
+  <joint name="base_to_post_4" type="fixed">
+    <parent link="base_link"/>
+    <child link="post_4"/>
+    <origin xyz="-0.14 -0.08 0.033"/>
+  </joint>
+
+  <link name="rear_platform">
+    <visual>      
+      <geometry>        
+        <mesh filename="package://rodney/meshes/smallRearPlatform.dae"/>
+      </geometry>            
+    </visual>
+  </link>  
+
+  <joint name="post_1_to_rear_platform" type="fixed">
+    <parent link="post_1"/>
+    <child link="rear_platform"/>
+    <origin rpy="0 0 1.58" xyz="0.01 -0.08 0.025"/>
+  </joint>
+ 
+  <!-- Neck and head -->
+   
+  <link name="neck">
+    <visual>
+      <geometry>
+        <cylinder length="0.30" radius="0.011"/>
+      </geometry>      
+      <material name="white"/>
+    </visual>
+  </link>
+  
+  <joint name="rear_platform_to_neck" type="fixed">
+    <parent link="rear_platform"/>
+    <child link="neck"/>
+    <origin xyz="0 0.08 0.1"/>
+  </joint>  
+  
+  <link name="head_fixing">
+    <visual>      
+      <geometry>        
+        <mesh filename="package://rodney/meshes/headFixing.dae"/>
+      </geometry>            
+    </visual>
+  </link>  
+
+  <joint name="neck_to_head_fixing" type="fixed">
+    <parent link="neck"/>
+    <child link="head_fixing"/>
+    <origin rpy="0 0 1.58" xyz="0.0 0.0 0.112"/>
+  </joint>
+  
+  <link name="head_pan_servo_block">
+    <visual>
+      <geometry>
+        <box size="0.057 0.032 0.074"/>
+      </geometry>      
+      <material name="black"/>
+    </visual>
+  </link>      
+
+  <joint name="head_fixing_to_servo_block" type="fixed">
+    <parent link="head_fixing"/>
+    <child link="head_pan_servo_block"/>
+    <origin rpy="0 0 0" xyz="-0.010 0.0 0.084"/>
+  </joint>
+          
+</robot>
+ 
