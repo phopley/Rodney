@@ -344,6 +344,38 @@
     <child link="head_pan_servo_block"/>
     <origin rpy="0 0 0" xyz="-0.010 0.0 0.084"/>
   </joint>
+
+  <link name="head_pan_bracket">
+    <visual>      
+      <geometry>        
+        <mesh filename="package://rodney/meshes/headPanBracket.dae"/>
+      </geometry>            
+    </visual>
+  </link>  
+  
+  <joint name="servo_block_to_head_pan_bracket" type="revolute">
+    <axis xyz="0 0 1"/>
+    <limit effort="1000.0" lower="-1.571" upper="1.571" velocity="0.5"/>
+    <parent link="head_pan_servo_block"/>
+    <child link="head_pan_bracket"/>
+    <origin rpy="0 0 3.142" xyz="0.01 0.0 0.037"/>
+  </joint> 
+
+  <link name="head_tilt_arm">
+    <visual>      
+      <geometry>        
+        <mesh filename="package://rodney/meshes/headTiltArm.dae"/>
+      </geometry>            
+    </visual>
+  </link>    
+
+  <joint name="head_pan_bracket_to_head_tilt_arm" type="revolute">
+    <axis xyz="0 1 0"/>
+    <limit effort="1000.0" lower="-1.572" upper="0.3" velocity="0.5"/>
+    <parent link="head_pan_bracket"/>
+    <child link="head_tilt_arm"/>
+    <origin rpy="0 0 0" xyz="0.0 -0.01 0.035"/>
+  </joint>           
           
 </robot>
  
