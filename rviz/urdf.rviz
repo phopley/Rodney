@@ -65,6 +65,56 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        front_left_motor:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_left_motor_bracket:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_left_wheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_right_motor:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_right_motor_bracket:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_right_wheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        head_fixing:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        head_pan_bracket:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        head_pan_servo_block:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        neck:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
         post_1:
           Alpha: 1
           Show Axes: false
@@ -85,6 +135,41 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        rear_left_motor:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rear_left_motor_bracket:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rear_left_wheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rear_platform:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rear_right_motor:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rear_right_motor_bracket:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        rear_right_wheel:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
       Name: RobotModel
       Robot Description: robot_description
       TF Prefix: ""
@@ -92,19 +177,96 @@ Visualization Manager:
       Value: true
       Visual Enabled: true
     - Class: rviz/TF
-      Enabled: false
+      Enabled: true
       Frame Timeout: 15
       Frames:
         All Enabled: true
+        base_link:
+          Value: true
+        front_left_motor:
+          Value: true
+        front_left_motor_bracket:
+          Value: true
+        front_left_wheel:
+          Value: true
+        front_right_motor:
+          Value: true
+        front_right_motor_bracket:
+          Value: true
+        front_right_wheel:
+          Value: true
+        head_fixing:
+          Value: true
+        head_pan_bracket:
+          Value: true
+        head_pan_servo_block:
+          Value: true
+        neck:
+          Value: true
+        post_1:
+          Value: true
+        post_2:
+          Value: true
+        post_3:
+          Value: true
+        post_4:
+          Value: true
+        rear_left_motor:
+          Value: true
+        rear_left_motor_bracket:
+          Value: true
+        rear_left_wheel:
+          Value: true
+        rear_platform:
+          Value: true
+        rear_right_motor:
+          Value: true
+        rear_right_motor_bracket:
+          Value: true
+        rear_right_wheel:
+          Value: true
       Marker Scale: 0.5
       Name: TF
-      Show Arrows: true
+      Show Arrows: false
       Show Axes: true
-      Show Names: true
+      Show Names: false
       Tree:
-        {}
+        base_link:
+          front_left_motor_bracket:
+            front_left_motor:
+              {}
+            front_left_wheel:
+              {}
+          front_right_motor_bracket:
+            front_right_motor:
+              {}
+            front_right_wheel:
+              {}
+          post_1:
+            rear_platform:
+              neck:
+                head_fixing:
+                  head_pan_servo_block:
+                    head_pan_bracket:
+                      {}
+          post_2:
+            {}
+          post_3:
+            {}
+          post_4:
+            {}
+          rear_left_motor_bracket:
+            rear_left_motor:
+              {}
+            rear_left_wheel:
+              {}
+          rear_right_motor_bracket:
+            rear_right_motor:
+              {}
+            rear_right_wheel:
+              {}
       Update Interval: 0
-      Value: false
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -130,25 +292,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 0.580320835
+      Distance: 1.28290439
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: -0.142493799
+        Y: 0.0316053033
+        Z: 0.118412942
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.484798193
+      Pitch: 0.589798093
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.753565192
+      Yaw: 0.778565168
     Saved: ~
 Window Geometry:
   Displays:
