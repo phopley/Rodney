@@ -526,7 +526,7 @@
     <child link="neck"/>
     <origin xyz="-0.070 -0.080 -0.050"/>
   </joint>  
-<!-- HERE mass values need checking but above the collision size, origin and the inertia values are correct for the given mass -->  
+  
   <link name="head_fixing">
     <visual>      
       <geometry>        
@@ -601,8 +601,7 @@
     <limit effort="1000.0" lower="-1.571" upper="1.571" velocity="0.5"/>
     <parent link="head_pan_servo_block"/>
     <child link="head_pan_bracket"/>
-    <origin xyz="0.0 0.0 0.025"/>
-    <!--<origin rpy="0 0 3.142" xyz="0.01 0.0 0.037"/>-->
+    <origin xyz="0.0 0.0 0.025"/>    
   </joint> 
 
   <link name="head_tilt_arm">
@@ -680,6 +679,6 @@
     <child link="display"/>
     <origin xyz="0.003 0.008 0.060"/>
   </joint> 
-                
+              
 </robot>
  
