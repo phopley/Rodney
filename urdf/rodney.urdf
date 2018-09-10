@@ -726,7 +726,7 @@
   <transmission name="head_pan_tran">
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="servo_block_to_head_pan_bracket">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="pan">
       <hardwareInterface>EffortJointInterface</hardwareInterface>
@@ -737,7 +737,7 @@
   <transmission name="head_tilt_tran">
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="head_pan_bracket_to_head_tilt_arm">
-      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
     </joint>
     <actuator name="tilt">
       <hardwareInterface>EffortJointInterface</hardwareInterface>
