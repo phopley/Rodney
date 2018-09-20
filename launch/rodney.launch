@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <launch>
 
+  <rosparam command="load" file="$(find rodney)/config/config.yaml" />
   <rosparam command="load" file="$(find pan_tilt)/config/config.yaml" />
   <rosparam command="load" file="$(find face_recognition)/config/config.yaml" />
   <rosparam command="load" file="$(find head_control)/config/config.yaml" />
