@@ -21,6 +21,7 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     
     camera_x_index_ = 2;
     camera_y_index_ = 3;
+    default_camera_pos_select_ = 1;
     
     max_linear_speed_ = 3;
     max_angular_speed_ = 3;
@@ -33,19 +34,25 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     // Obtain any configuration values from the parameter server. If they don't exist use the defaults above
     nh_.param("/controller/axes/linear_speed_index", linear_speed_index_, linear_speed_index_);
     nh_.param("/controller/axes/angular_speed_index", angular_speed_index_, angular_speed_index_);
+    nh_.param("/controller/axes/camera_x_index_", camera_x_index_, camera_x_index_);
+    nh_.param("/controller/axes/camera_y_index_", camera_y_index_, camera_y_index_);
     nh_.param("/controller/buttons/manual_mode_select", manual_mode_select_, manual_mode_select_);
+    nh_.param("/controller/buttons/default_camera_pos_select", default_camera_pos_select_, default_camera_pos_select_);
     nh_.param("/controller/dead_zone", dead_zone_, dead_zone_);
     nh_.param("/teleop/max_linear_speed", max_linear_speed_, max_linear_speed_);
     nh_.param("/teleop/max_angular_speed", max_angular_speed_, max_angular_speed_);
     nh_.param("/motor/ramp/linear", ramp_for_linear_, ramp_for_linear_);
-    nh_.param("/motor/ramp/angular", ramp_for_angular_, ramp_for_angular_);
-    nh_.param("/motor/ramp/camera_x_index_", camera_x_index_, camera_x_index_);
-    nh_.param("/motor/ramp/camera_y_index_", camera_y_index_, camera_y_index_);    
+    nh_.param("/motor/ramp/angular", ramp_for_angular_, ramp_for_angular_);    
      
     // Subscribe to receive keyboard input, joystick input and mission complete
     key_sub_ = nh_.subscribe("keyboard/keydown", 5, &RodneyNode::keyboardCallBack, this);
     joy_sub_ = nh_.subscribe("joy", 1, &RodneyNode::joystickCallback, this);
     mission_sub_ = nh_.subscribe("/missions/mission_complete", 5, &RodneyNode::completeCallBack, this);
+    
+    // The cmd_vel topic below is the command velocity message to the motor driver.
+    // This can be created from either keyboard or game pad input when in manual mode or from the thi subscribed
+    // topic when in autonomous mode.
+    demmand_sub_ = nh_.subscribe("demand_vel", 5, &RodneyNode::motorDemandCallBack, this);
 
     // Advertise the topics we publish
     face_status_pub_ = nh_.advertise<std_msgs::String>("/robot_face/expected_input", 5);
@@ -64,7 +71,7 @@ void RodneyNode::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
     joystick_x_axes = msg->axes[angular_speed_index_];
     joystick_y_axes = msg->axes[linear_speed_index_];
         
-    // Check dead zones    
+    // Check dead zone values   
     if(abs(joystick_x_axes) < dead_zone_)
     {
         joystick_x_axes = 0;
@@ -75,6 +82,7 @@ void RodneyNode::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
         joystick_y_axes = 0;
     }    
     
+    // Check for manual movement
     if(joystick_y_axes != 0)
     {      
         joystick_linear_speed_ = -(joystick_y_axes*(max_linear_speed_/(float)MAX_AXES_VALUE_));
@@ -96,41 +104,56 @@ void RodneyNode::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
     // Now check the joystick/game pad for manual camera movement               
     joystick_x_axes = msg->axes[camera_x_index_];
     joystick_y_axes = msg->axes[camera_y_index_];
-    if((joystick_x_axes != 0) && (joystick_y_axes != 0) && (manual_locomotion_mode_ == true))
+    
+    // Check dead zone values   
+    if(abs(joystick_x_axes) < dead_zone_)
     {
-        std_msgs::String mission_msg;   
-        mission_msg.data = "J3^";
-        
-        if(joystick_y_axes == 0)
-        {
-            mission_msg.data += "-^";
-        }
-        else if (joystick_y_axes > 0)
-        {
-            mission_msg.data += "u^";
-        }
-        else
-        {
-            mission_msg.data += "d^";        
-        }
-        
-        if(joystick_x_axes == 0)
-        {
-            mission_msg.data += "-";
-        }
-        else if (joystick_x_axes > 0)
-        {
-            mission_msg.data += "r";
-        }
-        else
-        {
-            mission_msg.data += "l";        
-        }
-        
-        mission_pub_.publish(mission_msg);
+        joystick_x_axes = 0;
     }
     
-    // Button 'A' on X-Box 360 controller selects manual locomotion mode
+    if(abs(joystick_y_axes) < dead_zone_)
+    {
+        joystick_y_axes = 0;
+    }  
+    
+    if(manual_locomotion_mode_ == true)
+    {
+        if((joystick_x_axes != 0) || (joystick_y_axes != 0))
+        {
+            std_msgs::String mission_msg;   
+            mission_msg.data = "J3^";
+        
+            if(joystick_y_axes == 0)
+            {
+                mission_msg.data += "-^";
+            }
+            else if (joystick_y_axes > 0)
+            {
+                mission_msg.data += "u^";
+            }
+            else
+            {
+                mission_msg.data += "d^";        
+            }
+        
+            if(joystick_x_axes == 0)
+            {
+                mission_msg.data += "-";
+            }
+            else if (joystick_x_axes > 0)
+            {
+                mission_msg.data += "r";
+            }
+            else
+            {
+                mission_msg.data += "l";        
+            }
+        
+            mission_pub_.publish(mission_msg);
+        }
+    }
+    
+    // Button on controller selects manual locomotion mode
     if(msg->buttons[manual_mode_select_] == 1)
     {
         if(mission_running_ == true)
@@ -145,6 +168,14 @@ void RodneyNode::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
         keyboard_angular_speed_ = 0.0f;
         
         manual_locomotion_mode_ = true; 
+    }
+    
+    // Button on controller selects central camera position   
+    if((manual_locomotion_mode_ == true) && (msg->buttons[default_camera_pos_select_] == 1))
+    {            
+        std_msgs::String mission_msg;
+        mission_msg.data = "J3^c^-";
+        mission_pub_.publish(mission_msg);
     }
 }
 //---------------------------------------------------------------------------
@@ -162,8 +193,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
     //      'Key pad 7 and Num Lock off' - Move robot forwards amd counter-clockwise if in manual locomotion mode    
     //      'Key pad 8 and Num Lock off' - Move robot foward if in manual locomotion mode
     //      'Key pad 9 and Num Lock off' - Move robot forwards amd clockwise if in manual locomotion mode
-    //      'Up key' - Move head/camera up in manual mode
-    //      'Down key' - Move head/camera down in manual mode
+    //      'Up key' - Move head/camera down in manual mode
+    //      'Down key' - Move head/camera up in manual mode
     //      'Right key' - Move head/camera right in manual mode
     //      'Left key' - Move head/camera left in manual mode 
     //      'Key pad +' - Increase linear speed by 10% (speed when using keyboard for teleop)
@@ -172,6 +203,7 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
     //      'Key pad /' - Decrease angular speed by 10% (speed when using keyboard for teleop)   
     //      '2' - Run mission 2    
     //      'c' or 'C' - Cancel current mission
+    //      'd' or 'D' - Move head/camera to the default position in manual mode 
     //      'm' or 'M' - Set locomotion mode to manual
     //      's' or 'S' - Currently used to test the status indication
     //      't' or 'T' - Currently used to test the speech functionality
@@ -185,7 +217,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         mission_msg.data = "M2";
         mission_pub_.publish(mission_msg);
                     
-        mission_running_ = true;        
+        mission_running_ = true; 
+        manual_locomotion_mode_ = false;       
     }
     else if((msg->code == keyboard::Key::KEY_c) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
     {          
@@ -196,6 +229,16 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
             cancel_pub_.publish(empty_msg);
         }        
     }
+    else if((msg->code == keyboard::Key::KEY_d) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
+    {          
+        // 'd' or 'D', Move camera to default position
+        if(manual_locomotion_mode_ == true)
+        {            
+            std_msgs::String mission_msg;
+            mission_msg.data = "J3^c^-";
+            mission_pub_.publish(mission_msg);
+        }       
+    }    
     else if((msg->code == keyboard::Key::KEY_s) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
     {
         // 's' or 'S', temporary code to test status            
@@ -372,22 +415,22 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
     else if(msg->code == keyboard::Key::KEY_UP)
     {
         // Up Key
-        // This is a simple job not a mission - move the head/camera up
+        // This is a simple job not a mission - move the head/camera down
         if(manual_locomotion_mode_ == true)
         {            
             std_msgs::String mission_msg;
-            mission_msg.data = "J3^u^-";
+            mission_msg.data = "J3^d^-";
             mission_pub_.publish(mission_msg);
         }
     }
     else if(msg->code == keyboard::Key::KEY_DOWN)
     {
         // Down Key
-        // This is a simple job not a mission - move the head/camera down
+        // This is a simple job not a mission - move the head/camera up
         if(manual_locomotion_mode_ == true)
         {
             std_msgs::String mission_msg;
-            mission_msg.data = "J3^d^-";
+            mission_msg.data = "J3^u^-";
             mission_pub_.publish(mission_msg);
         }
     }  
@@ -417,6 +460,14 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
     {
         ;
     } 
+}
+//---------------------------------------------------------------------------
+
+// Callback for when motor demands received in autonomous mode
+void RodneyNode::motorDemandCallBack(const geometry_msgs::Twist::ConstPtr& msg)
+{ 
+    linear_mission_demand_ = msg->linear.x;
+    angular_mission_demand_ = msg->angular.z;
 }
 //---------------------------------------------------------------------------
 

@@ -7,6 +7,7 @@ Out standing changes
 * Moved the scaning for faces action client to rondey_missions package
 * Added use of speech and facial expression
 * Added rviz files for robot modelling
+* Added teleop with keyboard and game controller
 
 0.2.0 (2018-06-24)
 ------------------

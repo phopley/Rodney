@@ -1,6 +1,7 @@
 controller:
   buttons:
     manual_mode_select: 0
+    default_camera_pos_select: 1
   axes:
     linear_speed_index: 4
     angular_speed_index: 0

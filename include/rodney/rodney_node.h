@@ -21,7 +21,8 @@ private:
     ros::Publisher twist_pub_;          // Topic to publish twist message
     ros::Subscriber key_sub_;           // Topic for keyboard input
     ros::Subscriber joy_sub_;           // Topic for joystick/game pad input
-    ros::Subscriber mission_sub_;       // Topic for mission complete indication  
+    ros::Subscriber mission_sub_;       // Topic for mission complete indication
+    ros::Subscriber demmand_sub_;       // Topic for autonomous motor demands
     ros::Time last_twist_send_time_;    // Time of previous message
     
     geometry_msgs::Twist last_twist_;   // The last Twist message sent     
@@ -31,9 +32,10 @@ private:
  
     int linear_speed_index_;   // Controller axes index for linear speed
     int angular_speed_index_;  // Controller axes index for angular speed
-    int manual_mode_select_;   // Controller button idex for manual mode (teleop)
+    int manual_mode_select_;   // Controller button index for manual mode (teleop)
     int camera_x_index_;       // Controller axes index for x direction head/camera
     int camera_y_index_;       // Controller axes index for y direction head/camera
+    int default_camera_pos_select_; // Controller button index formoving camera to default position
     
     int dead_zone_;                     // Controller dead zone value    
     
@@ -56,7 +58,8 @@ private:
                 
     void keyboardCallBack(const keyboard::Key::ConstPtr& msg);
     void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg);
-    void completeCallBack(const std_msgs::String::ConstPtr& msg); 
+    void completeCallBack(const std_msgs::String::ConstPtr& msg);
+    void motorDemandCallBack(const geometry_msgs::Twist::ConstPtr& msg);
     
     geometry_msgs::Twist rampedTwist(geometry_msgs::Twist prev, geometry_msgs::Twist target,
                                      ros::Time time_prev, ros::Time time_now);
