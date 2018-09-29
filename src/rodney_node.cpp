@@ -29,7 +29,11 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     dead_zone_ = 2000;
     
     ramp_for_linear_ = 5.0f;
-    ramp_for_angular_ = 5.0f;   
+    ramp_for_angular_ = 5.0f;
+    
+    voltage_level_warning_ = 9.5f; 
+    
+    wav_play_enabled_ = false;  
     
     // Obtain any configuration values from the parameter server. If they don't exist use the defaults above
     nh_.param("/controller/axes/linear_speed_index", linear_speed_index_, linear_speed_index_);
@@ -42,12 +46,19 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     nh_.param("/teleop/max_linear_speed", max_linear_speed_, max_linear_speed_);
     nh_.param("/teleop/max_angular_speed", max_angular_speed_, max_angular_speed_);
     nh_.param("/motor/ramp/linear", ramp_for_linear_, ramp_for_linear_);
-    nh_.param("/motor/ramp/angular", ramp_for_angular_, ramp_for_angular_);    
+    nh_.param("/motor/ramp/angular", ramp_for_angular_, ramp_for_angular_);
+    nh_.param("/battery/warning_level", voltage_level_warning_, voltage_level_warning_);    
+    nh_.param("/sounds/enabled", wav_play_enabled_, wav_play_enabled_);
+    
+    // Obtain the filename and text for the wav files that can be played    
+    nh_.getParam("/sounds/filenames", wav_file_names_);
+    nh_.getParam("/sounds/text", wav_file_texts_);
      
-    // Subscribe to receive keyboard input, joystick input and mission complete
+    // Subscribe to receive keyboard input, joystick input, mission complete and battery state
     key_sub_ = nh_.subscribe("keyboard/keydown", 5, &RodneyNode::keyboardCallBack, this);
     joy_sub_ = nh_.subscribe("joy", 1, &RodneyNode::joystickCallback, this);
     mission_sub_ = nh_.subscribe("/missions/mission_complete", 5, &RodneyNode::completeCallBack, this);
+    battery_status_sub_ = nh_.subscribe("main_battery_status", 1, &RodneyNode::batteryCallback, this);
     
     // The cmd_vel topic below is the command velocity message to the motor driver.
     // This can be created from either keyboard or game pad input when in manual mode or from the thi subscribed
@@ -59,6 +70,11 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     mission_pub_ = nh_.advertise<std_msgs::String>("/missions/mission_request", 10);
     cancel_pub_ = nh_.advertise<std_msgs::Empty>("/missions/mission_cancel", 5);
     twist_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+    
+    // Seed the random number generator
+    srand((unsigned)time(0));
+    
+    last_interaction_time_ = ros::Time::now();
 }
 //---------------------------------------------------------------------------
 
@@ -86,6 +102,7 @@ void RodneyNode::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
     if(joystick_y_axes != 0)
     {      
         joystick_linear_speed_ = -(joystick_y_axes*(max_linear_speed_/(float)MAX_AXES_VALUE_));
+        last_interaction_time_ = ros::Time::now();
     }
     else
     {
@@ -95,6 +112,7 @@ void RodneyNode::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
     if(joystick_x_axes != 0)
     {
         joystick_angular_speed_ = -(joystick_x_axes*(max_angular_speed_/(float)MAX_AXES_VALUE_));
+        last_interaction_time_ = ros::Time::now();
     }
     else
     {
@@ -150,6 +168,8 @@ void RodneyNode::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
             }
         
             mission_pub_.publish(mission_msg);
+            
+            last_interaction_time_ = ros::Time::now();
         }
     }
     
@@ -167,7 +187,9 @@ void RodneyNode::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
         keyboard_linear_speed_ = 0.0f; 
         keyboard_angular_speed_ = 0.0f;
         
-        manual_locomotion_mode_ = true; 
+        manual_locomotion_mode_ = true;
+        
+        last_interaction_time_ = ros::Time::now(); 
     }
     
     // Button on controller selects central camera position   
@@ -176,6 +198,8 @@ void RodneyNode::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
         std_msgs::String mission_msg;
         mission_msg.data = "J3^c^-";
         mission_pub_.publish(mission_msg);
+        
+        last_interaction_time_ = ros::Time::now();
     }
 }
 //---------------------------------------------------------------------------
@@ -204,10 +228,7 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
     //      '2' - Run mission 2    
     //      'c' or 'C' - Cancel current mission
     //      'd' or 'D' - Move head/camera to the default position in manual mode 
-    //      'm' or 'M' - Set locomotion mode to manual
-    //      's' or 'S' - Currently used to test the status indication
-    //      't' or 'T' - Currently used to test the speech functionality
-    //      'w' or 'W' - Currently used to test wav file play back
+    //      'm' or 'M' - Set locomotion mode to manual        
 
     // Check for key 2 with no modifiers apart from num lock is allowed
     if((msg->code == keyboard::Key::KEY_2) && ((msg->modifiers & ~keyboard::Key::MODIFIER_NUM) == 0))
@@ -218,7 +239,9 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         mission_pub_.publish(mission_msg);
                     
         mission_running_ = true; 
-        manual_locomotion_mode_ = false;       
+        manual_locomotion_mode_ = false;
+        
+        last_interaction_time_ = ros::Time::now();       
     }
     else if((msg->code == keyboard::Key::KEY_c) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
     {          
@@ -227,7 +250,9 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         {
             std_msgs::Empty empty_msg;
             cancel_pub_.publish(empty_msg);
-        }        
+        }
+        
+        last_interaction_time_ = ros::Time::now();        
     }
     else if((msg->code == keyboard::Key::KEY_d) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
     {          
@@ -237,34 +262,10 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
             std_msgs::String mission_msg;
             mission_msg.data = "J3^c^-";
             mission_pub_.publish(mission_msg);
-        }       
-    }    
-    else if((msg->code == keyboard::Key::KEY_s) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
-    {
-        // 's' or 'S', temporary code to test status            
-        // Publish staright to the robot face    
-        std_msgs::String status_msg;            
-        status_msg.data = "Rodney";
-        face_status_pub_.publish(status_msg);
-    }    
-    else if((msg->code == keyboard::Key::KEY_w) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
-    {
-        // 'w' or 'W', temporary code to test wav playing
-        // This is a simple job not a mission
-        std_msgs::String mission_msg;
-        std::string path = ros::package::getPath("rodney");
-        mission_msg.data = "J1^" + path + "/sounds/lost_in_space_danger.wav" + "^Danger Will Robinson danger:)";
-        ROS_INFO("%s", path.c_str());
-        mission_pub_.publish(mission_msg);            
-    }
-    else if((msg->code == keyboard::Key::KEY_t) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
-    {
-        // 't' or 'T', temporary code to test speech
-        // This is a simple job not a mission
-        std_msgs::String mission_msg;
-        mission_msg.data = "J2^happy birthday u an^Happy birthday Iwan:)";
-        mission_pub_.publish(mission_msg);
-    }
+        }    
+        
+        last_interaction_time_ = ros::Time::now();   
+    }       
     else if((msg->code == keyboard::Key::KEY_m) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
     {
         // 'm' or 'M', set locomotion mode to manual (any missions going to auto should set manual_locomotion_mode_ to false)
@@ -281,6 +282,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         keyboard_angular_speed_ = 0.0f;
         
         manual_locomotion_mode_ = true;
+        
+        last_interaction_time_ = ros::Time::now();
     }             
     else if((msg->code == keyboard::Key::KEY_KP1) && ((msg->modifiers & keyboard::Key::MODIFIER_NUM) == 0))
     {
@@ -291,6 +294,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
             keyboard_linear_speed_ = -linear_set_speed_;                        
             keyboard_angular_speed_ = -angular_set_speed_;        
         }
+        
+        last_interaction_time_ = ros::Time::now();
     }
     else if((msg->code == keyboard::Key::KEY_KP2) && ((msg->modifiers & keyboard::Key::MODIFIER_NUM) == 0))
     {
@@ -301,6 +306,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
             keyboard_linear_speed_ = -linear_set_speed_;        
             keyboard_angular_speed_ = 0.0f;            
         }
+        
+        last_interaction_time_ = ros::Time::now();
     }  
     else if((msg->code == keyboard::Key::KEY_KP3) && ((msg->modifiers & keyboard::Key::MODIFIER_NUM) == 0))
     {
@@ -311,6 +318,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
             keyboard_linear_speed_ = -linear_set_speed_;
             keyboard_angular_speed_ = angular_set_speed_;                    
         }
+        
+        last_interaction_time_ = ros::Time::now();
     }
     else if((msg->code == keyboard::Key::KEY_KP4) && ((msg->modifiers & keyboard::Key::MODIFIER_NUM) == 0))
     {
@@ -321,6 +330,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
             keyboard_linear_speed_ = 0.0f;
             keyboard_angular_speed_ = angular_set_speed_;                    
         }
+        
+        last_interaction_time_ = ros::Time::now();
     } 
     else if((msg->code == keyboard::Key::KEY_KP6) && ((msg->modifiers & keyboard::Key::MODIFIER_NUM) == 0))
     {
@@ -331,6 +342,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
             keyboard_linear_speed_ = 0.0f;  
             keyboard_angular_speed_ = -angular_set_speed_;                  
         }
+        
+        last_interaction_time_ = ros::Time::now();
     }
     else if((msg->code == keyboard::Key::KEY_KP7) && ((msg->modifiers & keyboard::Key::MODIFIER_NUM) == 0))
     {
@@ -341,6 +354,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
             keyboard_linear_speed_ = linear_set_speed_; 
             keyboard_angular_speed_ = angular_set_speed_;                   
         }
+        
+        last_interaction_time_ = ros::Time::now();
     }    
     else if((msg->code == keyboard::Key::KEY_KP8) && ((msg->modifiers & keyboard::Key::MODIFIER_NUM) == 0))
     {
@@ -351,6 +366,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
             keyboard_linear_speed_ = linear_set_speed_; 
             keyboard_angular_speed_ = 0.0f;                   
         }
+        
+        last_interaction_time_ = ros::Time::now();
     }
     else if((msg->code == keyboard::Key::KEY_KP9) && ((msg->modifiers & keyboard::Key::MODIFIER_NUM) == 0))
     {
@@ -361,6 +378,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
             keyboard_linear_speed_ = linear_set_speed_; 
             keyboard_angular_speed_ = -angular_set_speed_;                   
         }
+        
+        last_interaction_time_ = ros::Time::now();
     }
     else if(msg->code == keyboard::Key::KEY_SPACE)
     {
@@ -371,6 +390,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
             keyboard_linear_speed_= 0.0f;     
             keyboard_angular_speed_ = 0.0f;               
         }
+        
+        last_interaction_time_ = ros::Time::now();
     }
     else if(msg->code == keyboard::Key::KEY_KP_PLUS)
     {
@@ -380,7 +401,9 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         {
             linear_set_speed_ += ((10.0/100.0) * linear_set_speed_);
             ROS_INFO("Linear Speed now %f", linear_set_speed_);
-        }    
+        }  
+        
+        last_interaction_time_ = ros::Time::now();  
     }
     else if(msg->code == keyboard::Key::KEY_KP_MINUS)
     {
@@ -390,7 +413,9 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         {
             linear_set_speed_ -= ((10.0/100.0) * linear_set_speed_);
             ROS_INFO("Linear Speed now %f", linear_set_speed_);
-        }        
+        }  
+        
+        last_interaction_time_ = ros::Time::now();      
     }
     else if(msg->code == keyboard::Key::KEY_KP_MULTIPLY)
     {
@@ -401,6 +426,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
             angular_set_speed_ += ((10.0/100.0) * angular_set_speed_);
             ROS_INFO("Angular Speed now %f", angular_set_speed_);
         }    
+        
+        last_interaction_time_ = ros::Time::now();
     }
     else if(msg->code == keyboard::Key::KEY_KP_DIVIDE)
     {
@@ -410,7 +437,9 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         {
             angular_set_speed_ -= ((10.0/100.0) * angular_set_speed_);
             ROS_INFO("Angular Speed now %f", angular_set_speed_);
-        }    
+        }   
+        
+        last_interaction_time_ = ros::Time::now(); 
     }    
     else if(msg->code == keyboard::Key::KEY_UP)
     {
@@ -422,6 +451,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
             mission_msg.data = "J3^d^-";
             mission_pub_.publish(mission_msg);
         }
+        
+        last_interaction_time_ = ros::Time::now();
     }
     else if(msg->code == keyboard::Key::KEY_DOWN)
     {
@@ -433,6 +464,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
             mission_msg.data = "J3^u^-";
             mission_pub_.publish(mission_msg);
         }
+        
+        last_interaction_time_ = ros::Time::now();
     }  
     else if(msg->code == keyboard::Key::KEY_LEFT)
     {
@@ -444,6 +477,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
             mission_msg.data = "J3^-^l";
             mission_pub_.publish(mission_msg);
         }
+        
+        last_interaction_time_ = ros::Time::now();
     }       
     else if(msg->code == keyboard::Key::KEY_RIGHT)
     {
@@ -455,6 +490,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
             mission_msg.data = "J3^-^r";
             mission_pub_.publish(mission_msg);
         }
+        
+        last_interaction_time_ = ros::Time::now();
     }                             
     else
     {
@@ -471,9 +508,67 @@ void RodneyNode::motorDemandCallBack(const geometry_msgs::Twist::ConstPtr& msg)
 }
 //---------------------------------------------------------------------------
 
+// Callback for main battery status
+void RodneyNode::batteryCallback(const sensor_msgs::BatteryState::ConstPtr& msg)
+{ 
+    // Convert float to string with two decimal places
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(2) << msg->voltage;
+    std::string voltage = ss.str();
+    
+    std_msgs::String status_msg;
+    
+    // Publish battery voltage to the robot face
+    // However the '.' will be used by the face to change the expression to neutral so we will replace with ','
+    replace(voltage.begin(), voltage.end(), '.', ',');
+    
+    if(msg->voltage > voltage_level_warning_)
+    {
+        status_msg.data = "Battery level OK ";
+    }
+    else
+    {
+        status_msg.data = "Battery level LOW ";
+        
+        // Speak warning every 5 minutes        
+        if((ros::Time::now() - last_battery_warn_).toSec() > (5.0*60.0))
+        {
+            last_battery_warn_ = ros::Time::now();
+            
+            std_msgs::String mission_msg;
+            mission_msg.data = "J2^battery level low^Battery level low:(";
+            mission_pub_.publish(mission_msg);
+        }
+    }
+    
+    status_msg.data += voltage + "V";                                 
+    face_status_pub_.publish(status_msg);
+}
+//---------------------------------------------------------------------------
+
 void RodneyNode::completeCallBack(const std_msgs::String::ConstPtr& msg)
 {
     mission_running_ = false;
+}
+//---------------------------------------------------------------------------
+
+void RodneyNode::checkTimers(void)
+{
+    /* Check time since last interaction */
+    if((wav_play_enabled_ == true) && ((ros::Time::now() - last_interaction_time_).toSec() > (15.0*60.0)))
+    {
+        last_interaction_time_ = ros::Time::now();
+        
+        // Use a random number to pick the wav file
+        int random = (rand()%wav_file_names_.size())+1;                
+         
+        // This is a simple job not a mission
+        std_msgs::String mission_msg;
+        std::string path = ros::package::getPath("rodney");
+        mission_msg.data = "J1^" + path + "/sounds/" + wav_file_names_[std::to_string(random)] + 
+                           "^" + wav_file_texts_[std::to_string(random)];        
+        mission_pub_.publish(mission_msg);         
+    }
 }
 //---------------------------------------------------------------------------
 
@@ -577,6 +672,7 @@ int main(int argc, char **argv)
     while(ros::ok())
     {
         rodney_node.sendTwist();
+        rodney_node.checkTimers();
         
         ros::spinOnce();
         r.sleep();

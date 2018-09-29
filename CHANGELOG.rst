@@ -8,6 +8,8 @@ Out standing changes
 * Added use of speech and facial expression
 * Added rviz files for robot modelling
 * Added teleop with keyboard and game controller
+* Added battery status reporting
+* Added wav file playback if inactive
 
 0.2.0 (2018-06-24)
 ------------------

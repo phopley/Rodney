@@ -15,3 +15,20 @@ motor:
   ramp:
     linear: 5.0
     angular: 5.0
+battery:
+  warning_level: 9.5
+sounds:
+  enabled: 1
+  filenames:
+    '1': brain.wav
+    '2': fp_alcohol.wav
+    '3': i_am_analyzing.wav
+    '4': lost_in_space_danger.wav
+    '5': lost_in_space_robot_online.wav
+  text:
+    '1': Here I'am the brain the size of a planet and they ask me to take you up to the bridge, call that job satisfaction cause I don't
+    '2': Yes, relatively simple alcohol molecules with traces of fusel oil. Would 60 gallons be sufficient?
+    '3': Quite please I'am analysing 
+    '4': Danger Will Robinson danger
+    '5': Robot is online, reviewing primary directives
+    

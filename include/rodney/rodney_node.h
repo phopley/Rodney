@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 #include <keyboard/Key.h>
 #include <sensor_msgs/Joy.h>
+#include <sensor_msgs/BatteryState.h>
 #include <std_msgs/String.h>
 #include <geometry_msgs/Twist.h>
 
@@ -12,6 +13,7 @@ class RodneyNode
 public:
     RodneyNode(ros::NodeHandle n);
     void sendTwist(void);
+    void checkTimers(void);
     
 private:
     ros::NodeHandle nh_;
@@ -23,12 +25,19 @@ private:
     ros::Subscriber joy_sub_;           // Topic for joystick/game pad input
     ros::Subscriber mission_sub_;       // Topic for mission complete indication
     ros::Subscriber demmand_sub_;       // Topic for autonomous motor demands
+    ros::Subscriber battery_status_sub_;// Topic to monitor battery status for the main battery
     ros::Time last_twist_send_time_;    // Time of previous message
+    ros::Time last_battery_warn_;       // Time of the last spoken battery warning message
+    ros::Time last_interaction_time_;   // Time that a human last interacted with the robot
     
-    geometry_msgs::Twist last_twist_;   // The last Twist message sent     
+    geometry_msgs::Twist last_twist_;   // The last Twist message sent   
+    
+    std::map<std::string,std::string> wav_file_names_; 
+    std::map<std::string,std::string> wav_file_texts_;  
             
     bool mission_running_;
-    bool manual_locomotion_mode_;    
+    bool manual_locomotion_mode_;
+    bool wav_play_enabled_;    
  
     int linear_speed_index_;   // Controller axes index for linear speed
     int angular_speed_index_;  // Controller axes index for angular speed
@@ -51,6 +60,7 @@ private:
     float angular_mission_demand_;      // Angular speed demand when autonomous
     float ramp_for_angular_;            // Ramp rate for angular velocities
     float ramp_for_linear_;             // Ramp rate for linear velocities
+    float voltage_level_warning_;       // Battery voltage low warning level
     
     const uint16_t SHIFT_CAPS_NUM_LOCK_ = (keyboard::Key::MODIFIER_NUM | keyboard::Key::MODIFIER_CAPS | 
                                            keyboard::Key::MODIFIER_LSHIFT | keyboard::Key::MODIFIER_RSHIFT);
@@ -60,6 +70,7 @@ private:
     void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg);
     void completeCallBack(const std_msgs::String::ConstPtr& msg);
     void motorDemandCallBack(const geometry_msgs::Twist::ConstPtr& msg);
+    void batteryCallback(const sensor_msgs::BatteryState::ConstPtr& msg);
     
     geometry_msgs::Twist rampedTwist(geometry_msgs::Twist prev, geometry_msgs::Twist target,
                                      ros::Time time_prev, ros::Time time_now);
