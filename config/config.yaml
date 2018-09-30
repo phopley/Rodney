@@ -5,8 +5,8 @@ controller:
   axes:
     linear_speed_index: 4
     angular_speed_index: 0
-    camera_x_index_: 6
-    camera_y_index_: 7
+    camera_x_index: 6
+    camera_y_index: 7
   dead_zone: 3000
 teleop:
   max_linear_speed: 4

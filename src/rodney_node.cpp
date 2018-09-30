@@ -38,8 +38,8 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     // Obtain any configuration values from the parameter server. If they don't exist use the defaults above
     nh_.param("/controller/axes/linear_speed_index", linear_speed_index_, linear_speed_index_);
     nh_.param("/controller/axes/angular_speed_index", angular_speed_index_, angular_speed_index_);
-    nh_.param("/controller/axes/camera_x_index_", camera_x_index_, camera_x_index_);
-    nh_.param("/controller/axes/camera_y_index_", camera_y_index_, camera_y_index_);
+    nh_.param("/controller/axes/camera_x_index", camera_x_index_, camera_x_index_);
+    nh_.param("/controller/axes/camera_y_index", camera_y_index_, camera_y_index_);
     nh_.param("/controller/buttons/manual_mode_select", manual_mode_select_, manual_mode_select_);
     nh_.param("/controller/buttons/default_camera_pos_select", default_camera_pos_select_, default_camera_pos_select_);
     nh_.param("/controller/dead_zone", dead_zone_, dead_zone_);
@@ -549,13 +549,15 @@ void RodneyNode::batteryCallback(const sensor_msgs::BatteryState::ConstPtr& msg)
 void RodneyNode::completeCallBack(const std_msgs::String::ConstPtr& msg)
 {
     mission_running_ = false;
+    
+    last_interaction_time_ = ros::Time::now();
 }
 //---------------------------------------------------------------------------
 
 void RodneyNode::checkTimers(void)
 {
     /* Check time since last interaction */
-    if((wav_play_enabled_ == true) && ((ros::Time::now() - last_interaction_time_).toSec() > (15.0*60.0)))
+    if((wav_play_enabled_ == true) && (mission_running_ == false) && ((ros::Time::now() - last_interaction_time_).toSec() > (15.0*60.0)))
     {
         last_interaction_time_ = ros::Time::now();
         
