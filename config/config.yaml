@@ -18,7 +18,7 @@ motor:
 battery:
   warning_level: 9.5
 sounds:
-  enabled: 1
+  enabled: true
   filenames:
     '1': brain.wav
     '2': fp_alcohol.wav
