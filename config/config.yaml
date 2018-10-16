@@ -9,8 +9,8 @@ controller:
     camera_y_index: 7
   dead_zone: 3000
 teleop:
-  max_linear_speed: 4
-  max_angular_speed: 4
+  max_linear_speed: 1
+  max_angular_speed: 6
 motor:
   ramp:
     linear: 5.0
