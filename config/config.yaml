@@ -10,7 +10,7 @@ controller:
   dead_zone: 3000
 teleop:
   max_linear_speed: 1
-  max_angular_speed: 6
+  max_angular_speed: 8.7
 motor:
   ramp:
     linear: 5.0
