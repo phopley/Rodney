@@ -670,10 +670,10 @@
       </geometry>        
     </collision>  
     <inertial>
-      <!--<mass value="0.338"/>
-      <inertia ixx="0.001379" ixy="0.0" ixz="0.0" iyy="0.001039" iyz="0.0" izz="0.000342"/>-->
-      <mass value="0.010"/>
-      <inertia ixx="4.08e-5" ixy="0.0" ixz="0.0" iyy="3.07e-5" iyz="0.0" izz="1.01e-5"/>
+      <mass value="0.338"/>
+      <inertia ixx="0.001379" ixy="0.0" ixz="0.0" iyy="0.001039" iyz="0.0" izz="0.000342"/>
+      <!--<mass value="0.010"/>
+      <inertia ixx="4.08e-5" ixy="0.0" ixz="0.0" iyy="3.07e-5" iyz="0.0" izz="1.01e-5"/>-->
     </inertial>    
   </link>    
 
@@ -735,18 +735,54 @@
      
   <!-- To control the wheels -->  
   <gazebo>
-    <plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
-      <updateRate>100.0</updateRate>      
-      <robotNamespace>/</robotNamespace>
-      <leftFrontJoint>l_brk_to_wheel</leftFrontJoint>
-      <rightFrontJoint>r_brk_to_wheel</rightFrontJoint>        
-      <wheelSeparation>0.180</wheelSeparation>       
-      <wheelDiameter>0.106</wheelDiameter>
-      <robotBaseFrame>base_link</robotBaseFrame>           
-      <torque>1</torque>
-      <commandTopic>cmd_vel</commandTopic>
-      <broadcastTF>0</broadcastTF>     
+    <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">      
+      <alwaysOn>true</alwaysOn>
+      <legacyMode>false</legacyMode>
+      <updateRate>100.0</updateRate>            
+      <rosDebugLevel>na</rosDebugLevel>
+      <publishWheelTF>false</publishWheelTF>
+      <publishOdomTF>false</publishOdomTF>
+      <publishWheelJointState>false</publishWheelJointState>
+      <wheelAcceleration>0</wheelAcceleration>
+      <wheelTorque>5</wheelTorque>      
+      <leftJoint>l_brk_to_wheel</leftJoint>
+      <rightJoint>r_brk_to_wheel</rightJoint>      
+      <wheelSeparation>0.230</wheelSeparation>      
+      <wheelDiameter>0.106</wheelDiameter>      
+      <commandTopic>cmd_vel</commandTopic>      
+      <odometryTopic>odom</odometryTopic>
+      <odometryFrame>odom</odometryFrame>      
+      <robotBaseFrame>base_link</robotBaseFrame>                       
     </plugin>    
-  </gazebo>    
+  </gazebo>  
+  
+  <!-- To control head pan/tilt -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/rodney</robotNamespace>
+    </plugin>
+  </gazebo> 
+ 
+  <transmission name="head_pan_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="servo_block_to_head_pan_bracket">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="pan">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+ 
+  <transmission name="head_tilt_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="head_pan_bracket_to_head_tilt_arm">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="tilt">
+      <hardwareInterface>EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>    
   
 </robot>
