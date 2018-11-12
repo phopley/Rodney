@@ -71,6 +71,8 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     cancel_pub_ = nh_.advertise<std_msgs::Empty>("/missions/mission_cancel", 5);
     twist_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
     
+    battery_low_count_ = 0;
+    
     // Seed the random number generator
     srand((unsigned)time(0));
     
@@ -525,19 +527,29 @@ void RodneyNode::batteryCallback(const sensor_msgs::BatteryState::ConstPtr& msg)
     if(msg->voltage > voltage_level_warning_)
     {
         status_msg.data = "Battery level OK ";
+        battery_low_count_ = 0;
     }
     else
     {
-        status_msg.data = "Battery level LOW ";
-        
-        // Speak warning every 5 minutes        
-        if((ros::Time::now() - last_battery_warn_).toSec() > (5.0*60.0))
+        // If the battery level goes low we wait a number of messages to confirm it was not a dip as the motors started
+        if(battery_low_count_ > 1)
         {
-            last_battery_warn_ = ros::Time::now();
+        
+            status_msg.data = "Battery level LOW ";
+        
+            // Speak warning every 5 minutes        
+            if((ros::Time::now() - last_battery_warn_).toSec() > (5.0*60.0))
+            {
+                last_battery_warn_ = ros::Time::now();
             
-            std_msgs::String mission_msg;
-            mission_msg.data = "J2^battery level low^Battery level low:(";
-            mission_pub_.publish(mission_msg);
+                std_msgs::String mission_msg;
+                mission_msg.data = "J2^battery level low^Battery level low:(";
+                mission_pub_.publish(mission_msg);
+            }
+        }
+        else
+        {
+            battery_low_count_++;
         }
     }
     
