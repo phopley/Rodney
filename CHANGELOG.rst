@@ -2,10 +2,6 @@
 Changelog for package rodney
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Unreleased
-------------------
-* Added wheel encoder functionality to Arduino software
-
 0.1.1 (2018-11-12)
 ------------------
 * Moved Arduino sketch into package
