@@ -20,6 +20,7 @@ private:
     ros::Publisher face_status_pub_;    // Topic to publish status to be displayed by RobotFace
     ros::Publisher mission_pub_;        // Topic to start a mission or small task
     ros::Publisher cancel_pub_;         // Topic to cancel a mission
+    ros::Publisher ack_pub_;            // Topic for user to acknowledge some mission sections
     ros::Publisher twist_pub_;          // Topic to publish twist message
     ros::Subscriber key_sub_;           // Topic for keyboard input
     ros::Subscriber joy_sub_;           // Topic for joystick/game pad input

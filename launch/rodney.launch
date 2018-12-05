@@ -5,6 +5,7 @@
   <rosparam command="load" file="$(find pan_tilt)/config/config.yaml" />
   <rosparam command="load" file="$(find face_recognition)/config/config.yaml" />
   <rosparam command="load" file="$(find head_control)/config/config.yaml" />
+  <rosparam command="load" file="$(find tf_object_detection)/config/config.yaml" />
   
   <include file="$(find raspicam_node)/launch/camerav2_1280x960.launch" /> 
   <node name="republish" type="republish" pkg="image_transport" output="screen" args="compressed in:=/raspicam_node/image/ raw out:=/camera/image/raw" />
@@ -19,4 +20,5 @@
   <node pkg="speech" type="speech_node" name="speech_node" output="screen"/>
   <node pkg="rodney_missions" type="rodney_missions_node.py" name="rodney_missions" output="screen"/>
   <node pkg="rodney" type="rodney_node" name="rodney_node" output="screen" />
+  <node pkg="tf_object_detection" type="tf_object_detection_node.py" name="tf_object_detection_node" output="screen" />
 </launch>

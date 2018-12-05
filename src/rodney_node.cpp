@@ -69,9 +69,11 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     face_status_pub_ = nh_.advertise<std_msgs::String>("/robot_face/expected_input", 5);
     mission_pub_ = nh_.advertise<std_msgs::String>("/missions/mission_request", 10);
     cancel_pub_ = nh_.advertise<std_msgs::Empty>("/missions/mission_cancel", 5);
+    ack_pub_ = nh_.advertise<std_msgs::Empty>("/missions/acknowledge", 5);
     twist_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
     
     battery_low_count_ = 0;
+    mission_running_ = false;
     
     // Seed the random number generator
     srand((unsigned)time(0));
@@ -227,7 +229,9 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
     //      'Key pad -' - Decrease linear speed by 10% (speed when using keyboard for teleop)
     //      'Key pad *' - Increase angular speed by 10% (speed when using keyboard for teleop)
     //      'Key pad /' - Decrease angular speed by 10% (speed when using keyboard for teleop)   
-    //      '2' - Run mission 2    
+    //      '2' - Run mission 2
+    //      '3' - Run mission 3
+    //      'a' or 'A' - Some missions require the user to send an acknowledge
     //      'c' or 'C' - Cancel current mission
     //      'd' or 'D' - Move head/camera to the default position in manual mode 
     //      'm' or 'M' - Set locomotion mode to manual        
@@ -245,6 +249,18 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         
         last_interaction_time_ = ros::Time::now();       
     }
+    else if((msg->code == keyboard::Key::KEY_3) && ((msg->modifiers & ~keyboard::Key::MODIFIER_NUM) == 0))
+    {
+        // '3', start a complete scan looking for named object (mission 3). In this case the object is a "dog"
+        std_msgs::String mission_msg;
+        mission_msg.data = "M3^dog";
+        mission_pub_.publish(mission_msg);
+                    
+        mission_running_ = true; 
+        manual_locomotion_mode_ = false;
+        
+        last_interaction_time_ = ros::Time::now();    
+    }
     else if((msg->code == keyboard::Key::KEY_c) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
     {          
         // 'c' or 'C', cancel mission if one is running
@@ -252,6 +268,17 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         {
             std_msgs::Empty empty_msg;
             cancel_pub_.publish(empty_msg);
+        }
+        
+        last_interaction_time_ = ros::Time::now();        
+    }
+    else if((msg->code == keyboard::Key::KEY_a) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
+    {
+        // 'a' or 'A', acknowledge a mission step
+        if(mission_running_ == true)
+        {
+            std_msgs::Empty empty_msg;
+            ack_pub_.publish(empty_msg);                
         }
         
         last_interaction_time_ = ros::Time::now();        

@@ -2,6 +2,11 @@
 Changelog for package rodney
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.2 (2018-12-05)
+------------------
+* Set mission_running_ to false in contructor
+* Added code to start mission 3 and acknowledge missions steps
+
 0.1.1 (2018-11-12)
 ------------------
 * Moved Arduino sketch into package
