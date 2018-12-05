@@ -31,11 +31,14 @@ Topics:
   Publishes `std_msgs/String` Request to carry out robot missions or simple jobs
   
 * `/missions/mission_cancel`:  
-  Publishes `std_msgs/String` Request to cancel the current robot mission
+  Publishes `std_msgs/Empty` Request to cancel the current robot mission
   
 * `cmd_vel`:  
   Publishes `geometry_msgs/Twist` Velocity demands from either manaul input or the autonomous sub-system
 
+* `/missions/acknowledge`:  
+  Publishes `std_msgs/Empty` Acknowledge that a mission can move on
+  
 Parameters:
 
 * `/controller/axes/linear_speed_index`: Index of the controller axes used for requesting forward and backward movement. 
