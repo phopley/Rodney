@@ -11,4 +11,6 @@ git clone https://github.com/phopley/rodney_missions.git
 git clone https://github.com/lrse/ros-keyboard.git
 git clone https://github.com/phopley/servo_msgs.git
 git clone https://github.com/phopley/speech.git
+git clone https://github.com/phopley/tacho_msgs.git
 git clone https://github.com/phopley/tf_object_detection.git
+git clone https://github.com/phopley/thunderborg

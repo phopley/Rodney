@@ -7,7 +7,10 @@
 RodneyNode::RodneyNode(ros::NodeHandle n)
 {
     nh_ = n;
-    
+
+    joystick_linear_speed_ = 0.0f;
+    joystick_angular_speed_ = 0.0f;
+        
     linear_mission_demand_ = 0.0f;
     angular_mission_demand_ = 0.0f;
     
