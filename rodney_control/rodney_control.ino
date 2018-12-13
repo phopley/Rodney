@@ -27,7 +27,7 @@
 #define SERVO_3 10
 
 #define MISS_INT_COUNT 3
-#define ENCOUNDER_COUNTS_FULL_REV 6
+#define ENCOUNDER_COUNTS_FULL_REV 12
 
 ros::NodeHandle  nh;
 
@@ -153,23 +153,33 @@ void loop(){
 }
 
 /*  Each interrupt keeps track of the time between interrupts.
- *  Our max speed is around 1m/s and the encoder gives an interrupt 6 times per revolution.
- *  That means the minimum time between interrupts is approx 57ms, so lets ignore enything 
- *  less than 45ms and assume its spurious.The IR is affected by sunlight reflections so 
- *  this is an attempt to help filter our spurious detections
+ *  Our max speed is around 1m/s and the encoder gives an interrupt 12 times per revolution.
+ *  With a wheel circumference of 0.34m, that means the minimum time between interrupts is 
+ *  approx 28ms, so lets ignore enything less than 20ms and assume its spurious.
+ *  The IR is affected by sunlight reflections so this is an attempt to help filter out 
+ *  spurious detections.
  */
 void int0 () {
-  if(digitalRead(2) == 1)
+  if((micros() - timeLast0) > 20000)
   {
-    time0 = micros() - timeLast0;
+    if(digitalRead(2) == 1)
+    {
+      time0 = micros() - timeLast0;
+      timeLast0 = micros();
+      interrupt0 = true;
+      noInterruptCount0 = 0;
+    }
+  }
+  else
+  {
+    // Spurious detection. Reset timer, interrupts will synch back up
     timeLast0 = micros();
-    interrupt0 = true;
-    noInterruptCount0 = 0;
+    noInterruptCount0 = 0;    
   }
 }
 
 void int1 () {
-  if((micros() - timeLast1) > 45000)
+  if((micros() - timeLast1) > 20000)
   {
     if(digitalRead(3) == 1)
     {
