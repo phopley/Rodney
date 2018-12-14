@@ -7,7 +7,7 @@ controller:
     angular_speed_index: 0
     camera_x_index: 6
     camera_y_index: 7
-  dead_zone: 3000
+  dead_zone: 4000
 teleop:
   max_linear_speed: 1
   max_angular_speed: 8.7
