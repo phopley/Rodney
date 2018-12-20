@@ -5,6 +5,7 @@ Changelog for package rodney
 Unreleased
 ------------------
 * Update to rodney_control.ino to include rpm message
+* Tilt default at power up in rodney_control.ino now set to 90
 * Added tacho_msgs and thunderborg to clonepackages and createlinks
 * joystick_linear_speed_ and joystick_angular_speed_ set to 0.0 in constructor to fix bug if joystick node not running
 
