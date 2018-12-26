@@ -101,7 +101,7 @@ void setup(){
   
   // Defaults
   servo0.write(90);
-  servo1.write(90);
+  servo1.write(120);
 }
 
 long publisherTime;

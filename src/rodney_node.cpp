@@ -16,7 +16,7 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     
     manual_locomotion_mode_ = false;
     linear_set_speed_ = 0.5f;
-    angular_set_speed_ = 1.0f;
+    angular_set_speed_ = 2.5f;
     
     linear_speed_index_ = 0;
     angular_speed_index_ = 1;
@@ -74,6 +74,7 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     cancel_pub_ = nh_.advertise<std_msgs::Empty>("/missions/mission_cancel", 5);
     ack_pub_ = nh_.advertise<std_msgs::Empty>("/missions/acknowledge", 5);
     twist_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+    reset_odom_ = nh_.advertise<std_msgs::Empty>("/commands/reset_odomeetry", 1);
     
     battery_low_count_ = 0;
     mission_running_ = false;
@@ -237,7 +238,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
     //      'a' or 'A' - Some missions require the user to send an acknowledge
     //      'c' or 'C' - Cancel current mission
     //      'd' or 'D' - Move head/camera to the default position in manual mode 
-    //      'm' or 'M' - Set locomotion mode to manual        
+    //      'm' or 'M' - Set locomotion mode to manual
+    //      'r' or 'R' - Reset the odometry
 
     // Check for key 2 with no modifiers apart from num lock is allowed
     if((msg->code == keyboard::Key::KEY_2) && ((msg->modifiers & ~keyboard::Key::MODIFIER_NUM) == 0))
@@ -316,7 +318,14 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         manual_locomotion_mode_ = true;
         
         last_interaction_time_ = ros::Time::now();
-    }             
+    }
+    else if((msg->code == keyboard::Key::KEY_r) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
+    {
+        // 'r' or 'R', reset odometry command
+        std_msgs::Empty empty_msg;
+        reset_odom_.publish(empty_msg);
+
+    }
     else if((msg->code == keyboard::Key::KEY_KP1) && ((msg->modifiers & keyboard::Key::MODIFIER_NUM) == 0))
     {
         // Key 1 on keypad without num lock
