@@ -221,7 +221,7 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
     //      'r' or 'R' - Reset the odometry
     
     // Check for a number key (not key pad) with modifiers apart from num lock is allowed
-    if(((msg->code >= keyboard::Key::KEY_1) || (msg->code <= keyboard::Key::KEY_9)) && ((msg->modifiers & ~keyboard::Key::MODIFIER_NUM) == 0))
+    if(((msg->code >= keyboard::Key::KEY_1) && (msg->code <= keyboard::Key::KEY_9)) && ((msg->modifiers & ~keyboard::Key::MODIFIER_NUM) == 0))
     {    
         // Start a mission 
         std_msgs::String mission_msg;
