@@ -126,19 +126,19 @@
   <link name="left_motor">
     <visual>
       <geometry>
-        <cylinder length="0.056" radius="0.0185"/>
+        <cylinder length="0.070" radius="0.0185"/>
       </geometry>
       <origin rpy="1.57 0 0" xyz="0.0 -0.028 0.0"/>
       <material name="silver"/>
     </visual>
     <collision>
       <geometry>
-        <cylinder length="0.056" radius="0.0185"/>
+        <cylinder length="0.070" radius="0.0185"/>
       </geometry>
       <origin rpy="1.57 0 0" xyz="0.0 -0.028 0.0"/>
     </collision>
     <inertial>
-      <mass value="0.196"/>
+      <mass value="0.206"/>
       <inertia ixx="6.79916e-5" ixy="0.0" ixz="0.0" iyy="6.79916e-5" iyz="0.0" izz="3.35405e-5"/>
     </inertial>               
   </link>
@@ -208,19 +208,19 @@
   <link name="right_motor">
     <visual>
       <geometry>
-        <cylinder length="0.056" radius="0.0185"/>
+        <cylinder length="0.070" radius="0.0185"/>
       </geometry>
       <origin rpy="1.57 0 0" xyz="0.0 0.028 0.0"/>      
       <material name="silver"/>
     </visual>
     <collision>
       <geometry>
-        <cylinder length="0.056" radius="0.0185"/>
+        <cylinder length="0.070" radius="0.0185"/>
       </geometry>
       <origin rpy="1.57 0 0" xyz="0.0 0.028 0.0"/>
     </collision>
     <inertial>
-      <mass value="0.196"/>
+      <mass value="0.206"/>
       <inertia ixx="6.79916e-5" ixy="0.0" ixz="0.0" iyy="6.79916e-5" iyz="0.0" izz="3.35405e-5"/>
     </inertial>     
   </link>
@@ -264,16 +264,16 @@
   <link name="front_caster_bracket">
     <visual>
       <geometry>
-        <box size="0.025 0.040 0.060"/>
+        <box size="0.025 0.040 0.070"/>
       </geometry>
-      <origin xyz="0.0 0.0 0.030"/>
+      <origin xyz="0.0 0.0 0.035"/>
       <material name="blue" />
     </visual>
     <collision>
       <geometry>
-        <box size=".025 0.040 0.060"/>
+        <box size=".025 0.040 0.070"/>
       </geometry>    
-      <origin xyz="0.0 0.0 0.030"/>
+      <origin xyz="0.0 0.0 0.035"/>
     </collision>
     <inertial>
       <mass value="0.030"/>
@@ -284,7 +284,7 @@
   <joint name="base_to_front_caster" type="fixed">
     <parent link="base_link"/>
     <child link="front_caster_bracket"/>
-    <origin xyz="0.150 0.0 -0.060"/>
+    <origin xyz="0.150 0.0 -0.070"/>
   </joint>
   
   <link name="front_caster">
@@ -311,23 +311,23 @@
     <axis xyz="1 1 1"/>
     <parent link="front_caster_bracket"/>
     <child link="front_caster"/>
-    <origin xyz="0.0 0.0 0.0"/>
+    <origin xyz="0.0 0.0 0.004"/>
   </joint>
     
   <!-- Rear -->
   <link name="rear_caster_bracket">
     <visual>
       <geometry>
-        <box size="0.025 0.040 0.060"/>
+        <box size="0.025 0.040 0.070"/>
       </geometry>
-      <origin xyz="0.0 0.0 0.030"/>
+      <origin xyz="0.0 0.0 0.035"/>
       <material name="blue" />
     </visual>
     <collision>
       <geometry>
-        <box size=".025 0.040 0.060"/>
+        <box size=".025 0.040 0.070"/>
       </geometry>    
-      <origin xyz="0.0 0.0 0.030"/>
+      <origin xyz="0.0 0.0 0.035"/>
     </collision>
     <inertial>
       <mass value="0.030"/>
@@ -338,7 +338,7 @@
   <joint name="base_to_rear_caster" type="fixed">
     <parent link="base_link"/>
     <child link="rear_caster_bracket"/>
-    <origin xyz="-0.150 0.0 -0.060"/>
+    <origin xyz="-0.150 0.0 -0.070"/>
   </joint>    
 
   <link name="rear_caster">
@@ -365,7 +365,7 @@
     <axis xyz="1 1 1"/>
     <parent link="rear_caster_bracket"/>
     <child link="rear_caster"/>
-    <origin xyz="0.0 0.0 0.0"/>
+    <origin xyz="0.0 0.0 0.004"/>
   </joint>         
   
   <!-- Rear platform -->

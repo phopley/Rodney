@@ -4,13 +4,13 @@ Changelog for package rodney
 
 Unreleased
 ------------------
+* Removed republish from the launch file
 * Angular set speed default now 2.5 radians/sec instead of 1.0
 * Added publishing the reset_odometry command if keyboard 'R' or 'r' pressed
 * Added source list parameter to rviz.launch
-* Update to rodney_control.ino to include rpm message and hall sensor code
 * Tilt default at power up in rodney_control.ino now set to 120
-* Added tacho_msgs and thunderborg to clonepackages and createlinks
 * joystick_linear_speed_ and joystick_angular_speed_ set to 0.0 in constructor to fix bug if joystick node not running
+* Removed mission 3
 
 0.1.2 (2018-12-05)
 ------------------

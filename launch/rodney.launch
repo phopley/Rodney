@@ -5,15 +5,11 @@
   <rosparam command="load" file="$(find pan_tilt)/config/config.yaml" />
   <rosparam command="load" file="$(find face_recognition)/config/config.yaml" />
   <rosparam command="load" file="$(find head_control)/config/config.yaml" />
-  <rosparam command="load" file="$(find tf_object_detection)/config/config.yaml" />
-  <rosparam command="load" file="$(find thunderborg)/config/config.yaml" />
+  <rosparam command="load" file="$(find rodney_missions)/config/config.yaml" />
   
   <include file="$(find raspicam_node)/launch/camerav2_1280x960.launch" /> 
-  <node name="republish" type="republish" pkg="image_transport" output="screen" args="compressed in:=/raspicam_node/image/ raw out:=/camera/image/raw" />
-  
-  <node pkg="pan_tilt" type="pan_tilt_node" name="pan_tilt_node" output="screen">
-    <remap from="pan_tilt_node/index0_position" to="pan_tilt_node/head_position"/>
-  </node>
+
+  <node pkg="pan_tilt" type="pan_tilt_node" name="pan_tilt_node" output="screen"/>
   <node pkg="face_recognition" type="face_recognition_node.py" name="face_recognition_node" output="screen"/>
   <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen" args="/dev/ttyUSB0"/>
   <node pkg="head_control" type="head_control_node" name="head_control_node" output="screen"/>
@@ -21,6 +17,4 @@
   <node pkg="speech" type="speech_node" name="speech_node" output="screen"/>
   <node pkg="rodney_missions" type="rodney_missions_node.py" name="rodney_missions" output="screen"/>
   <node pkg="rodney" type="rodney_node" name="rodney_node" output="screen" />
-  <node pkg="tf_object_detection" type="tf_object_detection_node.py" name="tf_object_detection_node" output="screen" />
-  <node pkg="thunderborg" type="thunderborg_node.py" name="thunderborg_node" output="screen" />
 </launch>

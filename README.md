@@ -33,11 +33,14 @@ Topics:
 * `/missions/mission_cancel`:  
   Publishes `std_msgs/Empty` Request to cancel the current robot mission
   
+* `/missions/acknowledge`:  
+  Publishes `std_msgs/Empty` Acknowledge that a mission can move on
+  
 * `cmd_vel`:  
   Publishes `geometry_msgs/Twist` Velocity demands from either manaul input or the autonomous sub-system
 
-* `/missions/acknowledge`:  
-  Publishes `std_msgs/Empty` Acknowledge that a mission can move on
+* `/commands/reset_odometry`:  
+  Publishes `std_msgs/Empty` Request to reset the odmoetry values
   
 Parameters:
 

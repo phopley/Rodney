@@ -26,7 +26,7 @@ private:
     ros::Subscriber key_sub_;           // Topic for keyboard input
     ros::Subscriber joy_sub_;           // Topic for joystick/game pad input
     ros::Subscriber mission_sub_;       // Topic for mission complete indication
-    ros::Subscriber demmand_sub_;       // Topic for autonomous motor demands
+    ros::Subscriber demand_sub_;        // Topic for autonomous motor demands
     ros::Subscriber battery_status_sub_;// Topic to monitor battery status for the main battery
     ros::Time last_twist_send_time_;    // Time of previous message
     ros::Time last_battery_warn_;       // Time of the last spoken battery warning message

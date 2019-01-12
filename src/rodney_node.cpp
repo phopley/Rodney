@@ -64,9 +64,9 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     battery_status_sub_ = nh_.subscribe("main_battery_status", 1, &RodneyNode::batteryCallback, this);
     
     // The cmd_vel topic below is the command velocity message to the motor driver.
-    // This can be created from either keyboard or game pad input when in manual mode or from the thi subscribed
-    // topic when in autonomous mode.
-    demmand_sub_ = nh_.subscribe("demand_vel", 5, &RodneyNode::motorDemandCallBack, this);
+    // This can be created from either keyboard or game pad input when in manual mode or from the this 
+    // subscribed topic when in autonomous mode. It will probably be remapped from the navigation stack
+    demand_sub_ = nh_.subscribe("demand_vel", 5, &RodneyNode::motorDemandCallBack, this);
 
     // Advertise the topics we publish
     face_status_pub_ = nh_.advertise<std_msgs::String>("/robot_face/expected_input", 5);
@@ -233,38 +233,25 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
     //      'Key pad -' - Decrease linear speed by 10% (speed when using keyboard for teleop)
     //      'Key pad *' - Increase angular speed by 10% (speed when using keyboard for teleop)
     //      'Key pad /' - Decrease angular speed by 10% (speed when using keyboard for teleop)   
-    //      '2' - Run mission 2
-    //      '3' - Run mission 3
+    //      '1' to '9' - Run a mission (1 -9)
     //      'a' or 'A' - Some missions require the user to send an acknowledge
     //      'c' or 'C' - Cancel current mission
     //      'd' or 'D' - Move head/camera to the default position in manual mode 
     //      'm' or 'M' - Set locomotion mode to manual
     //      'r' or 'R' - Reset the odometry
-
-    // Check for key 2 with no modifiers apart from num lock is allowed
-    if((msg->code == keyboard::Key::KEY_2) && ((msg->modifiers & ~keyboard::Key::MODIFIER_NUM) == 0))
-    {
-        // '2', start a complete scan looking for faces (mission 2)
+    
+    // Check for a number key (not key pad) with modifiers apart from num lock is allowed
+    if(((msg->code >= keyboard::Key::KEY_1) || (msg->code <= keyboard::Key::KEY_9)) && ((msg->modifiers & ~keyboard::Key::MODIFIER_NUM) == 0))
+    {    
+        // Start a mission 
         std_msgs::String mission_msg;
-        mission_msg.data = "M2";
+        mission_msg.data = "M" + std::to_string(msg->code-keyboard::Key::KEY_0);
         mission_pub_.publish(mission_msg);
                     
         mission_running_ = true; 
         manual_locomotion_mode_ = false;
         
-        last_interaction_time_ = ros::Time::now();       
-    }
-    else if((msg->code == keyboard::Key::KEY_3) && ((msg->modifiers & ~keyboard::Key::MODIFIER_NUM) == 0))
-    {
-        // '3', start a complete scan looking for named object (mission 3). In this case the object is a "dog"
-        std_msgs::String mission_msg;
-        mission_msg.data = "M3^dog";
-        mission_pub_.publish(mission_msg);
-                    
-        mission_running_ = true; 
-        manual_locomotion_mode_ = false;
-        
-        last_interaction_time_ = ros::Time::now();    
+        last_interaction_time_ = ros::Time::now();                       
     }
     else if((msg->code == keyboard::Key::KEY_c) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
     {          
