@@ -705,9 +705,9 @@ int main(int argc, char **argv)
     ros::NodeHandle n;    
     RodneyNode rodney_node(n);   
     std::string node_name = ros::this_node::getName();
-	ROS_INFO("%s started", node_name.c_str());
+    ROS_INFO("%s started", node_name.c_str());
 	
-	ros::Rate r(20); // 20Hz	    
+    ros::Rate r(20); // 20Hz	    
     
     while(ros::ok())
     {
@@ -718,6 +718,6 @@ int main(int argc, char **argv)
         r.sleep();
     }
     
-return 0;    
+    return 0;    
 }
 
