@@ -596,9 +596,9 @@
     </inertial>           
   </link>
     
-  <joint name="servo_block_to_head_pan_bracket" type="revolute">
+  <joint name="head_pan" type="revolute">
     <axis xyz="0 0 1"/>
-    <limit effort="1000.0" lower="-1.571" upper="1.571" velocity="0.5"/>
+    <limit effort="1000.0" lower="-1.5708" upper="1.5708" velocity="0.5"/>
     <parent link="head_pan_servo_block"/>
     <child link="head_pan_bracket"/>
     <dynamic damping="100.0" friction="100.0" />
@@ -623,9 +623,9 @@
     </inertial>            
   </link>    
 
-  <joint name="head_pan_bracket_to_head_tilt_arm" type="revolute">
+  <joint name="head_tilt" type="revolute">
     <axis xyz="0 1 0"/>    
-    <limit effort="1000.0" lower="-1.396" upper="0.698" velocity="0.5"/>
+    <limit effort="1000.0" lower="-1.39626" upper="0.698132" velocity="0.5"/>
     <parent link="head_pan_bracket"/>
     <child link="head_tilt_arm"/>
     <dynamic damping="100.0" friction="100.0" />

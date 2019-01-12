@@ -1,12 +1,19 @@
 /*
- * This version controls upto four RC ServosnoInterruptCount and publishes the tacho message monitoring
- * two wheels.
+ * This version controls upto four RC Servos and publishes the tacho message monitoring
+ * two motors.
  * 
  * The node subscribes to the servo topic and acts on a rodney_msgs::servo_array message.
  * This message contains two elements, index and angle. Index references the servos 0-3 and 
  * angle is the angle to set the servo to 0-180.
  *
- *
+ * D2 -> INT0 used for monitoring right motor speed
+ * D3 -> INT1 used for monitoring left motor speed
+ * D4 -> Digital input used for sensing right motor direction
+ * D5 -> PWM servo indexed 2
+ * D6 -> PWM servo indexed 1
+ * D7 -> Digital input used for sensing left motor direction
+ * D9 -> PWM servo indexed 0
+ * D10 -> PWM servo indexed 3
  */
 
 #if (ARDUINO >= 100)
@@ -20,14 +27,19 @@
 #include <servo_msgs/servo_array.h>
 #include <tacho_msgs/tacho.h>
 
-/* Define the PWM pins that the servos are connected to */
+// Define the PWM pins that the servos are connected to
 #define SERVO_0 9
 #define SERVO_1 6
 #define SERVO_2 5
 #define SERVO_3 10
 
-#define MISS_INT_COUNT 3
-#define ENCOUNDER_COUNTS_FULL_REV 12
+// Define pins used for two Hall sensors
+#define ENCODER0_PINA 2 // Interrupt 0
+#define ENCODER0_PINB 4
+#define ENCODER1_PINA 3 // Interrupt 1
+#define ENCODER1_PINB 7
+
+#define GEAR_BOX_COUNTS_PER_REV 1440.0f
 
 ros::NodeHandle  nh;
 
@@ -38,17 +50,15 @@ Servo servo3;
 
 tacho_msgs::tacho tachoMsg;
 
-volatile bool interrupt0 = false;
-volatile bool interrupt1 = false;
-volatile unsigned long time0 = 0;
-volatile unsigned long time1 = 0;
-volatile unsigned long timeLast0 = 0;
-volatile unsigned long timeLast1 = 0;
-volatile unsigned int noInterruptCount0 = 0;
-volatile unsigned int noInterruptCount1 = 0;
+byte encoder0PinALast;
+byte encoder1PinALast;
+volatile int encoder0Count; // Number of pulses
+volatile int encoder1Count; // Number of pulses
+volatile boolean encoder0Direction; //Rotation direction
+volatile boolean encoder1Direction; //Rotation direction
 
-void servo_cb( const servo_msgs::servo_array& cmd_msg){
-  
+void servo_cb( const servo_msgs::servo_array& cmd_msg)
+{  
   /* Which servo to drive */
   switch(cmd_msg.index)
   {
@@ -76,16 +86,13 @@ void servo_cb( const servo_msgs::servo_array& cmd_msg){
       nh.logdebug("No Servo");
       break;
   }
-    
-  digitalWrite(13, HIGH-digitalRead(13));  //toggle led  
 }
 
 ros::Subscriber<servo_msgs::servo_array> sub("servo", servo_cb);
 ros::Publisher pub("tacho", &tachoMsg);
 
-void setup(){
-  pinMode(13, OUTPUT);
-
+void setup()
+{
   nh.initNode();
   nh.subscribe(sub);
   nh.advertise(pub);
@@ -95,104 +102,119 @@ void setup(){
   servo2.attach(SERVO_2);
   servo3.attach(SERVO_3);
 
-  // Attach the interrupts for the tachos
-  attachInterrupt(0, int0, RISING); // Int0 is pin 2
-  attachInterrupt(1, int1, RISING); // Int1 is pin 3
+  encoder0Direction = true;   // default is forward
+  encoder1Direction = true;
+  encoder0Count = 0;
+  encoder1Count = 0;
+
+  pinMode(ENCODER0_PINB, INPUT);
+  pinMode(ENCODER1_PINB, INPUT);
+  
+  // Attach the interrupts for the Hall sensors
+  attachInterrupt(0, WheelSpeed0, CHANGE); // Int0 is pin 2
+  attachInterrupt(1, WheelSpeed1, CHANGE); // Int1 is pin 3
   
   // Defaults
   servo0.write(90);
   servo1.write(120);
 }
 
-long publisherTime;
+unsigned long publisherTime;
+unsigned long currentTime;
+unsigned long lastTime;
+float deltaTime;
 
-void loop(){
+void loop()
+{
   // Is it time to publish the tacho message
-  if(millis() > publisherTime) {
-    if(interrupt0 == false)
-    {
-      noInterruptCount0++;
+  if(millis() > publisherTime)
+  {
+    currentTime = micros();
+    deltaTime = (float)(currentTime - lastTime)/1000000.0;
 
-      if(noInterruptCount0 >= MISS_INT_COUNT)
-      {
-        // No new interrupt for a while so reset the rpm to zero
-        noInterruptCount0 = MISS_INT_COUNT;
-        tachoMsg.rwheelrpm = 0.0;          
-      } // Otherwise just use the rpm set previously
-    }
-    else
+    // Right wheel speed
+    tachoMsg.rwheelrpm = ((((float)encoder0Count)/deltaTime)/GEAR_BOX_COUNTS_PER_REV)*60.0f;
+    
+    if(encoder0Direction == false)
     {
-      tachoMsg.rwheelrpm = (1000000.0/((float)(time0*ENCOUNDER_COUNTS_FULL_REV)))*60;
-      
-      interrupt0 = false;      
+      tachoMsg.rwheelrpm = -(tachoMsg.rwheelrpm);
     }
 
-    if(interrupt1 == false)
+    // Left wheel speed
+    tachoMsg.lwheelrpm = ((((float)encoder1Count)/deltaTime)/GEAR_BOX_COUNTS_PER_REV)*60.0f;
+    
+    if(encoder1Direction == false)
     {
-      noInterruptCount1++;   
-
-      if(noInterruptCount1 >= MISS_INT_COUNT)
-      {
-        // No new interrupt for a while so reset the velocity to zero
-        noInterruptCount1 = MISS_INT_COUNT;
-        tachoMsg.lwheelrpm = 0.0;      
-      }// Otherwise just use the rpm set previously
+      tachoMsg.lwheelrpm = -(tachoMsg.lwheelrpm);
     }
-    else
-    {
-      tachoMsg.lwheelrpm = (1000000.0/((float)(time1*ENCOUNDER_COUNTS_FULL_REV)))*60;
-      interrupt1 = false;
-    }    
 
+    lastTime = currentTime;
+    
     pub.publish(&tachoMsg);
-
     publisherTime = millis() + 50; // Publish at 20Hz
   }
   
   nh.spinOnce();
 }
 
-/*  Each interrupt keeps track of the time between interrupts.
- *  Our max speed is around 1m/s and the encoder gives an interrupt 12 times per revolution.
- *  With a wheel circumference of 0.34m, that means the minimum time between interrupts is 
- *  approx 28ms, so lets ignore enything less than 20ms and assume its spurious.
- *  The IR is affected by sunlight reflections so this is an attempt to help filter out 
- *  spurious detections.
- */
-void int0 () {
-  if((micros() - timeLast0) > 20000)
+// ISR 0
+void WheelSpeed0()
+{
+  int state = digitalRead(ENCODER0_PINA);
+
+  if((encoder0PinALast == LOW) && (state == HIGH))
   {
-    if(digitalRead(2) == 1)
+    int val = digitalRead(ENCODER0_PINB);
+
+    if(val == LOW && encoder0Direction)
     {
-      time0 = micros() - timeLast0;
-      timeLast0 = micros();
-      interrupt0 = true;
-      noInterruptCount0 = 0;
+      encoder0Direction = false; // Reverse
     }
+    else if (val == HIGH && !encoder0Direction)
+    {
+      encoder0Direction = true; // Forward
+    }
+  }
+
+  encoder0PinALast = state;
+
+  if(!encoder0Direction)
+  {
+    encoder0Count++;
   }
   else
   {
-    // Spurious detection. Reset timer, interrupts will synch back up
-    timeLast0 = micros();
-    noInterruptCount0 = 0;    
+    encoder0Count--;
   }
 }
 
-void int1 () {
-  if((micros() - timeLast1) > 20000)
+// ISR 1
+void WheelSpeed1()
+{
+  int state = digitalRead(ENCODER1_PINA);
+
+  if((encoder1PinALast == LOW) && (state == HIGH))
   {
-    if(digitalRead(3) == 1)
+    int val = digitalRead(ENCODER1_PINB);
+
+    if(val == LOW && encoder1Direction)
     {
-      time1 = micros() - timeLast1;
-      timeLast1 = micros();
-      interrupt1 = true;
-      noInterruptCount1 = 0;
+      encoder1Direction = false; // Reverse
     }
+    else if (val == HIGH && !encoder1Direction)
+    {
+      encoder1Direction = true; // Forward
+    }
+  }
+
+  encoder1PinALast = state;
+
+  if(!encoder1Direction)
+  {
+    encoder1Count++;
   }
   else
   {
-    // Spurious detection. Reset timer, interrupts will synch back up
-    timeLast1 = micros();
-    noInterruptCount1 = 0;
+    encoder1Count--;
   }
 }
