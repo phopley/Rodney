@@ -2,7 +2,7 @@
 Changelog for package rodney
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Unreleased
+0.1.3 (2019-01-13)
 ------------------
 * Removed republish from the launch file
 * Angular set speed default now 2.5 radians/sec instead of 1.0
