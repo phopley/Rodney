@@ -2,6 +2,12 @@
 Changelog for package rodney
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Unreleased
+------------------
+* Added encoder code to the Arduino sketch
+* Added the Thunderborg node to the launch file
+* Added Thunderborg and tacho_msgs to clonepackages and createlinks file
+
 0.1.3 (2019-01-13)
 ------------------
 * Removed republish from the launch file

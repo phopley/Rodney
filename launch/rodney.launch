@@ -6,6 +6,7 @@
   <rosparam command="load" file="$(find face_recognition)/config/config.yaml" />
   <rosparam command="load" file="$(find head_control)/config/config.yaml" />
   <rosparam command="load" file="$(find rodney_missions)/config/config.yaml" />
+  <rosparam command="load" file="$(find thunderborg)/config/config.yaml" />
   
   <include file="$(find raspicam_node)/launch/camerav2_1280x960.launch" /> 
 
@@ -17,4 +18,5 @@
   <node pkg="speech" type="speech_node" name="speech_node" output="screen"/>
   <node pkg="rodney_missions" type="rodney_missions_node.py" name="rodney_missions" output="screen"/>
   <node pkg="rodney" type="rodney_node" name="rodney_node" output="screen" />
+  <node pkg="thunderborg" type="thunderborg_node.py" name="thunderborg" output="screen" />
 </launch>
