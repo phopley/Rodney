@@ -7,6 +7,7 @@ Unreleased
 * Added encoder code to the Arduino sketch
 * Added the Thunderborg node to the launch file
 * Added Thunderborg and tacho_msgs to clonepackages and createlinks file
+* Added camera to urdf model
 
 0.1.3 (2019-01-13)
 ------------------
