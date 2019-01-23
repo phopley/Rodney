@@ -39,7 +39,8 @@ private:
             
     bool mission_running_;
     bool manual_locomotion_mode_;
-    bool wav_play_enabled_; 
+    bool wav_play_enabled_;
+    bool pid_enabled_; 
     
     unsigned int battery_low_count_; // Counter for low battery low messages   
  

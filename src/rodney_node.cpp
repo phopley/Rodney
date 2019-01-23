@@ -15,10 +15,10 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     angular_mission_demand_ = 0.0f;
     
     manual_locomotion_mode_ = false;
-    linear_set_speed_ = 0.5f;
-    angular_set_speed_ = 2.5f; 
+    linear_set_speed_ = 0.25f;
+    angular_set_speed_ = 1.5f; 
     
-    // Obtain any configuration values from the parameter server. If they don't exist use the defaults above
+    // Obtain any configuration values from the parameter server. If they don't exist use the defaults
     nh_.param("/controller/axes/linear_speed_index", linear_speed_index_, 0);
     nh_.param("/controller/axes/angular_speed_index", angular_speed_index_, 1);
     nh_.param("/controller/axes/camera_x_index", camera_x_index_, 2);
@@ -26,12 +26,13 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     nh_.param("/controller/buttons/manual_mode_select", manual_mode_select_, 0);
     nh_.param("/controller/buttons/default_camera_pos_select", default_camera_pos_select_, 1);
     nh_.param("/controller/dead_zone", dead_zone_, 2000);
-    nh_.param("/teleop/max_linear_speed", max_linear_speed_, 3.0f);
-    nh_.param("/teleop/max_angular_speed", max_angular_speed_, 3.0f);
+    nh_.param("/teleop/max_linear_speed", max_linear_speed_, 1.0f);
+    nh_.param("/teleop/max_angular_speed", max_angular_speed_, 8.7f);
     nh_.param("/motor/ramp/linear", ramp_for_linear_, 5.0f);
     nh_.param("/motor/ramp/angular", ramp_for_angular_, 5.0f);
     nh_.param("/battery/warning_level", voltage_level_warning_, 9.5f);    
     nh_.param("/sounds/enabled", wav_play_enabled_, false);
+    nh_.param("/pid/use_pid", pid_enabled_, false);
     
     // Obtain the filename and text for the wav files that can be played    
     nh_.getParam("/sounds/filenames", wav_file_names_);
@@ -619,16 +620,25 @@ void RodneyNode::sendTwist(void)
         target_twist.linear.x = linear_mission_demand_;
         target_twist.angular.z = angular_mission_demand_;
     }
-    
-    ros::Time time_now = ros::Time::now();
+
+    // If not using the PID ramp to the target value. 
+    if (false == pid_enabled_)
+    {
+        ros::Time time_now = ros::Time::now();
         
-    // Ramp towards are required twist velocities
-    last_twist_ = rampedTwist(last_twist_, target_twist, last_twist_send_time_, time_now);
+        // Ramp towards are required twist velocities
+        last_twist_ = rampedTwist(last_twist_, target_twist, last_twist_send_time_, time_now);
         
-    last_twist_send_time_ = time_now;
+        last_twist_send_time_ = time_now;
         
-    // Publish the Twist message
-    twist_pub_.publish(last_twist_);
+        // Publish the Twist message using the ramp value
+        twist_pub_.publish(last_twist_);
+    }
+    else
+    {
+        // Publish the Twist message using the target value
+        twist_pub_.publish(target_twist);
+    }        
 }
 //---------------------------------------------------------------------------
 

@@ -133,11 +133,11 @@ void loop()
     deltaTime = (float)(currentTime - lastTime)/1000000.0;
 
     // Right wheel speed
-    tachoMsg.rwheelrpm = ((((float)encoder0Count)/deltaTime)/GEAR_BOX_COUNTS_PER_REV)*60.0f;
+    tachoMsg.rwheelrpm = (((((float)encoder0Count)/2.0f)/deltaTime)/GEAR_BOX_COUNTS_PER_REV)*60.0f;
     encoder0Count = 0;
 
     // Left wheel speed
-    tachoMsg.lwheelrpm = ((((float)encoder1Count)/deltaTime)/GEAR_BOX_COUNTS_PER_REV)*60.0f;
+    tachoMsg.lwheelrpm = (((((float)encoder1Count)/2.0f)/deltaTime)/GEAR_BOX_COUNTS_PER_REV)*60.0f;
     encoder1Count = 0;
 
     lastTime = currentTime;
