@@ -39,7 +39,8 @@ private:
             
     bool mission_running_;
     bool manual_locomotion_mode_;
-    bool wav_play_enabled_; 
+    bool wav_play_enabled_;
+    bool pid_enabled_; 
     
     unsigned int battery_low_count_; // Counter for low battery low messages   
  
@@ -65,6 +66,11 @@ private:
     float ramp_for_angular_;            // Ramp rate for angular velocities
     float ramp_for_linear_;             // Ramp rate for linear velocities
     float voltage_level_warning_;       // Battery voltage low warning level
+    
+    float lslope_;                      // Graph slope of the linear speed from joystick input
+    float lyintercept_;                 // Graph y-intercept of the linear speed from joystick input
+    float aslope_;                      // Graph slope of the angular speed from joystick input
+    float ayintercept_;                 // Graph y-intercept of the angular speed from joystick input
     
     const uint16_t SHIFT_CAPS_NUM_LOCK_ = (keyboard::Key::MODIFIER_NUM | keyboard::Key::MODIFIER_CAPS | 
                                            keyboard::Key::MODIFIER_LSHIFT | keyboard::Key::MODIFIER_RSHIFT);

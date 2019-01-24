@@ -628,7 +628,7 @@
     <limit effort="1000.0" lower="-1.39626" upper="0.698132" velocity="0.5"/>
     <parent link="head_pan_bracket"/>
     <child link="head_tilt_arm"/>
-    <dynamic damping="100.0" friction="100.0" />
+    <dynamic damping="0.7" friction="0.0" />
     <origin xyz="0.0 -0.009 0.035"/>
   </joint>   
 
@@ -681,6 +681,30 @@
     <origin xyz="0.003 0.008 0.060"/>
   </joint> 
     
+  <link name="camera">
+    <visual>      
+      <geometry>        
+        <box size="0.005 0.025 0.020"/>
+      </geometry>      
+      <material name="blue"/>           
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.005 0.025 0.020"/>        
+      </geometry>        
+    </collision>
+    <inertial>
+      <mass value="1e-5"/>
+      <inertia ixx="1e-6" ixy="0.0" ixz="0.0" iyy="1e-6" iyz="0.0" izz="1e-6"/>
+    </inertial>    
+  </link>
+  
+  <joint name="camera_joint" type="fixed">
+    <parent link="display"/>
+    <child link="camera"/>
+    <origin xyz="0.0 0.0 0.065"/>
+  </joint>              
+    
   <!-- Gazebo stuff -->
   
   <gazebo reference="left_wheel">
@@ -730,6 +754,10 @@
   <gazebo reference="rear_caster_bracket">
     <material>Gazebo/Blue</material>
   </gazebo> 
+  
+  <gazebo reference="camera">
+    <material>Gazebo/Blue</material>
+  </gazebo>
      
   <!-- To control the wheels -->  
   <gazebo>
@@ -781,6 +809,47 @@
       <hardwareInterface>EffortJointInterface</hardwareInterface>
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
-  </transmission>    
+  </transmission>
+  
+<!-- camera -->
+  <gazebo reference="camera">
+    <sensor type="camera" name="camera1">
+      <update_rate>30.0</update_rate>
+      <camera name="head">
+        <horizontal_fov>1.3962634</horizontal_fov>
+        <image>         
+          <width>800</width>
+          <height>800</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <!-- Noise is sampled independently per pixel on each frame.
+               That pixel's noise value is added to each of its color
+               channels, which at that point lie in the range [0,1]. -->
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>raspicam_node</cameraName>
+        <imageTopicName>image</imageTopicName>
+        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+        <frameName>camera</frameName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>  
   
 </robot>

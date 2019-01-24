@@ -2,6 +2,14 @@
 Changelog for package rodney
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.0 (2019-01-24)
+------------------
+* Improved conversion from joystick position to speed command
+* Added encoder code to the Arduino sketch
+* Added the Thunderborg node to the launch file
+* Added Thunderborg and tacho_msgs to clonepackages and createlinks file
+* Added camera to urdf model
+
 0.1.3 (2019-01-13)
 ------------------
 * Removed republish from the launch file

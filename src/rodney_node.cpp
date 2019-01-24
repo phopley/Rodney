@@ -15,10 +15,10 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     angular_mission_demand_ = 0.0f;
     
     manual_locomotion_mode_ = false;
-    linear_set_speed_ = 0.5f;
-    angular_set_speed_ = 2.5f; 
+    linear_set_speed_ = 0.25f;
+    angular_set_speed_ = 1.5f; 
     
-    // Obtain any configuration values from the parameter server. If they don't exist use the defaults above
+    // Obtain any configuration values from the parameter server. If they don't exist use the defaults
     nh_.param("/controller/axes/linear_speed_index", linear_speed_index_, 0);
     nh_.param("/controller/axes/angular_speed_index", angular_speed_index_, 1);
     nh_.param("/controller/axes/camera_x_index", camera_x_index_, 2);
@@ -26,12 +26,13 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     nh_.param("/controller/buttons/manual_mode_select", manual_mode_select_, 0);
     nh_.param("/controller/buttons/default_camera_pos_select", default_camera_pos_select_, 1);
     nh_.param("/controller/dead_zone", dead_zone_, 2000);
-    nh_.param("/teleop/max_linear_speed", max_linear_speed_, 3.0f);
-    nh_.param("/teleop/max_angular_speed", max_angular_speed_, 3.0f);
+    nh_.param("/teleop/max_linear_speed", max_linear_speed_, 1.0f);
+    nh_.param("/teleop/max_angular_speed", max_angular_speed_, 8.7f);
     nh_.param("/motor/ramp/linear", ramp_for_linear_, 5.0f);
     nh_.param("/motor/ramp/angular", ramp_for_angular_, 5.0f);
     nh_.param("/battery/warning_level", voltage_level_warning_, 9.5f);    
     nh_.param("/sounds/enabled", wav_play_enabled_, false);
+    nh_.param("/pid/use_pid", pid_enabled_, false);
     
     // Obtain the filename and text for the wav files that can be played    
     nh_.getParam("/sounds/filenames", wav_file_names_);
@@ -59,6 +60,14 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     battery_low_count_ = 0;
     mission_running_ = false;
     
+    // Calculate the slope and y-intercept of the joytick input against linear speed
+    lslope_ = max_linear_speed_/(MAX_AXES_VALUE_-dead_zone_);
+    lyintercept_ = -(lslope_*dead_zone_);
+    
+    // Calculate the slope and y-intercept of the joytick input against angular speed
+    aslope_ = max_angular_speed_/(MAX_AXES_VALUE_-dead_zone_);
+    ayintercept_ = -(aslope_*dead_zone_);
+    
     // Seed the random number generator
     srand((unsigned)time(0));
     
@@ -74,37 +83,37 @@ void RodneyNode::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
     // manual locomotion mode can use the joystick/game pad
     joystick_x_axes = msg->axes[angular_speed_index_];
     joystick_y_axes = msg->axes[linear_speed_index_];
+    
+    // Check for manual movement
+    
+    // Check dead zone values
+    if(abs(joystick_y_axes) < dead_zone_)
+    {
+        joystick_linear_speed_ = 0.0f;
+    }
+    else
+    { 
+        joystick_linear_speed_ = (lslope_*(float)abs(joystick_y_axes))+lyintercept_;
         
+        if(joystick_y_axes > 0.0f)
+        {
+            joystick_linear_speed_ = -joystick_linear_speed_;
+        }
+    }
+       
     // Check dead zone values   
     if(abs(joystick_x_axes) < dead_zone_)
     {
-        joystick_x_axes = 0;
-    }
-    
-    if(abs(joystick_y_axes) < dead_zone_)
-    {
-        joystick_y_axes = 0;
-    }    
-    
-    // Check for manual movement
-    if(joystick_y_axes != 0)
-    {      
-        joystick_linear_speed_ = -(joystick_y_axes*(max_linear_speed_/(float)MAX_AXES_VALUE_));
-        last_interaction_time_ = ros::Time::now();
+        joystick_angular_speed_ = 0.0f;
     }
     else
     {
-        joystick_linear_speed_ = 0;
-    }
-    
-    if(joystick_x_axes != 0)
-    {
-        joystick_angular_speed_ = -(joystick_x_axes*(max_angular_speed_/(float)MAX_AXES_VALUE_));
-        last_interaction_time_ = ros::Time::now();
-    }
-    else
-    {
-        joystick_angular_speed_ = 0;
+        joystick_angular_speed_ = (aslope_*(float)abs(joystick_x_axes))+ayintercept_;
+        
+        if(joystick_x_axes > 0.0f)
+        {
+            joystick_angular_speed_ = -joystick_angular_speed_;
+        }
     }
     
     // Now check the joystick/game pad for manual camera movement               
@@ -619,16 +628,25 @@ void RodneyNode::sendTwist(void)
         target_twist.linear.x = linear_mission_demand_;
         target_twist.angular.z = angular_mission_demand_;
     }
-    
-    ros::Time time_now = ros::Time::now();
+
+    // If not using the PID ramp to the target value. 
+    if (false == pid_enabled_)
+    {
+        ros::Time time_now = ros::Time::now();
         
-    // Ramp towards are required twist velocities
-    last_twist_ = rampedTwist(last_twist_, target_twist, last_twist_send_time_, time_now);
+        // Ramp towards are required twist velocities
+        last_twist_ = rampedTwist(last_twist_, target_twist, last_twist_send_time_, time_now);
         
-    last_twist_send_time_ = time_now;
+        last_twist_send_time_ = time_now;
         
-    // Publish the Twist message
-    twist_pub_.publish(last_twist_);
+        // Publish the Twist message using the ramp value
+        twist_pub_.publish(last_twist_);
+    }
+    else
+    {
+        // Publish the Twist message using the target value
+        twist_pub_.publish(target_twist);
+    }        
 }
 //---------------------------------------------------------------------------
 

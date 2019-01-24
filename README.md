@@ -61,4 +61,4 @@ Parameters:
 * `/sounds/text`: A list of speeches which match the contents of the wav file names.
 
 ## Arduino Sketch
-The `rodney_control` directory contains an Arduino sketch `rodney_control.ino` which handles some of the rodney robot function e.g. servo movements.
+The `rodney_control` directory contains an Arduino sketch `rodney_control.ino` which handles some of the rodney robot function e.g. servo movements and motor encoder readings.
