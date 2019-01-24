@@ -67,6 +67,11 @@ private:
     float ramp_for_linear_;             // Ramp rate for linear velocities
     float voltage_level_warning_;       // Battery voltage low warning level
     
+    float lslope_;                      // Graph slope of the linear speed from joystick input
+    float lyintercept_;                 // Graph y-intercept of the linear speed from joystick input
+    float aslope_;                      // Graph slope of the angular speed from joystick input
+    float ayintercept_;                 // Graph y-intercept of the angular speed from joystick input
+    
     const uint16_t SHIFT_CAPS_NUM_LOCK_ = (keyboard::Key::MODIFIER_NUM | keyboard::Key::MODIFIER_CAPS | 
                                            keyboard::Key::MODIFIER_LSHIFT | keyboard::Key::MODIFIER_RSHIFT);
     const unsigned int MAX_AXES_VALUE_ = 32767; 

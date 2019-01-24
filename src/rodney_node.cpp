@@ -60,6 +60,14 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     battery_low_count_ = 0;
     mission_running_ = false;
     
+    // Calculate the slope and y-intercept of the joytick input against linear speed
+    lslope_ = max_linear_speed_/(MAX_AXES_VALUE_-dead_zone_);
+    lyintercept_ = -(lslope_*dead_zone_);
+    
+    // Calculate the slope and y-intercept of the joytick input against angular speed
+    aslope_ = max_angular_speed_/(MAX_AXES_VALUE_-dead_zone_);
+    ayintercept_ = -(aslope_*dead_zone_);
+    
     // Seed the random number generator
     srand((unsigned)time(0));
     
@@ -75,37 +83,37 @@ void RodneyNode::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
     // manual locomotion mode can use the joystick/game pad
     joystick_x_axes = msg->axes[angular_speed_index_];
     joystick_y_axes = msg->axes[linear_speed_index_];
+    
+    // Check for manual movement
+    
+    // Check dead zone values
+    if(abs(joystick_y_axes) < dead_zone_)
+    {
+        joystick_linear_speed_ = 0.0f;
+    }
+    else
+    { 
+        joystick_linear_speed_ = (lslope_*(float)abs(joystick_y_axes))+lyintercept_;
         
+        if(joystick_y_axes > 0.0f)
+        {
+            joystick_linear_speed_ = -joystick_linear_speed_;
+        }
+    }
+       
     // Check dead zone values   
     if(abs(joystick_x_axes) < dead_zone_)
     {
-        joystick_x_axes = 0;
-    }
-    
-    if(abs(joystick_y_axes) < dead_zone_)
-    {
-        joystick_y_axes = 0;
-    }    
-    
-    // Check for manual movement
-    if(joystick_y_axes != 0)
-    {      
-        joystick_linear_speed_ = -(joystick_y_axes*(max_linear_speed_/(float)MAX_AXES_VALUE_));
-        last_interaction_time_ = ros::Time::now();
+        joystick_angular_speed_ = 0.0f;
     }
     else
     {
-        joystick_linear_speed_ = 0;
-    }
-    
-    if(joystick_x_axes != 0)
-    {
-        joystick_angular_speed_ = -(joystick_x_axes*(max_angular_speed_/(float)MAX_AXES_VALUE_));
-        last_interaction_time_ = ros::Time::now();
-    }
-    else
-    {
-        joystick_angular_speed_ = 0;
+        joystick_angular_speed_ = (aslope_*(float)abs(joystick_x_axes))+ayintercept_;
+        
+        if(joystick_x_axes > 0.0f)
+        {
+            joystick_angular_speed_ = -joystick_angular_speed_;
+        }
     }
     
     // Now check the joystick/game pad for manual camera movement               
