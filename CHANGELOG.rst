@@ -2,6 +2,10 @@
 Changelog for package rodney
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Unreleased
+------------------
+* Added LIDAR to URDF model
+
 0.2.0 (2019-01-24)
 ------------------
 * Improved conversion from joystick position to speed command

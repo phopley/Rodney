@@ -703,8 +703,164 @@
     <parent link="display"/>
     <child link="camera"/>
     <origin xyz="0.0 0.0 0.065"/>
-  </joint>              
+  </joint>
+  
+  <!-- Front platform -->
+ 
+  <link name="fwd_post_1">
+    <visual>
+      <geometry>
+        <cylinder length="0.030" radius="0.005"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.015"/>      
+      <material name="blue"/> 
+    </visual>
+    <collision>
+       <geometry>
+        <cylinder length="0.030" radius="0.005"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.015"/>
+    </collision>
+    <inertial>
+      <mass value="0.0015"/>
+      <inertia ixx="1.12594e-7" ixy="0.0" ixz="0.0" iyy="1.12594e-7" iyz="0.0" izz="1.875e-10" />
+    </inertial>  
+  </link>  
+  
+  <joint name="base_to_fwd_post_1" type="fixed">
+    <parent link="base_link"/>
+    <child link="fwd_post_1"/>
+    <origin xyz="0.14 0.08 0.008"/>
+  </joint>
+  
+
+  <link name="fwd_post_2">
+    <visual>
+      <geometry>
+        <cylinder length="0.030" radius="0.005"/>
+      </geometry> 
+      <origin xyz="0.0 0.0 0.015"/>     
+      <material name="blue"/> 
+    </visual>
+    <collision>
+       <geometry>
+        <cylinder length="0.030" radius="0.005"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.015"/>
+    </collision>
+    <inertial>
+      <mass value="0.0015"/>
+      <inertia ixx="1.12594e-7" ixy="0.0" ixz="0.0" iyy="1.12594e-7" iyz="0.0" izz="1.875e-10" />
+    </inertial>  
+  </link> 
+  
+  <joint name="base_to_fwd_post_2" type="fixed">
+    <parent link="base_link"/>
+    <child link="fwd_post_2"/>
+    <origin xyz="0.14 -0.08 0.008"/>
+  </joint>    
+ 
+  <link name="fwd_post_3">
+    <visual>
+      <geometry>
+        <cylinder length="0.030" radius="0.005"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.015"/>      
+      <material name="blue"/> 
+    </visual>
+    <collision>
+       <geometry>
+        <cylinder length="0.030" radius="0.005"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.015"/>
+    </collision>
+    <inertial>
+      <mass value="0.0015"/>
+      <inertia ixx="1.12594e-7" ixy="0.0" ixz="0.0" iyy="1.12594e-7" iyz="0.0" izz="1.875e-10" />
+    </inertial>  
+  </link> 
+
+  <joint name="base_to_fwd_post_3" type="fixed">
+    <parent link="base_link"/>
+    <child link="fwd_post_3"/>
+    <origin xyz="0.12 -0.08 0.008"/>
+  </joint>    
     
+  <link name="fwd_post_4">
+    <visual>
+      <geometry>
+        <cylinder length="0.030" radius="0.005"/>
+      </geometry>      
+      <origin xyz="0.0 0.0 0.015"/>
+      <material name="blue"/> 
+    </visual>
+    <collision>
+       <geometry>
+        <cylinder length="0.030" radius="0.005"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.015"/>
+    </collision>
+    <inertial>
+      <mass value="0.0015"/>
+      <inertia ixx="1.12594e-7" ixy="0.0" ixz="0.0" iyy="1.12594e-7" iyz="0.0" izz="1.875e-10" />
+    </inertial>  
+  </link>
+ 
+  <joint name="base_to_fwd_post_4" type="fixed">
+    <parent link="base_link"/>
+    <child link="fwd_post_4"/>
+    <origin xyz="0.12 0.08 0.008"/>
+  </joint>
+
+  <link name="fwd_platform">
+    <visual>
+      <geometry>
+        <box size="0.04 0.18 0.003"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.04 0.018 0.003"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.030"/>
+      <inertia ixx="8.1e-5" ixy="0.0" ixz="0.0" iyy="0.000085" iyz="0.0" izz="4.02e-6" />
+    </inertial>  
+  </link>
+  
+  <joint name="fwd_post_1_to_fwd_platform" type="fixed">
+    <parent link="fwd_post_1"/>
+    <child link="fwd_platform"/>
+    <origin xyz="-0.01 -0.08 0.030"/>
+  </joint> 
+  
+  <!-- LIDAR link -->
+  <link name="lidar_link">
+    <visual>
+      <geometry>
+        <box size="0.02 0.03 0.01"/>
+      </geometry>      
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.02 0.03 0.01"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="1e-5"/>
+      <inertia ixx="1e-6" ixy="0.0" ixz="0.0" iyy="1e-6" iyz="0.0" izz="1e-6" />
+    </inertial>  
+  </link>
+  
+  <joint name="lidar_to_fwd_platform" type="fixed">
+    <parent link="fwd_platform"/>
+    <child link ="lidar_link"/>
+    <origin xyz="0.0 0.0 0.0065"/>
+  </joint>     
+        
   <!-- Gazebo stuff -->
   
   <gazebo reference="left_wheel">
@@ -758,6 +914,30 @@
   <gazebo reference="camera">
     <material>Gazebo/Blue</material>
   </gazebo>
+  
+  <gazebo reference="fwd_post_1">
+    <material>Gazebo/Blue</material>
+  </gazebo>  
+
+  <gazebo reference="fwd_post_2">
+    <material>Gazebo/Blue</material>
+  </gazebo>   
+  
+  <gazebo reference="fwd_post_3">
+    <material>Gazebo/Blue</material>
+  </gazebo>     
+  
+  <gazebo reference="fwd_post_4">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+  
+  <gazebo reference="fwd_platform">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+  
+  <gazebo reference="lidar_link">
+    <material>Gazebo/Blue</material>
+  </gazebo>      
      
   <!-- To control the wheels -->  
   <gazebo>
@@ -811,7 +991,7 @@
     </actuator>
   </transmission>
   
-<!-- camera -->
+  <!-- camera -->
   <gazebo reference="camera">
     <sensor type="camera" name="camera1">
       <update_rate>30.0</update_rate>
@@ -851,5 +1031,38 @@
       </plugin>
     </sensor>
   </gazebo>  
+  
+  <!-- LIDAR -->
+  <gazebo reference="lidar_link">
+    <sensor type="ray" name="base_lidar_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>1</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>180</samples>
+            <resolution>1</resolution>
+            <min_angle>-1.570796</min_angle>
+            <max_angle>1.570796</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.10</min>
+          <max>40.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
+        <topicName>laser/scan</topicName>
+        <frameName>lidar_link</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
   
 </robot>
