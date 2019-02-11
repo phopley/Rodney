@@ -5,6 +5,7 @@ Changelog for package rodney
 Unreleased
 ------------------
 * Added LIDAR to URDF model
+* Changed from Arduino Nano to Teensy
 
 0.2.0 (2019-01-24)
 ------------------
