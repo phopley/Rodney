@@ -26,7 +26,7 @@
  * 
  */
 
-#include <Servo.h>
+#include <PWMServo.h>
 #include <LIDARLite.h>
 #include "ros.h"  // USE "ros.h" not <ros.h> SO THAT WE USE OUR LOCAL VERSION
 #include <sensor_msgs/LaserScan.h>
@@ -53,6 +53,8 @@ void WheelSpeed1();
 #define ENCODER1_PINA 3  // Interrupt
 #define ENCODER1_PINB 4  // Digital pin
 
+#define LED_PIN 13  // Onboard LED
+
 #define GEAR_BOX_COUNTS_PER_REV 1440.0f
 
 #define NUM_READINGS 180 // 1 each degree
@@ -60,11 +62,11 @@ void WheelSpeed1();
 #define TRUE_MAX_ANGLE (1.571)
 #define ANGLE_INCREMENT (3.142 / NUM_READINGS)
 
-Servo     servoLidar;
-Servo     servo0;
-Servo     servo1;
-Servo     servo2;
-Servo     servo3;
+PWMServo  servoLidar;
+PWMServo  servo0;
+PWMServo  servo1;
+PWMServo  servo2;
+PWMServo  servo3;
 LIDARLite myLidarLite;
 
 tacho_msgs::tacho      tachoMsg;
@@ -102,8 +104,9 @@ void setup()
   nh.subscribe(subServo);
   nh.subscribe(subLidarCmd);
 
-  // Attach LIDAR  servo
-  servoLidar.attach(SERVO_LIDAR);
+  // Attach LIDAR  servo. The servo I'm using goes back past 0 degrees
+  // so setting the min and maximum (defaults are 544, 2400)
+  servoLidar.attach(SERVO_LIDAR, 620, 2400);
   servoLidar.write(0); // Start at 0 degrees (-1.571  radians for ROS)
 
   // Attach other servos
@@ -147,6 +150,10 @@ void setup()
   incDir = true;
   newScan = true;
   laserOn = false;
+
+  // Turn on the onboard LED to show we are running 
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, HIGH);
 }
 
 
