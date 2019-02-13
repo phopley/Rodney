@@ -710,16 +710,16 @@
   <link name="fwd_post_1">
     <visual>
       <geometry>
-        <cylinder length="0.030" radius="0.005"/>
+        <cylinder length="0.055" radius="0.005"/>
       </geometry>
-      <origin xyz="0.0 0.0 0.015"/>      
+      <origin xyz="0.0 0.0 0.0275"/>      
       <material name="blue"/> 
     </visual>
     <collision>
        <geometry>
-        <cylinder length="0.030" radius="0.005"/>
+        <cylinder length="0.055" radius="0.005"/>
       </geometry>
-      <origin xyz="0.0 0.0 0.015"/>
+      <origin xyz="0.0 0.0 0.0275"/>
     </collision>
     <inertial>
       <mass value="0.0015"/>
@@ -737,16 +737,16 @@
   <link name="fwd_post_2">
     <visual>
       <geometry>
-        <cylinder length="0.030" radius="0.005"/>
+        <cylinder length="0.055" radius="0.005"/>
       </geometry> 
-      <origin xyz="0.0 0.0 0.015"/>     
-      <material name="blue"/> 
+      <origin xyz="0.0 0.0 0.0275"/>     
+      <material name="blue"/>
     </visual>
     <collision>
        <geometry>
-        <cylinder length="0.030" radius="0.005"/>
+        <cylinder length="0.055" radius="0.005"/>
       </geometry>
-      <origin xyz="0.0 0.0 0.015"/>
+      <origin xyz="0.0 0.0 0.0275"/>
     </collision>
     <inertial>
       <mass value="0.0015"/>
@@ -763,16 +763,16 @@
   <link name="fwd_post_3">
     <visual>
       <geometry>
-        <cylinder length="0.030" radius="0.005"/>
+        <cylinder length="0.055" radius="0.005"/>
       </geometry>
-      <origin xyz="0.0 0.0 0.015"/>      
-      <material name="blue"/> 
+      <origin xyz="0.0 0.0 0.0275"/>      
+      <material name="blue"/>
     </visual>
     <collision>
        <geometry>
-        <cylinder length="0.030" radius="0.005"/>
+        <cylinder length="0.055" radius="0.005"/>
       </geometry>
-      <origin xyz="0.0 0.0 0.015"/>
+      <origin xyz="0.0 0.0 0.0275"/>
     </collision>
     <inertial>
       <mass value="0.0015"/>
@@ -783,22 +783,22 @@
   <joint name="base_to_fwd_post_3" type="fixed">
     <parent link="base_link"/>
     <child link="fwd_post_3"/>
-    <origin xyz="0.12 -0.08 0.008"/>
+    <origin xyz="0.085 -0.08 0.008"/>
   </joint>    
     
   <link name="fwd_post_4">
     <visual>
       <geometry>
-        <cylinder length="0.030" radius="0.005"/>
+        <cylinder length="0.055" radius="0.005"/>
       </geometry>      
-      <origin xyz="0.0 0.0 0.015"/>
+      <origin xyz="0.0 0.0 0.0275"/>
       <material name="blue"/> 
     </visual>
     <collision>
        <geometry>
-        <cylinder length="0.030" radius="0.005"/>
+        <cylinder length="0.055" radius="0.005"/>
       </geometry>
-      <origin xyz="0.0 0.0 0.015"/>
+      <origin xyz="0.0 0.0 0.0275"/>
     </collision>
     <inertial>
       <mass value="0.0015"/>
@@ -809,19 +809,18 @@
   <joint name="base_to_fwd_post_4" type="fixed">
     <parent link="base_link"/>
     <child link="fwd_post_4"/>
-    <origin xyz="0.12 0.08 0.008"/>
+    <origin xyz="0.085 0.08 0.008"/>
   </joint>
 
   <link name="fwd_platform">
     <visual>
-      <geometry>
-        <box size="0.04 0.18 0.003"/>
+      <geometry>      
+        <mesh filename="package://rodney/meshes/fwdPlatform.dae"/>
       </geometry>
-      <material name="blue"/>
     </visual>
     <collision>
       <geometry>
-        <box size="0.04 0.018 0.003"/>
+        <box size="0.075 0.018 0.003"/>
       </geometry>
     </collision>
     <inertial>
@@ -833,20 +832,44 @@
   <joint name="fwd_post_1_to_fwd_platform" type="fixed">
     <parent link="fwd_post_1"/>
     <child link="fwd_platform"/>
-    <origin xyz="-0.01 -0.08 0.030"/>
+    <origin xyz="-0.0275 -0.080 0.055"/>
   </joint> 
+  
+  <link name="lidar_servo">
+    <visual>
+      <geometry>
+        <box size="0.041 0.020 0.040"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.041 0.020 0.040"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.084"/>
+      <inertia ixx="3.77e-5" ixy="0.0" ixz="0.0" iyy="2.99e-5" iyz="0.0" izz="5.23e-5"/>
+    </inertial>
+  </link>
+    
+  <joint name="fwd_platform_to_lidar_servo" type="fixed">
+    <parent link="fwd_platform"/>
+    <child link="lidar_servo"/>
+    <origin xyz="0.010 0.0 -0.007"/>
+  </joint>    
   
   <!-- LIDAR link -->
   <link name="lidar_link">
     <visual>
       <geometry>
-        <box size="0.02 0.03 0.01"/>
+        <box size="0.040 0.048 0.020"/>
       </geometry>      
       <material name="black"/>
     </visual>
     <collision>
       <geometry>
-        <box size="0.02 0.03 0.01"/>
+        <box size="0.040 0.048 0.020"/>
       </geometry>
     </collision>
     <inertial>
@@ -855,10 +878,10 @@
     </inertial>  
   </link>
   
-  <joint name="lidar_to_fwd_platform" type="fixed">
-    <parent link="fwd_platform"/>
+  <joint name="lidar_to_lidar_servo" type="fixed">
+    <parent link="lidar_servo"/>
     <child link ="lidar_link"/>
-    <origin xyz="0.0 0.0 0.0065"/>
+    <origin xyz="0.020 0.0 0.030"/>
   </joint>     
         
   <!-- Gazebo stuff -->
@@ -930,13 +953,13 @@
   <gazebo reference="fwd_post_4">
     <material>Gazebo/Blue</material>
   </gazebo>
-  
-  <gazebo reference="fwd_platform">
-    <material>Gazebo/Blue</material>
+    
+  <gazebo reference="lidar_servo">
+    <material>Gazebo/Black</material>
   </gazebo>
-  
+    
   <gazebo reference="lidar_link">
-    <material>Gazebo/Blue</material>
+    <material>Gazebo/Black</material>
   </gazebo>      
      
   <!-- To control the wheels -->  
