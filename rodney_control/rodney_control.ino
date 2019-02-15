@@ -57,7 +57,7 @@ void WheelSpeed1();
 
 #define GEAR_BOX_COUNTS_PER_REV 1440.0f
 
-#define NUM_READINGS 180 // 1 each degree
+#define NUM_READINGS 181 // 1 each degree (0 to 180)
 #define TRUE_MIN_ANGLE (-1.571)
 #define TRUE_MAX_ANGLE (1.571)
 #define ANGLE_INCREMENT (3.142 / NUM_READINGS)
@@ -84,6 +84,7 @@ float ranges[NUM_READINGS];
 bool  laserOn;        // True when the LIDAR is enabled
 bool  incDir;         // True when direction of LIDAR servo is increasing angle
 bool  newScan;        // True when the start of a new scanning sequence is due
+bool  watingOnScan;   // When true have set timer between single scans and waiting for a signle scan to complete
 int   scanIndex;      // Current scan position gives servo position and array position for ranges
 byte  encoder0PinALast;
 byte  encoder1PinALast;
@@ -94,6 +95,7 @@ volatile boolean encoder1Direction; //Rotation direction
 unsigned long publisherTime;
 unsigned long currentTime;
 unsigned long lastTime;
+unsigned long scanTime;
 
 
 void setup() 
@@ -104,10 +106,12 @@ void setup()
   nh.subscribe(subServo);
   nh.subscribe(subLidarCmd);
 
-  // Attach LIDAR  servo. The servo I'm using goes back past 0 degrees
-  // so setting the min and maximum (defaults are 544, 2400)
-  servoLidar.attach(SERVO_LIDAR, 620, 2400);
-  servoLidar.write(0); // Start at 0 degrees (-1.571  radians for ROS)
+  // Attach LIDAR  servo.
+  servoLidar.attach(SERVO_LIDAR);
+  // Start at 0 degrees (-1.571  radians for ROS)
+  // Except the HiTEC HS-422 servo works in the left hand rule not 
+  // the right hand rule used by ros. So set 180 degrees for thsi type of servo
+  servoLidar.write(180); 
 
   // Attach other servos
   servo0.attach(SERVO_0); //attach it to the pin
@@ -150,6 +154,7 @@ void setup()
   incDir = true;
   newScan = true;
   laserOn = false;
+  watingOnScan = false;
 
   // Turn on the onboard LED to show we are running 
   pinMode(LED_PIN, OUTPUT);
@@ -159,10 +164,23 @@ void setup()
 
 void loop()
 {
-  if(laserOn == true)
+  if((laserOn == true) && (watingOnScan == false))
   {
     // Move the LIDAR servo
-    servoLidar.write(scanIndex);
+    // The HiTEC HS-422 servo works in the left hand rule not the right hand rule used by ros.
+    // That is the HS-422 increases then angle in an anti-clockwise direction.
+    if(incDir == true)
+    { 
+      servoLidar.write(180-scanIndex);      
+    }
+    else
+    {
+      servoLidar.write(scanIndex);      
+    }
+
+    // Delay to give time for servo to move into position
+    scanTime = millis() + 10; //+ 3;
+    watingOnScan = true;
   }
 
   // Is it time to publish the tacho message
@@ -186,7 +204,7 @@ void loop()
   }
 
   // Is the LIDAR enabled
-  if(laserOn == true)
+  if((laserOn == true) && (millis() > scanTime))
   {
     if(incDir == true)
     {
@@ -223,7 +241,7 @@ void loop()
         lidarPub.publish(&lidarMsg);
 
         // Setup to move in the other direction
-        scanIndex = NUM_READINGS-1;
+        scanIndex = 0;
         newScan = true;
         incDir = false;
       }
@@ -233,8 +251,8 @@ void loop()
       if(newScan == true)
       {
         // Moving clockwise around Z, angle decreasing with ROS standard
-        lidarMsg.angle_min = -TRUE_MIN_ANGLE;
-        lidarMsg.angle_max = -TRUE_MAX_ANGLE;
+        lidarMsg.angle_min = TRUE_MAX_ANGLE;
+        lidarMsg.angle_max = TRUE_MIN_ANGLE;
         lidarMsg.angle_increment = -ANGLE_INCREMENT;
 
         // Time is acquisition time of first ray in scan
@@ -254,9 +272,9 @@ void loop()
         ranges[scanIndex] = (float)myLidarLite.distance(false) / 100.0f;
       }
 
-      scanIndex--;
+      scanIndex++;
 
-      if(scanIndex < 0)
+      if(scanIndex == NUM_READINGS)
       {
         // End of the scan sequence
         lidarMsg.ranges = ranges;  
@@ -267,7 +285,9 @@ void loop()
         newScan = true;
         incDir = true;
       }      
-    }    
+    }
+
+    watingOnScan = false;
   }
   
   nh.spinOnce();
@@ -319,7 +339,10 @@ void command_lidar_cb( const std_msgs::Bool& cmd_msg)
   else
   {
     // Set servo to start of scan for when next enabled
-    servoLidar.write(0);
+    // Start at 0 degrees (-1.571  radians for ROS)
+    // Except the HiTEC HS-422 servo works in the left hand rule not 
+    // the right hand rule used by ros. So set 180 degrees for thsi type of servo
+    servoLidar.write(180);
   }    
 }
 
