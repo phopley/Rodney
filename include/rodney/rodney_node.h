@@ -40,7 +40,8 @@ private:
     bool mission_running_;
     bool manual_locomotion_mode_;
     bool wav_play_enabled_;
-    bool pid_enabled_; 
+    bool pid_enabled_;
+    bool manual_lidar_enable_;  // true when operator manually enables the LIDAR function 
     
     unsigned int battery_low_count_; // Counter for low battery low messages   
  
@@ -49,7 +50,8 @@ private:
     int manual_mode_select_;   // Controller button index for manual mode (teleop)
     int camera_x_index_;       // Controller axes index for x direction head/camera
     int camera_y_index_;       // Controller axes index for y direction head/camera
-    int default_camera_pos_select_; // Controller button index formoving camera to default position
+    int default_camera_pos_select_; // Controller button index for moving camera to default position
+    int lidar_enable_select_;       // Controller button index for enable/disable LIDAR function
     
     int dead_zone_;                     // Controller dead zone value    
     

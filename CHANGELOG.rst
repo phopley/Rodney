@@ -6,6 +6,8 @@ Unreleased
 ------------------
 * Added LIDAR to URDF model
 * Changed from Arduino Nano to Teensy
+* In the urdf file added origin to each inertial tag where it is not left as default
+* Added functionality to manually enable to LIDAR from keyboard or joystick
 
 0.2.0 (2019-01-24)
 ------------------

@@ -18,6 +18,8 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     linear_set_speed_ = 0.25f;
     angular_set_speed_ = 1.5f; 
     
+    manual_lidar_enable_ = false;
+    
     // Obtain any configuration values from the parameter server. If they don't exist use the defaults
     nh_.param("/controller/axes/linear_speed_index", linear_speed_index_, 0);
     nh_.param("/controller/axes/angular_speed_index", angular_speed_index_, 1);
@@ -25,6 +27,7 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     nh_.param("/controller/axes/camera_y_index", camera_y_index_, 3);
     nh_.param("/controller/buttons/manual_mode_select", manual_mode_select_, 0);
     nh_.param("/controller/buttons/default_camera_pos_select", default_camera_pos_select_, 1);
+    nh_.param("/controller/buttons/lidar_enable", lidar_enable_select_, 2);
     nh_.param("/controller/dead_zone", dead_zone_, 2000);
     nh_.param("/teleop/max_linear_speed", max_linear_speed_, 1.0f);
     nh_.param("/teleop/max_angular_speed", max_angular_speed_, 8.7f);
@@ -198,6 +201,28 @@ void RodneyNode::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
         
         last_interaction_time_ = ros::Time::now();
     }
+    
+    // Button on controller selects to enable/disable the lidar function
+    if((manual_locomotion_mode_ == true) && (msg->buttons[lidar_enable_select_] == 1))
+    {
+        std_msgs::String mission_msg;
+        
+        if(manual_lidar_enable_ == true)
+        {
+            // Disable the LIDAR function
+            mission_msg.data = "J4^disable";            
+            manual_lidar_enable_ = false;
+        }
+        else
+        {
+            // Enable the LIDAR function
+            mission_msg.data = "J4^enable";
+            manual_lidar_enable_ = true;
+        }
+        
+        mission_pub_.publish(mission_msg);        
+        last_interaction_time_ = ros::Time::now();
+    }
 }
 //---------------------------------------------------------------------------
 
@@ -225,7 +250,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
     //      '1' to '9' - Run a mission (1 -9)
     //      'a' or 'A' - Some missions require the user to send an acknowledge
     //      'c' or 'C' - Cancel current mission
-    //      'd' or 'D' - Move head/camera to the default position in manual mode 
+    //      'd' or 'D' - Move head/camera to the default position in manual mode
+    //      'l' or 'L' - Disable/Enable LIDAR function 
     //      'm' or 'M' - Set locomotion mode to manual
     //      'r' or 'R' - Reset the odometry
     
@@ -239,6 +265,7 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
                     
         mission_running_ = true; 
         manual_locomotion_mode_ = false;
+        manual_lidar_enable_ = false;
         
         last_interaction_time_ = ros::Time::now();                       
     }
@@ -275,7 +302,27 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         }    
         
         last_interaction_time_ = ros::Time::now();   
-    }       
+    } 
+    else if((msg->code == keyboard::Key::KEY_l) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
+    {
+                std_msgs::String mission_msg;
+        
+        if(manual_lidar_enable_ == true)
+        {
+            // Disable the LIDAR function
+            mission_msg.data = "J4^-0";            
+            manual_lidar_enable_ = false;
+        }
+        else
+        {
+            // Enable the LIDAR function
+            mission_msg.data = "J4^-1";
+            manual_lidar_enable_ = true;
+        }
+        
+        mission_pub_.publish(mission_msg);        
+        last_interaction_time_ = ros::Time::now();
+    }      
     else if((msg->code == keyboard::Key::KEY_m) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
     {
         // 'm' or 'M', set locomotion mode to manual (any missions going to auto should set manual_locomotion_mode_ to false)
