@@ -12,7 +12,10 @@
 
   <node pkg="pan_tilt" type="pan_tilt_node" name="pan_tilt_node" output="screen"/>
   <node pkg="face_recognition" type="face_recognition_node.py" name="face_recognition_node" output="screen"/>
-  <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen" args="/dev/ttyACM0"/>
+  <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
+    <param name="port" value="/dev/ttyACM0"/>
+    <param name="baud" value="500000"/>
+  </node>
   <node pkg="head_control" type="head_control_node" name="head_control_node" output="screen"/>
   <node pkg="homer_robot_face" type="RobotFace" name="RobotFace" output="screen"/>
   <node pkg="speech" type="speech_node" name="speech_node" output="screen"/>
