@@ -5,7 +5,7 @@ Changelog for package rodney
 Unreleased
 ------------------
 * Added LIDAR to URDF model
-* Changed from Arduino Nano to Teensy
+* "Arduino" code changed to use either an Arduino Nano or a Teensy. Nano uses smaller buffer sizes a Teensy use higher baud rate
 * In the urdf file added origin to each inertial tag where it is not left as default
 * Added functionality to manually enable to LIDAR from keyboard or joystick
 * Changed head points in URDF model from EfforJointInterface to PositionJointInterface

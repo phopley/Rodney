@@ -29,13 +29,15 @@
  * D9 (PWM)  -> servo indexed 0  
  * 
  */
-#if defined(__MK64FX512__)
+#if defined(__MK64FX512__) || defined(__MK66FX1M0__)
 #include <PWMServo.h> // Use PWMServo if using a Teensy
-#include "ros.h"      // Use "ros.h" not <ros.h> so that by using our local version we can increase buffer size if required
 #else
 #include <Servo.h>
-#include <ros.h>
 #endif
+// Use "ros.h" not <ros.h> so that by using our local version 
+// we can increase/decrease buffer size if required and 
+// increased the baud rate on faster boards.
+#include "ros.h"
 #include <servo_msgs/servo_array.h>
 #include <tacho_msgs/tacho.h>
 
@@ -47,7 +49,7 @@ void WheelSpeed1();
 
 #define GEAR_BOX_COUNTS_PER_REV 1440.0f
 
-#if defined(__MK64FX512__) 
+#if defined(__MK64FX512__) || defined(__MK66FX1M0__) 
 // Teensy
 // Define the PWM pins that the other servos are connected to
 #define SERVO_0 23
