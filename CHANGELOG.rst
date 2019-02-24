@@ -9,6 +9,7 @@ Unreleased
 * In the urdf file added origin to each inertial tag where it is not left as default
 * Added functionality to manually enable to LIDAR from keyboard or joystick
 * Changed head points in URDF model from EfforJointInterface to PositionJointInterface
+* Moved scripts to a scripts folder and create rules for remapping serial ports
 
 0.2.0 (2019-01-24)
 ------------------
