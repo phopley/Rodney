@@ -17,3 +17,13 @@ The connections to a Teensy 3.5 are:
 * Pin 22 (PWM)  -> servo indexed 1
 * PIN 23 (PWM)  -> servo indexed 0
 
+The connections to a Nano are:
+* D2 (INT)   -> used for monitoring right motor speed
+* D4 (Input) -> used for sensing right motor direction
+* D3 (INT)   -> used for monitoring left motor speed
+* D7 (Input) -> used for sensing left motor direction 
+* D10 (PWM)  -> servo indexed 3
+* D5 (PWM)  -> servo indexed 2 
+* D6 (PWM)  -> servo indexed 1
+* D9 (PWM)  -> servo indexed 0
+

@@ -26,7 +26,7 @@
  * D10 (PWM)  -> servo indexed 3
  * D5 (PWM)  -> servo indexed 2 
  * D6 (PWM)  -> servo indexed 1
- * D9 (PWM)  -> servo indexed 0  
+ * D9 (PWM)  -> servo indexed 0
  * 
  */
 #if defined(__MK64FX512__) || defined(__MK66FX1M0__)
@@ -49,8 +49,10 @@ void WheelSpeed1();
 
 #define GEAR_BOX_COUNTS_PER_REV 1440.0f
 
-#if defined(__MK64FX512__) || defined(__MK66FX1M0__) 
-// Teensy
+#if defined(__MK64FX512__) || defined(__MK66FX1M0__)  // Teensy
+// Define the period in milliseconds between tacho messages
+#define TACHO_PERIOD_MS 25  // Publish at 40Hz
+
 // Define the PWM pins that the other servos are connected to
 #define SERVO_0 23
 #define SERVO_1 22
@@ -67,7 +69,10 @@ PWMServo  servo0;
 PWMServo  servo1;
 PWMServo  servo2;
 PWMServo  servo3;
-#else
+#else // Arduino Nano
+// Define the period in milliseconds between tacho messages
+#define TACHO_PERIOD_MS 50  // Publish at 20Hz
+
 // Define the PWM pins that the other servos are connected to
 #define SERVO_0 9
 #define SERVO_1 9
@@ -159,7 +164,7 @@ void loop()
     lastTime = currentTime;
     
     tachoPub.publish(&tachoMsg);
-    publisherTime = millis() + 50; // Publish at 20Hz
+    publisherTime = millis() + TACHO_PERIOD_MS;
   }
   
   nh.spinOnce();

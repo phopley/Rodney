@@ -6,6 +6,7 @@ Unreleased
 ------------------
 * Added LIDAR to URDF model
 * "Arduino" code changed to use either an Arduino Nano or a Teensy. Nano uses smaller buffer sizes a Teensy use higher baud rate
+* Increased tacho message publish rate to 40Hz on a Teensy
 * In the urdf file added origin to each inertial tag where it is not left as default
 * Added functionality to manually enable to LIDAR from keyboard or joystick
 * Changed head points in URDF model from EfforJointInterface to PositionJointInterface
