@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
+<!-- Model for Rodney 
+     As a general rule all the origins will be in the center of a link -->
 <robot name="Rodney">
 
   <material name="blue">
@@ -25,17 +27,16 @@
     <visual>      
       <geometry>        
         <mesh filename="package://rodney/meshes/rodneyBase.dae"/>        
-      </geometry>      
+      </geometry>
+      <origin xyz="0.0 0.0 -0.005"/>      
     </visual>
     <collision>
       <geometry>
-        <box size="0.340 0.180 0.008"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.004"/>
+        <box size="0.340 0.180 0.010"/>
+      </geometry>      
     </collision>
     <inertial>
-      <mass value="0.297"/>
-      <origin xyz="0.0 0.0 0.004"/>
+      <mass value="0.297"/>      
       <inertia ixx="0.000803" ixy="0.0" ixz="0.0" iyy="0.003663" iyz="0.0" izz="0.002863"/>      
     </inertial>
   </link>
@@ -46,19 +47,16 @@
     <visual>
       <geometry>
         <box size="0.075 0.056 0.030"/>
-      </geometry>
-      <origin xyz="0.0 0.0 -0.015"/>
+      </geometry>      
       <material name="black" />
     </visual>
     <collision>
       <geometry>
         <box size="0.075 0.056 0.030"/>
-      </geometry>    
-      <origin xyz="0.0 0.0 -0.015"/>
+      </geometry>          
     </collision>
     <inertial>
-      <mass value="0.259"/>
-      <origin xyz="0.0 0.0 -0.015"/>
+      <mass value="0.259"/>      
       <inertia ixx="8.71e-5" ixy="0.0" ixz="0.0" iyy="0.000189" iyz="0.0" izz="0.000141"/>
     </inertial>    
   </link>
@@ -66,26 +64,23 @@
   <joint name="base_to_AAx10" type="fixed">
     <parent link="base_link"/>
     <child link="AAx10"/>
-    <origin xyz="0.060 0.0 0.0"/>
+    <origin xyz="0.070 0.0 -0.020"/>
   </joint>  
        
   <link name="USB_PACK">
     <visual>
       <geometry>
         <box size="0.146 0.074 0.020"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.010"/>
+      </geometry>      
       <material name="black" />
     </visual>
     <collision>
       <geometry>
         <box size="0.146 0.074 0.020"/>
-      </geometry>    
-      <origin xyz="0.0 0.0 0.010"/>
+      </geometry>          
     </collision>
     <inertial>
-      <mass value="0.358"/>
-      <origin xyz="0.0 0.0 0.010"/>
+      <mass value="0.358"/>      
       <inertia ixx="0.000175" ixy="0.0" ixz="0.0" iyy="0.000799" iyz="0.0" izz="0.000648"/>
     </inertial>    
   </link>
@@ -93,7 +88,7 @@
   <joint name="base_to_USB_PACK" type="fixed">
     <parent link="base_link"/>
     <child link="USB_PACK"/>
-    <origin xyz="0.060 0.0 0.008"/>
+    <origin xyz="0.060 0.0 0.015"/>
   </joint>  
            
   <!-- Motors and wheels -->
@@ -105,18 +100,18 @@
       <geometry>
         <box size="0.042 0.049 0.002"/>
       </geometry>      
-      <origin rpy="1.58 0 0" xyz="0.0 0.0 -0.0245"/>      
+      <origin rpy="1.58 0 0"/>      
       <material name="bronze"/>
     </visual>
     <collision>
       <geometry>
         <box size="0.042 0.049 0.002"/>
       </geometry>
-      <origin rpy="1.58 0 0" xyz="0.0 0.0 -0.0245"/>
+      <origin rpy="1.58 0 0"/>
     </collision>
     <inertial>
       <mass value="0.035"/>
-      <origin rpy="1.58 0 0" xyz="0.0 0.0 -0.0245"/>
+      <origin rpy="1.58 0 0"/>
       <inertia ixx="7.01e-6" ixy="0.0" ixz="0.0" iyy="1.21e-5" iyz="0.0" izz="5.16e-6"/>
     </inertial>    
   </link>
@@ -124,53 +119,53 @@
   <joint name="base_to_l_motor_brk" type="fixed">
     <parent link="base_link"/>
     <child link="left_motor_bracket"/>
-    <origin xyz="0.0 0.095 0.0"/>
+    <origin xyz="0.0 0.091 -0.0295"/>
   </joint>
-        
+      
   <link name="left_motor">
     <visual>
       <geometry>
         <cylinder length="0.070" radius="0.0185"/>
       </geometry>
-      <origin rpy="1.57 0 0" xyz="0.0 -0.028 0.0"/>
+      <origin rpy="1.57 0 0"/>
       <material name="silver"/>
     </visual>
     <collision>
       <geometry>
         <cylinder length="0.070" radius="0.0185"/>
       </geometry>
-      <origin rpy="1.57 0 0" xyz="0.0 -0.028 0.0"/>
+      <origin rpy="1.57 0 0"/>
     </collision>
     <inertial>
       <mass value="0.206"/>
-      <origin rpy="1.57 0 0" xyz="0.0 -0.028 0.0"/>
+      <origin rpy="1.57 0 0"/>
       <inertia ixx="6.79916e-5" ixy="0.0" ixz="0.0" iyy="6.79916e-5" iyz="0.0" izz="3.35405e-5"/>
     </inertial>               
   </link>
-  
+ 
   <joint name="l_brk_to_l_motor" type="fixed">
     <parent link="left_motor_bracket"/>
     <child link="left_motor"/>    
-    <origin xyz="0.0 -0.001 -0.028"/>
+    <origin xyz="0.0 -0.036 -0.004"/>
   </joint>
- 
+   
   <link name="left_wheel">
     <visual>
       <geometry>
-        <cylinder length="0.050" radius="0.053"/>
+        <cylinder length="0.050" radius="0.050"/>
       </geometry>
-      <origin rpy="1.57 0 0" xyz="0.0 0.025 0.0"/>      
+      <origin rpy="1.57 0 0"/>      
       <material name="black"/>
     </visual>
     <collision>
       <geometry>
-        <cylinder length="0.050" radius="0.053"/>
+        <cylinder length="0.050" radius="0.050"/>
       </geometry>
-      <origin rpy="1.57 0 0" xyz="0.0 0.025 0.0"/>     
+      <origin rpy="1.57 0 0"/>     
     </collision>
     <inertial>
       <mass value="0.117"/>
-      <origin rpy="1.57 0 0" xyz="0.0 0.025 0.0"/>
+      <origin rpy="1.57 0 0"/>
       <inertia ixx="0.000106538" ixy="0.0" ixz="0.0" iyy="0.000106538" iyz="0.0" izz="0.000164327"/>
     </inertial>   
   </link>
@@ -180,9 +175,9 @@
     <parent link="left_motor_bracket"/>
     <child link="left_wheel"/>
     <dynamic damping="200.0" friction="200.0" />
-    <origin xyz="0.0 0.001 -0.034"/>
+    <origin xyz="0.0 0.029 -0.0105"/>
   </joint> 
-  
+        
   <!-- right -->
   
   <link name="right_motor_bracket">
@@ -190,18 +185,18 @@
       <geometry>
         <box size="0.042 0.049 0.002"/>
       </geometry>
-      <origin rpy="1.58 0 0" xyz="0.0 0.0 -0.0245"/>      
+      <origin rpy="1.58 0 0"/>      
       <material name="bronze"/>
     </visual>
     <collision>
       <geometry>
         <box size="0.042 0.049 0.002"/>
       </geometry>
-      <origin rpy="1.58 0 0" xyz="0.0 0.0 -0.0245"/>
+      <origin rpy="1.58 0 0"/>
     </collision>
     <inertial>
       <mass value="0.035"/>
-      <origin rpy="1.58 0 0" xyz="0.0 0.0 -0.0245"/>
+      <origin rpy="1.58 0 0"/>
       <inertia ixx="7.01e-6" ixy="0.0" ixz="0.0" iyy="1.21e-5" iyz="0.0" izz="5.16e-6"/>
     </inertial>     
   </link>
@@ -209,7 +204,7 @@
   <joint name="base_to_r_motor_brk" type="fixed">
     <parent link="base_link"/>
     <child link="right_motor_bracket"/>
-    <origin xyz="0.0 -0.095 0.0"/>
+    <origin xyz="0.0 -0.091 -0.0295"/>
   </joint>
            
   <link name="right_motor">
@@ -217,18 +212,18 @@
       <geometry>
         <cylinder length="0.070" radius="0.0185"/>
       </geometry>
-      <origin rpy="1.57 0 0" xyz="0.0 0.028 0.0"/>      
+      <origin rpy="1.57 0 0"/>      
       <material name="silver"/>
     </visual>
     <collision>
       <geometry>
         <cylinder length="0.070" radius="0.0185"/>
       </geometry>
-      <origin rpy="1.57 0 0" xyz="0.0 0.028 0.0"/>
+      <origin rpy="1.57 0 0"/>
     </collision>
     <inertial>
       <mass value="0.206"/>
-      <origin rpy="1.57 0 0" xyz="0.0 0.028 0.0"/> 
+      <origin rpy="1.57 0 0"/> 
       <inertia ixx="6.79916e-5" ixy="0.0" ixz="0.0" iyy="6.79916e-5" iyz="0.0" izz="3.35405e-5"/>
     </inertial>     
   </link>
@@ -236,26 +231,26 @@
   <joint name="r_brk_to_r_motor" type="fixed">
     <parent link="right_motor_bracket"/>
     <child link="right_motor"/>    
-    <origin xyz="0.0 0.001 -0.028"/>
+    <origin xyz="0.0 0.036 -0.004"/>
   </joint>
    
   <link name="right_wheel">
     <visual>
       <geometry>
-        <cylinder length="0.050" radius="0.053"/>
+        <cylinder length="0.050" radius="0.050"/>
       </geometry>
-      <origin rpy="1.57 0 0" xyz="0.0 -0.025 0.0"/>      
+      <origin rpy="1.57 0 0"/>      
       <material name="black"/>
     </visual>
     <collision>
       <geometry>
-        <cylinder length="0.050" radius="0.053"/>
+        <cylinder length="0.050" radius="0.050"/>
       </geometry>
-      <origin rpy="1.57 0 0" xyz="0.0 -0.025 0.0"/>     
+      <origin rpy="1.57 0 0"/>     
     </collision>
     <inertial>
       <mass value="0.117"/>
-      <origin rpy="1.57 0 0" xyz="0.0 -0.025 0.0"/>
+      <origin rpy="1.57 0 0"/>
       <inertia ixx="0.000106538" ixy="0.0" ixz="0.0" iyy="0.000106538" iyz="0.0" izz="0.000164327"/>
     </inertial>    
   </link>
@@ -265,28 +260,25 @@
     <parent link="right_motor_bracket"/>
     <child link="right_wheel"/>
     <dynamic damping="200.0" friction="200.0" />
-    <origin xyz="0.0 -0.001 -0.034"/>
+    <origin xyz="0.0 -0.029 -0.0105"/>
   </joint>
-  
+
   <!-- Casters -->
   <!-- Front -->
   <link name="front_caster_bracket">
     <visual>
       <geometry>
-        <box size="0.025 0.040 0.070"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.035"/>
+        <box size="0.025 0.040 0.065"/>
+      </geometry>      
       <material name="blue" />
     </visual>
     <collision>
       <geometry>
-        <box size=".025 0.040 0.070"/>
-      </geometry>    
-      <origin xyz="0.0 0.0 0.035"/>
+        <box size="0.025 0.040 0.065"/>
+      </geometry>          
     </collision>
     <inertial>
-      <mass value="0.030"/>
-      <origin xyz="0.0 0.0 0.035"/>
+      <mass value="0.030"/>      
       <inertia ixx="0.000013" ixy="0.0" ixz="0.0" iyy="5.56e-6" iyz="0.0" izz="1.06e-5"/>
     </inertial> 
   </link>
@@ -294,26 +286,23 @@
   <joint name="base_to_front_caster" type="fixed">
     <parent link="base_link"/>
     <child link="front_caster_bracket"/>
-    <origin xyz="0.150 0.0 -0.070"/>
+    <origin xyz="0.150 0.0 -0.0375"/>
   </joint>
   
   <link name="front_caster">
     <visual>
       <geometry>
         <sphere radius="0.020"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.0"/>
+      </geometry>      
       <material name="white" />
     </visual>
     <collision>
       <geometry>
         <sphere radius="0.020"/>
-      </geometry>    
-      <origin xyz="0.0 0.0 0.0"/>
+      </geometry>          
     </collision>
     <inertial>
-      <mass value="0.003"/>
-      <origin xyz="0.0 0.0 0.0"/>
+      <mass value="0.003"/>      
       <inertia ixx="5e-6" ixy="0.0" ixz="0.0" iyy="5e-6" iyz="0.0" izz="5e-6"/>
     </inertial>     
   </link>      
@@ -322,27 +311,24 @@
     <axis xyz="1 1 1"/>
     <parent link="front_caster_bracket"/>
     <child link="front_caster"/>
-    <origin xyz="0.0 0.0 0.004"/>
+    <origin xyz="0.0 0.0 -0.0315"/>
   </joint>
-    
+
   <!-- Rear -->
   <link name="rear_caster_bracket">
     <visual>
       <geometry>
-        <box size="0.025 0.040 0.070"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.035"/>
+        <box size="0.025 0.040 0.065"/>
+      </geometry>      
       <material name="blue" />
     </visual>
     <collision>
       <geometry>
-        <box size=".025 0.040 0.070"/>
-      </geometry>    
-      <origin xyz="0.0 0.0 0.035"/>
+        <box size="0.025 0.040 0.065"/>
+      </geometry>          
     </collision>
     <inertial>
-      <mass value="0.030"/>
-      <origin xyz="0.0 0.0 0.035"/>
+      <mass value="0.030"/>      
       <inertia ixx="0.000013" ixy="0.0" ixz="0.0" iyy="5.56e-6" iyz="0.0" izz="1.06e-5"/>
     </inertial> 
   </link>
@@ -350,26 +336,23 @@
   <joint name="base_to_rear_caster" type="fixed">
     <parent link="base_link"/>
     <child link="rear_caster_bracket"/>
-    <origin xyz="-0.150 0.0 -0.070"/>
+    <origin xyz="-0.150 0.0 -0.0375"/>
   </joint>    
 
   <link name="rear_caster">
     <visual>
       <geometry>
         <sphere radius="0.020"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.0"/>
+      </geometry>      
       <material name="white" />
     </visual>
     <collision>
       <geometry>
         <sphere radius="0.020"/>
-      </geometry>    
-      <origin xyz="0.0 0.0 0.0"/>
+      </geometry>          
     </collision>
     <inertial>
-      <mass value="0.003"/>
-      <origin xyz="0.0 0.0 0.0"/>
+      <mass value="0.003"/>      
       <inertia ixx="5e-6" ixy="0.0" ixz="0.0" iyy="5e-6" iyz="0.0" izz="5e-6"/>
     </inertial> 
   </link>      
@@ -378,28 +361,25 @@
     <axis xyz="1 1 1"/>
     <parent link="rear_caster_bracket"/>
     <child link="rear_caster"/>
-    <origin xyz="0.0 0.0 0.004"/>
+    <origin xyz="0.0 0.0 -0.0315"/>
   </joint>         
   
   <!-- Rear platform -->
-
+ 
   <link name="post_1">
     <visual>
       <geometry>
         <cylinder length="0.020" radius="0.005"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.010"/>      
+      </geometry>           
       <material name="blue"/>
     </visual>
     <collision>
       <geometry>
         <cylinder length="0.020" radius="0.005"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.010"/> 
+      </geometry>      
     </collision>
     <inertial>
-      <mass value="0.001"/>
-      <origin xyz="0.0 0.0 0.010"/>
+      <mass value="0.001"/>      
       <inertia ixx="3.95833e-8" ixy="0.0" ixz="0.0" iyy="3.95833e-8" iyz="0.0" izz="1.25e-8"/>
     </inertial>           
   </link>
@@ -407,26 +387,23 @@
   <joint name="base_to_post_1" type="fixed">
     <parent link="base_link"/>
     <child link="post_1"/>
-    <origin xyz="-0.06 0.08 0.008"/>
+    <origin xyz="-0.06 0.08 0.015"/>
   </joint>
  
   <link name="post_2">
     <visual>
       <geometry>
         <cylinder length="0.020" radius="0.005"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.010"/>      
+      </geometry>            
       <material name="blue"/>
     </visual>
     <collision>
       <geometry>
         <cylinder length="0.020" radius="0.005"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.010"/> 
+      </geometry>       
     </collision>
     <inertial>
-      <mass value="0.001"/>
-      <origin xyz="0.0 0.0 0.010"/>
+      <mass value="0.001"/>      
       <inertia ixx="3.95833e-8" ixy="0.0" ixz="0.0" iyy="3.95833e-8" iyz="0.0" izz="1.25e-8"/>
     </inertial>    
   </link>
@@ -434,26 +411,23 @@
   <joint name="base_to_post_2" type="fixed">
     <parent link="base_link"/>
     <child link="post_2"/>
-    <origin xyz="-0.14 0.08 0.008"/>
+    <origin xyz="-0.14 0.08 0.015"/>
   </joint>
   
   <link name="post_3">
     <visual>
       <geometry>
         <cylinder length="0.020" radius="0.005"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.010"/>      
+      </geometry>          
       <material name="blue"/>
     </visual>
     <collision>
       <geometry>
         <cylinder length="0.020" radius="0.005"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.010"/> 
+      </geometry>      
     </collision>
     <inertial>
-      <mass value="0.001"/>
-      <origin xyz="0.0 0.0 0.010"/>
+      <mass value="0.001"/>      
       <inertia ixx="3.95833e-8" ixy="0.0" ixz="0.0" iyy="3.95833e-8" iyz="0.0" izz="1.25e-8"/>
     </inertial>    
   </link>
@@ -461,26 +435,23 @@
   <joint name="base_to_post_3" type="fixed">
     <parent link="base_link"/>
     <child link="post_3"/>
-    <origin xyz="-0.06 -0.08 0.008"/>
+    <origin xyz="-0.06 -0.08 0.015"/>
   </joint>    
  
   <link name="post_4">
     <visual>
       <geometry>
         <cylinder length="0.020" radius="0.005"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.010"/>      
+      </geometry>           
       <material name="blue"/>
     </visual>
     <collision>
       <geometry>
         <cylinder length="0.020" radius="0.005"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.010"/> 
+      </geometry>      
     </collision>
     <inertial>
-      <mass value="0.001"/>
-      <origin xyz="0.0 0.0 0.010"/> 
+      <mass value="0.001"/>       
       <inertia ixx="3.95833e-8" ixy="0.0" ixz="0.0" iyy="3.95833e-8" iyz="0.0" izz="1.25e-8"/>
     </inertial>    
   </link>
@@ -488,7 +459,7 @@
   <joint name="base_to_post_4" type="fixed">
     <parent link="base_link"/>
     <child link="post_4"/>
-    <origin xyz="-0.14 -0.08 0.008"/>
+    <origin xyz="-0.14 -0.08 0.015"/>
   </joint>
 
   <link name="rear_platform">
@@ -496,17 +467,15 @@
       <geometry>        
         <mesh filename="package://rodney/meshes/smallRearPlatform.dae"/>
       </geometry>
-      <origin rpy="0 0 1.57" xyz="0.010 -0.080 0.0"/>              
+      <origin rpy="0 0 1.57" xyz="0.050 0.0 -0.0015"/>              
     </visual>
     <collision>      
       <geometry>        
         <box size="0.180 0.098 0.003"/>
-      </geometry>
-      <origin rpy="0 0 1.57" xyz="-0.04 -0.080 0.0015"/>              
+      </geometry>                    
     </collision> 
     <inertial>
-      <mass value="0.050"/>
-      <origin rpy="0 0 1.57" xyz="-0.04 -0.080 0.0015"/>
+      <mass value="0.050"/>      
       <inertia ixx="4.01e-5" ixy="0.0" ixz="0.0" iyy="0.000175" iyz="0.0" izz="0.000135"/>
     </inertial>        
   </link>  
@@ -514,7 +483,7 @@
   <joint name="post_1_to_rear_platform" type="fixed">
     <parent link="post_1"/>
     <child link="rear_platform"/>
-    <origin xyz="0.0 0.0 0.02"/>
+    <origin xyz="-0.040 -0.080 0.0115"/>
   </joint>
 
   <!-- Neck and head -->
@@ -523,19 +492,16 @@
     <visual>
       <geometry>
         <cylinder length="0.30" radius="0.011"/>
-      </geometry>
-      <origin xyz="0 0.0 0.15"/>      
+      </geometry>           
       <material name="white"/>
     </visual>
     <collision>
       <geometry>
         <cylinder length="0.30" radius="0.011"/>
-      </geometry>
-      <origin xyz="0 0.0 0.15"/>            
+      </geometry>                  
     </collision>
     <inertial>
-      <mass value="0.033"/>
-      <origin xyz="0 0.0 0.15"/>
+      <mass value="0.033"/>      
       <inertia ixx="0.000248498" ixy="0.0" ixz="0.0" iyy="0.000248498" iyz="0.0" izz="1.9965e-6"/>
     </inertial>         
   </link>
@@ -543,7 +509,7 @@
   <joint name="rear_platform_to_neck" type="fixed">
     <parent link="rear_platform"/>
     <child link="neck"/>
-    <origin xyz="-0.070 -0.080 -0.028"/>
+    <origin xyz="-0.030 0.0 0.1205"/>
   </joint>
   
   <link name="head_fixing">
@@ -556,12 +522,10 @@
     <collision>
       <geometry>        
         <box size="0.03 0.04 0.1"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.010"/> 
+      </geometry>       
     </collision>
     <inertial>
-      <mass value="0.015"/>
-      <origin xyz="0.0 0.0 0.010"/>
+      <mass value="0.015"/>      
       <inertia ixx="1.45e-5" ixy="0.0" ixz="0.0" iyy="3.13e-6" iyz="0.0" izz="1.36e-5"/>
     </inertial>    
   </link>  
@@ -569,26 +533,23 @@
   <joint name="neck_to_head_fixing" type="fixed">
     <parent link="neck"/>
     <child link="head_fixing"/>
-    <origin xyz="0.0 0.0 0.30"/>
+    <origin xyz="0.0 0.0 0.150"/>
   </joint>  
-  
+ 
   <link name="head_pan_servo_block">
     <visual>
       <geometry>
         <box size="0.057 0.032 0.066"/>        
-      </geometry>
-      <origin xyz="0.008 0.0 -0.008"/>      
+      </geometry>                  
       <material name="black"/>
     </visual>
     <collision>
       <geometry>
         <box size="0.057 0.032 0.066"/>        
-      </geometry>
-      <origin xyz="0.008 0.0 -0.008"/>
+      </geometry>      
     </collision>
     <inertial>
-      <mass value="0.084"/>
-      <origin xyz="0.008 0.0 -0.008"/>
+      <mass value="0.084"/>      
       <inertia ixx="3.77e-5" ixy="0.0" ixz="0.0" iyy="2.99e-5" iyz="0.0" izz="5.23e-5"/>
     </inertial>               
   </link>      
@@ -596,46 +557,47 @@
   <joint name="head_fixing_to_servo_block" type="fixed">
     <parent link="head_fixing"/>
     <child link="head_pan_servo_block"/>
-    <origin xyz="0.0 0.0 0.047"/>
+    <origin xyz="0.008 0.0 0.039"/>
   </joint>   
-
+ 
   <link name="head_pan_bracket">
     <visual>      
       <geometry>        
         <mesh filename="package://rodney/meshes/headPanBracket.dae"/>
-      </geometry>            
+      </geometry>                 
     </visual>
     <collision>
       <geometry>
         <box size="0.025 0.068 0.045"/>
       </geometry>
-      <origin xyz="0.0 0.0 0.0225"/>
+      <origin xyz="0.0 0.0 0.0225"/>       
     </collision>
     <inertial>
-      <mass value="0.010"/>
       <origin xyz="0.0 0.0 0.0225"/>
+      <mass value="0.010"/>      
       <inertia ixx="5.54e-6" ixy="0.0" ixz="0.0" iyy="4.37e-6" iyz="0.0" izz="2.21e-6"/> 
     </inertial>           
   </link>
-    
+   
   <joint name="head_pan" type="revolute">
     <axis xyz="0 0 1"/>
     <limit effort="1000.0" lower="-1.5708" upper="1.5708" velocity="0.5"/>
     <parent link="head_pan_servo_block"/>
     <child link="head_pan_bracket"/>
-    <origin xyz="0.0 0.0 0.025"/>    
+    <origin xyz="-0.008 0.0 0.033"/>    
   </joint>   
 
   <link name="head_tilt_arm">
     <visual>      
       <geometry>        
         <mesh filename="package://rodney/meshes/headTiltArm.dae"/>
-      </geometry>            
+      </geometry>
+      <!-- Using origin of mesh which helps to line up the peices connected to this odd shape -->            
     </visual>
     <collision>
       <geometry>
         <box size="0.075 0.065 0.020"/>
-      </geometry>
+      </geometry>        
       <origin xyz="0.018 0.0 0.00"/> 
     </collision>
     <inertial>
@@ -704,7 +666,7 @@
   <joint name="display_bracket_to_display" type="fixed">
     <parent link="display_bracket"/>
     <child link="display"/>
-    <origin xyz="0.003 0.008 0.060"/>
+    <origin xyz="0.0055 0.008 0.060"/>
   </joint> 
     
   <link name="camera">
@@ -730,26 +692,23 @@
     <child link="camera"/>
     <origin xyz="0.0 0.0 0.065"/>
   </joint>
-  
+
   <!-- Front platform -->
  
   <link name="fwd_post_1">
     <visual>
       <geometry>
         <cylinder length="0.055" radius="0.005"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.0275"/>      
+      </geometry>            
       <material name="blue"/> 
     </visual>
     <collision>
        <geometry>
         <cylinder length="0.055" radius="0.005"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.0275"/>
+      </geometry>      
     </collision>
     <inertial>
-      <mass value="0.0015"/>
-      <origin xyz="0.0 0.0 0.0275"/>
+      <mass value="0.0015"/>      
       <inertia ixx="1.12594e-7" ixy="0.0" ixz="0.0" iyy="1.12594e-7" iyz="0.0" izz="1.875e-10" />
     </inertial>  
   </link>  
@@ -757,7 +716,7 @@
   <joint name="base_to_fwd_post_1" type="fixed">
     <parent link="base_link"/>
     <child link="fwd_post_1"/>
-    <origin xyz="0.14 0.08 0.008"/>
+    <origin xyz="0.14 0.08 0.0325"/>
   </joint>
   
 
@@ -765,19 +724,16 @@
     <visual>
       <geometry>
         <cylinder length="0.055" radius="0.005"/>
-      </geometry> 
-      <origin xyz="0.0 0.0 0.0275"/>     
+      </geometry>           
       <material name="blue"/>
     </visual>
     <collision>
        <geometry>
         <cylinder length="0.055" radius="0.005"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.0275"/>
+      </geometry>      
     </collision>
     <inertial>
-      <mass value="0.0015"/>
-      <origin xyz="0.0 0.0 0.0275"/>
+      <mass value="0.0015"/>      
       <inertia ixx="1.12594e-7" ixy="0.0" ixz="0.0" iyy="1.12594e-7" iyz="0.0" izz="1.875e-10" />
     </inertial>  
   </link> 
@@ -785,26 +741,23 @@
   <joint name="base_to_fwd_post_2" type="fixed">
     <parent link="base_link"/>
     <child link="fwd_post_2"/>
-    <origin xyz="0.14 -0.08 0.008"/>
+    <origin xyz="0.14 -0.08 0.0325"/>
   </joint>    
  
   <link name="fwd_post_3">
     <visual>
       <geometry>
         <cylinder length="0.055" radius="0.005"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.0275"/>      
+      </geometry>    
       <material name="blue"/>
     </visual>
     <collision>
        <geometry>
         <cylinder length="0.055" radius="0.005"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.0275"/>
+      </geometry>     
     </collision>
     <inertial>
-      <mass value="0.0015"/>
-      <origin xyz="0.0 0.0 0.0275"/>
+      <mass value="0.0015"/>      
       <inertia ixx="1.12594e-7" ixy="0.0" ixz="0.0" iyy="1.12594e-7" iyz="0.0" izz="1.875e-10" />
     </inertial>  
   </link> 
@@ -812,26 +765,23 @@
   <joint name="base_to_fwd_post_3" type="fixed">
     <parent link="base_link"/>
     <child link="fwd_post_3"/>
-    <origin xyz="0.085 -0.08 0.008"/>
+    <origin xyz="0.085 -0.08 0.0325"/>
   </joint>    
     
   <link name="fwd_post_4">
     <visual>
       <geometry>
         <cylinder length="0.055" radius="0.005"/>
-      </geometry>      
-      <origin xyz="0.0 0.0 0.0275"/>
+      </geometry>            
       <material name="blue"/> 
     </visual>
     <collision>
        <geometry>
         <cylinder length="0.055" radius="0.005"/>
-      </geometry>
-      <origin xyz="0.0 0.0 0.0275"/>
+      </geometry>      
     </collision>
     <inertial>
       <mass value="0.0015"/>
-      <origin xyz="0.0 0.0 0.0275"/>
       <inertia ixx="1.12594e-7" ixy="0.0" ixz="0.0" iyy="1.12594e-7" iyz="0.0" izz="1.875e-10" />
     </inertial>  
   </link>
@@ -839,7 +789,7 @@
   <joint name="base_to_fwd_post_4" type="fixed">
     <parent link="base_link"/>
     <child link="fwd_post_4"/>
-    <origin xyz="0.085 0.08 0.008"/>
+    <origin xyz="0.085 0.08 0.0325"/>
   </joint>
 
   <link name="fwd_platform">
@@ -847,6 +797,7 @@
       <geometry>      
         <mesh filename="package://rodney/meshes/fwdPlatform.dae"/>
       </geometry>
+      <origin xyz="-0.0125 0.0 0.0"/>
     </visual>
     <collision>
       <geometry>
@@ -862,57 +813,86 @@
   <joint name="fwd_post_1_to_fwd_platform" type="fixed">
     <parent link="fwd_post_1"/>
     <child link="fwd_platform"/>
-    <origin xyz="-0.0275 -0.080 0.055"/>
+    <origin xyz="-0.040 -0.080 0.029"/>
   </joint> 
   
-  <link name="lidar_servo">
-    <visual>
-      <geometry>
-        <box size="0.041 0.020 0.040"/>
-      </geometry>
-      <material name="black"/>
-    </visual>
-    <collision>
-      <geometry>
-        <box size="0.041 0.020 0.040"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="0.084"/>
-      <inertia ixx="3.77e-5" ixy="0.0" ixz="0.0" iyy="2.99e-5" iyz="0.0" izz="5.23e-5"/>
-    </inertial>
-  </link>
-    
-  <joint name="fwd_platform_to_lidar_servo" type="fixed">
-    <parent link="fwd_platform"/>
-    <child link="lidar_servo"/>
-    <origin xyz="0.010 0.0 -0.007"/>
-  </joint>    
-  
   <!-- LIDAR link -->
+  <!-- Using mesh of a model --> 
   <link name="lidar_link">
     <visual>
       <geometry>
-        <box size="0.040 0.048 0.020"/>
-      </geometry>      
-      <material name="black"/>
+        <mesh filename="package://rodney/meshes/rplidar.dae"/>
+      </geometry>
+      <origin rpy="1.57 0 0" xyz="-0.035 0.035 -0.044"/>            
     </visual>
     <collision>
       <geometry>
-        <box size="0.040 0.048 0.020"/>
+        <box size="0.0985 0.070 0.060"/>
       </geometry>
     </collision>
     <inertial>
-      <mass value="1e-5"/>
-      <inertia ixx="1e-6" ixy="0.0" ixz="0.0" iyy="1e-6" iyz="0.0" izz="1e-6" />
+      <mass value="0.213"/>
+      <inertia ixx="0.000151" ixy="0.0" ixz="0.0" iyy="0.000259" iyz="0.0" izz="0.000236" />
     </inertial>  
   </link>
   
-  <joint name="lidar_to_lidar_servo" type="fixed">
-    <parent link="lidar_servo"/>
+  <joint name="fwd_platform_to_lidar" type="fixed">
+    <parent link="fwd_platform"/>
     <child link ="lidar_link"/>
-    <origin xyz="0.020 0.0 0.030"/>
-  </joint>     
+    <origin xyz="-0.015 0.0 0.0455"/>
+  </joint>
+  
+    
+  <!-- Using Box and cylinder -->
+  <!--
+  <link name="lidar_base">
+    <visual>
+      <geometry>
+        <box size="0.0985 0.070 0.032"/>
+      </geometry>
+      <material name="black"/>           
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.0985 0.070 0.032"/>        
+      </geometry>        
+    </collision>
+    <inertial>
+      <mass value="0.142"/>
+      <inertia ixx="7.01e-5" ixy="0.0" ixz="0.0" iyy="0.00173" iyz="0.0" izz="0.000127"/>
+    </inertial>    
+  </link>
+  
+  <joint name="fwd_platform_to_lidar_base" type="fixed">
+    <parent link="fwd_platform"/>
+    <child link ="lidar_base"/>
+    <origin xyz="0.0 0.0 0.0175"/>
+  </joint>      
+  
+  <link name="lidar_link">
+    <visual>
+      <geometry>    
+        <cylinder length="0.023" radius="0.035"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>    
+        <cylinder length="0.023" radius="0.035"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.071"/>
+      <inertia ixx="2.48737e-5" ixy="0.0" ixz="0.0" iyy="2.48737e-5" iyz="0.0" izz="4.34875e-5"/>
+    </inertial>    
+  </link>
+  
+  <joint name="lidar_base-to_lidar_link" type="fixed">
+    <parent link="lidar_base"/>
+    <child link ="lidar_link"/>
+    <origin xyz="-0.01425 0.0 0.0275"/>
+  </joint> 
+  -->  
         
   <!-- Gazebo stuff -->
   
@@ -990,7 +970,11 @@
     
   <gazebo reference="lidar_link">
     <material>Gazebo/Black</material>
-  </gazebo>      
+  </gazebo>
+  
+  <gazebo reference="lidar_base">
+    <material>Gazebo/Black</material>
+  </gazebo>       
      
   <!-- To control the wheels -->  
   <gazebo>
@@ -1000,7 +984,7 @@
       <updateRate>100.0</updateRate>            
       <rosDebugLevel>na</rosDebugLevel>
       <publishWheelTF>false</publishWheelTF>
-      <publishOdomTF>false</publishOdomTF>
+      <publishOdomTF>true</publishOdomTF>
       <publishWheelJointState>false</publishWheelJointState>
       <wheelAcceleration>0</wheelAcceleration>
       <wheelTorque>5</wheelTorque>      
@@ -1096,19 +1080,19 @@
     <sensor type="ray" name="base_lidar_sensor">
       <pose>0 0 0 0 0 0</pose>
       <visualize>false</visualize>
-      <update_rate>2</update_rate>
+      <update_rate>10</update_rate>
       <ray>
         <scan>
           <horizontal>
-            <samples>180</samples>
+            <samples>720</samples>
             <resolution>1</resolution>
-            <min_angle>-1.570796</min_angle>
-            <max_angle>1.570796</max_angle>
+            <min_angle>-2.70526</min_angle>
+            <max_angle>2.70526</max_angle>            
           </horizontal>
         </scan>
         <range>
-          <min>0.10</min>
-          <max>40.0</max>
+          <min>0.15</min>
+          <max>12.0</max>
           <resolution>0.01</resolution>
         </range>
         <noise>
@@ -1118,7 +1102,7 @@
         </noise>
       </ray>
       <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
-        <topicName>laser/scan</topicName>
+        <topicName>scan</topicName>
         <frameName>lidar_link</frameName>
       </plugin>
     </sensor>

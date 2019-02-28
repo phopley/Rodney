@@ -2,6 +2,7 @@
 <launch>
 
   <rosparam command="load" file="$(find rodney)/config/config.yaml" />
+  <rosparam command="load" file="$(find rodney)/config/laser_filter_config.yaml" ns="scan_to_scan_filter_chain" />
   <rosparam command="load" file="$(find pan_tilt)/config/config.yaml" />
   <rosparam command="load" file="$(find face_recognition)/config/config.yaml" />
   <rosparam command="load" file="$(find head_control)/config/config.yaml" />
@@ -22,4 +23,16 @@
   <node pkg="rodney_missions" type="rodney_missions_node.py" name="rodney_missions" output="screen"/>
   <node pkg="rodney" type="rodney_node" name="rodney_node" output="screen" />
   <node pkg="thunderborg" type="thunderborg_node.py" name="thunderborg" output="screen" />
+  <!--
+  <node pkg="rplidar_ros" type="rplidarNode" name="rplidar_node" output="screen">
+    <param name="serial_port" type="string" value="/dev/ttyUSB0"/>
+    <param name="serial_baudrate" type="int" value="115200"/>
+    <param name="frame_id" type="string" value="laser"/>
+    <remap from="scan" to="scan_filter_input"/>
+  </node>
+  <node pkg ="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain" output="screen">
+    <remap from="scan" to="scan_filter_input"/>
+    <remap from="scan_filtered" to="scan"/>
+  </node>
+  -->
 </launch>
