@@ -4,7 +4,8 @@ Changelog for package rodney
 
 Unreleased
 ------------------
-* Added RPLidar and scan filter nodes to launch file
+* Added rodney.xacro and now auto generate rodney.urdf file
+* Added RPLidar and scan filter nodes to rodney launch file
 * Added LIDAR to URDF model
 * "Arduino" code changed to use either an Arduino Nano or a Teensy. Nano uses smaller buffer sizes a Teensy use higher baud rate
 * Increased tacho message publish rate to 40Hz on a Teensy
