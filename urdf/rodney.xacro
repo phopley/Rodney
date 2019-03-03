@@ -698,9 +698,9 @@
     <origin xyz="-0.040 -0.080 ${fwd_post_height+(fwd_platf_z/2.0)}"/>
   </joint> 
   
-  <!-- LIDAR link -->
+  <!-- LIDAR -->
   <!-- Using mesh of a model --> 
-  <link name="lidar_link">
+  <link name="laser">
     <visual>
       <geometry>
         <mesh filename="package://rodney/meshes/rplidar.dae"/>
@@ -751,7 +751,7 @@
     <origin xyz="0.0 0.0 0.0175"/>
   </joint>      
   
-  <link name="lidar_link">
+  <link name="laser">
     <visual>
       <geometry>    
         <cylinder length="0.023" radius="0.035"/>
@@ -958,7 +958,7 @@
   </gazebo>  
   
   <!-- LIDAR -->
-  <gazebo reference="lidar_link">
+  <gazebo reference="laser">
     <sensor type="ray" name="base_lidar_sensor">
       <pose>0 0 0 0 0 0</pose>
       <visualize>false</visualize>
@@ -985,7 +985,7 @@
       </ray>
       <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
         <topicName>scan</topicName>
-        <frameName>lidar_link</frameName>
+        <frameName>laser</frameName>
       </plugin>
     </sensor>
   </gazebo>
