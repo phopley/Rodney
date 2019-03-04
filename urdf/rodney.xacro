@@ -173,6 +173,7 @@
       </inertial>               
     </link>
     <joint name="${prefix}_brk_to_${prefix}_wheel" type="continuous">
+      <axis xyz="0 1 0"/>
       <parent link="${prefix}_motor_bracket"/>
       <child link="${prefix}_wheel"/>    
       <origin xyz="0.0 ${reflect*0.029} -0.0105"/>
@@ -212,7 +213,7 @@
     <joint name="base_to_${prefix}_caster" type="fixed">
       <parent link="base_link"/>
       <child link="${prefix}_caster_bracket"/>
-      <origin xyz="${reflect*0.150} 0.0 -0.0375"/>
+      <origin xyz="${reflect*0.150} 0.0 -0.037"/>
     </joint>      
   </xacro:macro>
 
@@ -670,19 +671,19 @@
     <material>Gazebo/Black</material>
   </gazebo>     
   
-  <gazebo reference="post_1">
+  <gazebo reference="rear_post_1">
     <material>Gazebo/Blue</material>
   </gazebo>
 
-  <gazebo reference="post_2">
+  <gazebo reference="rear_post_2">
     <material>Gazebo/Blue</material>
   </gazebo>
   
-  <gazebo reference="post_3">
+  <gazebo reference="rear_post_3">
     <material>Gazebo/Blue</material>
   </gazebo>
   
-  <gazebo reference="post_4">
+  <gazebo reference="rear_post_4">
     <material>Gazebo/Blue</material>
   </gazebo>  
 
@@ -754,8 +755,8 @@
       <publishWheelJointState>false</publishWheelJointState>
       <wheelAcceleration>0</wheelAcceleration>
       <wheelTorque>5</wheelTorque>      
-      <leftJoint>l_brk_to_wheel</leftJoint>
-      <rightJoint>r_brk_to_wheel</rightJoint>      
+      <leftJoint>left_brk_to_left_wheel</leftJoint>
+      <rightJoint>right_brk_to_right_wheel</rightJoint>      
       <wheelSeparation>0.230</wheelSeparation>      
       <wheelDiameter>0.106</wheelDiameter>      
       <commandTopic>cmd_vel</commandTopic>      
@@ -768,10 +769,9 @@
   <!-- To control head pan/tilt -->
   
   <gazebo>
-    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so"/>
-    <robotNamespace>/Rodney</robotNamespace>
-    <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
-    <legacyModeNS>True</legacyModeNS>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">      
+      <legacyModeNS>true</legacyModeNS>
+    </plugin>
   </gazebo> 
 
   <transmission name="head_pan_tran">
@@ -795,15 +795,15 @@
       <mechanicalReduction>1</mechanicalReduction>
     </actuator>
   </transmission>
-  
+ 
   <gazebo>
     <plugin name="joint_state_publisher"
-            filename="libgazebo_ros_joint_state_publisher.so">
-      <jointName>head_pan, head_tilt, front_caster_bk_to_ball, rear_caster_bk_to_ball, l_brk_to_wheel, r_brk_to_wheel</jointName>
-      <updateRate>20.0</updateRate>
+            filename="libgazebo_ros_joint_state_publisher.so">      
+      <jointName>head_pan, head_tilt, front_caster_bk_to_ball, rear_caster_bk_to_ball, left_brk_to_left_wheel, right_brk_to_right_wheel</jointName>
+      <updateRate>20.0</updateRate>      
     </plugin>
   </gazebo>  
-  
+
   <!-- camera -->
   <gazebo reference="camera">
     <sensor type="camera" name="camera1">

@@ -153,6 +153,7 @@
     </inertial>
   </link>
   <joint name="left_brk_to_left_wheel" type="continuous">
+    <axis xyz="0 1 0"/>
     <parent link="left_motor_bracket"/>
     <child link="left_wheel"/>
     <origin xyz="0.0 0.029 -0.0105"/>
@@ -228,6 +229,7 @@
     </inertial>
   </link>
   <joint name="right_brk_to_right_wheel" type="continuous">
+    <axis xyz="0 1 0"/>
     <parent link="right_motor_bracket"/>
     <child link="right_wheel"/>
     <origin xyz="0.0 -0.029 -0.0105"/>
@@ -253,7 +255,7 @@
   <joint name="base_to_front_caster" type="fixed">
     <parent link="base_link"/>
     <child link="front_caster_bracket"/>
-    <origin xyz="0.15 0.0 -0.0375"/>
+    <origin xyz="0.15 0.0 -0.037"/>
   </joint>
   <link name="front_caster">
     <visual>
@@ -298,7 +300,7 @@
   <joint name="base_to_rear_caster" type="fixed">
     <parent link="base_link"/>
     <child link="rear_caster_bracket"/>
-    <origin xyz="-0.15 0.0 -0.0375"/>
+    <origin xyz="-0.15 0.0 -0.037"/>
   </joint>
   <link name="rear_caster">
     <visual>
@@ -842,16 +844,16 @@
   <gazebo reference="right_wheel">
     <material>Gazebo/Black</material>
   </gazebo>
-  <gazebo reference="post_1">
+  <gazebo reference="rear_post_1">
     <material>Gazebo/Blue</material>
   </gazebo>
-  <gazebo reference="post_2">
+  <gazebo reference="rear_post_2">
     <material>Gazebo/Blue</material>
   </gazebo>
-  <gazebo reference="post_3">
+  <gazebo reference="rear_post_3">
     <material>Gazebo/Blue</material>
   </gazebo>
-  <gazebo reference="post_4">
+  <gazebo reference="rear_post_4">
     <material>Gazebo/Blue</material>
   </gazebo>
   <gazebo reference="display">
@@ -908,8 +910,8 @@
       <publishWheelJointState>false</publishWheelJointState>
       <wheelAcceleration>0</wheelAcceleration>
       <wheelTorque>5</wheelTorque>
-      <leftJoint>l_brk_to_wheel</leftJoint>
-      <rightJoint>r_brk_to_wheel</rightJoint>
+      <leftJoint>left_brk_to_left_wheel</leftJoint>
+      <rightJoint>right_brk_to_right_wheel</rightJoint>
       <wheelSeparation>0.230</wheelSeparation>
       <wheelDiameter>0.106</wheelDiameter>
       <commandTopic>cmd_vel</commandTopic>
@@ -920,7 +922,9 @@
   </gazebo>
   <!-- To control head pan/tilt -->
   <gazebo>
-    <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control"/>
+    <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
+      <legacyModeNS>true</legacyModeNS>
+    </plugin>
   </gazebo>
   <transmission name="head_pan_tran">
     <type>transmission_interface/SimpleTransmission</type>
@@ -944,7 +948,7 @@
   </transmission>
   <gazebo>
     <plugin filename="libgazebo_ros_joint_state_publisher.so" name="joint_state_publisher">
-      <jointName>head_pan, head_tilt, front_caster_bk_to_ball, rear_caster_bk_to_ball, l_brk_to_wheel, r_brk_to_wheel</jointName>
+      <jointName>head_pan, head_tilt, front_caster_bk_to_ball, rear_caster_bk_to_ball, left_brk_to_left_wheel, right_brk_to_right_wheel</jointName>
       <updateRate>20.0</updateRate>
     </plugin>
   </gazebo>
