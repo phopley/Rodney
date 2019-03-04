@@ -4,12 +4,12 @@ Changelog for package rodney
 
 Unreleased
 ------------------
-* Added rodney.xacro and now auto generate rodney.urdf file
 * Added RPLidar and scan filter nodes to rodney launch file
+* Added functionality to manually enable to LIDAR from keyboard or joystick
 * Added LIDAR to URDF model
+* Added rodney.xacro and now auto generate rodney.urdf file
 * "Arduino" code changed to use either an Arduino Nano or a Teensy. Nano uses smaller buffer sizes a Teensy use higher baud rate
 * Increased tacho message publish rate to 40Hz on a Teensy
-* Added functionality to manually enable to LIDAR from keyboard or joystick
 * Changed head points in URDF model from EfforJointInterface to PositionJointInterface
 * Moved scripts to a scripts folder and create rules for remapping serial ports
 

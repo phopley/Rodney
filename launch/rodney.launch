@@ -1,29 +1,41 @@
 <?xml version="1.0" ?>
 <launch>
-
-  <rosparam command="load" file="$(find rodney)/config/config.yaml" />
-  <rosparam command="load" file="$(find rodney)/config/laser_filter_config.yaml" ns="scan_to_scan_filter_chain" />
-  <rosparam command="load" file="$(find pan_tilt)/config/config.yaml" />
-  <rosparam command="load" file="$(find face_recognition)/config/config.yaml" />
-  <rosparam command="load" file="$(find head_control)/config/config.yaml" />
-  <rosparam command="load" file="$(find rodney_missions)/config/config.yaml" />
-  <rosparam command="load" file="$(find thunderborg)/config/config.yaml" />
+  <!-- Load the URDF model in to the parameter server from the xacro file.
+       This will be used by the Joint state and robot state publishers -->
+  <arg name="model" default="$(find rodney)/urdf/rodney.xacro"/>
+  <param name="robot_description" command="$(find xacro)/xacro --inorder $(arg model)"/>
+    
+  <!-- Load each of the node config files into the parameter server -->   
+  <rosparam command="load" file="$(find rodney)/config/config.yaml"/>
+  <rosparam command="load" file="$(find rodney)/config/laser_filter_config.yaml" ns="scan_to_scan_filter_chain"/>
+  <rosparam command="load" file="$(find pan_tilt)/config/config.yaml"/>
+  <rosparam command="load" file="$(find face_recognition)/config/config.yaml"/>
+  <rosparam command="load" file="$(find head_control)/config/config.yaml"/>
+  <rosparam command="load" file="$(find rodney_missions)/config/config.yaml"/>
+  <rosparam command="load" file="$(find thunderborg)/config/config.yaml"/>
   
+  <!-- Launch the camera node from one of its launch files -->
   <include file="$(find raspicam_node)/launch/camerav2_1280x960.launch" /> 
 
+  <!-- Start all the nodes that make up Rondey -->
+  <!-- Starting with those written for the project -->
   <node pkg="pan_tilt" type="pan_tilt_node" name="pan_tilt_node" output="screen"/>
   <node pkg="face_recognition" type="face_recognition_node.py" name="face_recognition_node" output="screen"/>
-  <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
-    <param name="port" value="/dev/ttyACM0"/>
-    <param name="baud" value="500000"/>
-  </node>
-  <node pkg="head_control" type="head_control_node" name="head_control_node" output="screen"/>
-  <node pkg="homer_robot_face" type="RobotFace" name="RobotFace" output="screen"/>
+  <node pkg="head_control" type="head_control_node" name="head_control_node" output="screen"/>  
   <node pkg="speech" type="speech_node" name="speech_node" output="screen"/>
   <node pkg="rodney_missions" type="rodney_missions_node.py" name="rodney_missions" output="screen"/>
   <node pkg="rodney" type="rodney_node" name="rodney_node" output="screen" />
   <node pkg="thunderborg" type="thunderborg_node.py" name="thunderborg" output="screen" />
-  <!--
+  <!-- The Arduino or Teensy. 
+       For Arduino Nano use /dev/ttyUSB0 (or nano if dev rules updated) and 57600.
+       For the Teensy use the defaults /dev/ttyACM0 (or teensy if dev rules updated) and 500000 -->
+  <arg name="serial_port" default="/dev/ttyACM0"/>
+  <arg name="baud_rate" default="500000"/>  
+  <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
+    <param name="port" value="$(arg serial_port)"/>
+    <param name="baud" value="$(arg baud_rate)"/>
+  </node>
+  <!-- The RPLidar and laser filter node -->
   <node pkg="rplidar_ros" type="rplidarNode" name="rplidar_node" output="screen">
     <param name="serial_port" type="string" value="/dev/ttyUSB0"/>
     <param name="serial_baudrate" type="int" value="115200"/>
@@ -34,5 +46,11 @@
     <remap from="scan" to="scan_filter_input"/>
     <remap from="scan_filtered" to="scan"/>
   </node>
-  -->
+  <!-- The robot face -->
+  <node pkg="homer_robot_face" type="RobotFace" name="RobotFace" output="screen"/>
+  <!-- The joint and robot state publishers which will use the model to broadcast the tf's -->
+  <!--<node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <rosparam param="source_list">["/pan_tilt_node/joints"]</rosparam>
+  </node>
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />  -->
 </launch>

@@ -95,276 +95,160 @@
            
   <!-- Motors and wheels -->
   
-  <!-- left -->
-
-  <link name="left_motor_bracket">
-    <visual>
-      <geometry>
-        <box size="0.042 0.049 0.002"/>
-      </geometry>      
-      <origin rpy="1.58 0 0"/>      
-      <material name="bronze"/>
-    </visual>
-    <collision>
-      <geometry>
-        <box size="0.042 0.049 0.002"/>
-      </geometry>
-      <origin rpy="1.58 0 0"/>
-    </collision>
-    <inertial>
-      <origin rpy="1.58 0 0"/>      
-      <mass value="0.035"/>      
-      <inertia ixx="7.01e-6" ixy="0.0" ixz="0.0" iyy="5.16e-6" iyz="0.0" izz="1.21e-5"/>
-    </inertial>    
-  </link>
-
-  <joint name="base_to_l_motor_brk" type="fixed">
-    <parent link="base_link"/>
-    <child link="left_motor_bracket"/>
-    <origin xyz="0.0 0.091 -0.0295"/>
-  </joint>
-      
-  <link name="left_motor">
-    <visual>
-      <geometry>
-        <cylinder length="0.070" radius="0.0185"/>
-      </geometry>
-      <origin rpy="1.57 0 0"/>
-      <material name="silver"/>
-    </visual>
-    <collision>
-      <geometry>
-        <cylinder length="0.070" radius="0.0185"/>
-      </geometry>
-      <origin rpy="1.57 0 0"/>
-    </collision>
-    <inertial>
-      <origin rpy="1.57 0 0"/>      
-      <mass value="0.206"/>    
-      <inertia ixx="0.000101743" ixy="0.0" ixz="0.0" iyy="0.000101743" iyz="0.0" izz="3.52518e-5"/>
-    </inertial>               
-  </link>
- 
-  <joint name="l_brk_to_l_motor" type="fixed">
-    <parent link="left_motor_bracket"/>
-    <child link="left_motor"/>    
-    <origin xyz="0.0 -0.036 -0.004"/>
-  </joint>
-   
-  <link name="left_wheel">
-    <visual>
-      <geometry>
-        <cylinder length="0.050" radius="0.050"/>
-      </geometry>
-      <origin rpy="1.57 0 0"/>      
-      <material name="black"/>
-    </visual>
-    <collision>
-      <geometry>
-        <cylinder length="0.050" radius="0.050"/>
-      </geometry>
-      <origin rpy="1.57 0 0"/>     
-    </collision>
-    <inertial>
-      <origin rpy="1.57 0 0"/>   
-      <mass value="0.117"/>      
+  <xacro:macro name="motor_bracket" params="prefix reflect">
+    <link name="${prefix}_motor_bracket">
+      <visual>
+        <geometry>
+          <box size="0.042 0.049 0.002"/>
+        </geometry>
+        <origin rpy="1.58 0 0"/>           
+        <material name="bronze"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="0.042 0.049 0.002"/>
+        </geometry>
+        <origin rpy="1.58 0 0"/>      
+      </collision>
+      <inertial>
+        <origin rpy="1.58 0 0"/>
+        <mass value="0.035"/>      
+        <inertia ixx="7.01e-6" ixy="0.0" ixz="0.0" iyy="5.16e-6" iyz="0.0" izz="1.21e-5"/>
+      </inertial>           
+    </link>      
+    <joint name="base_to_${prefix}_motor_bracket" type="fixed">
+      <parent link="base_link"/>
+      <child link="${prefix}_motor_bracket"/>
+      <origin xyz="0.0 ${reflect*0.091} -0.0291"/>
+    </joint>
+  </xacro:macro>
+  
+  <xacro:macro name="motor" params="prefix reflect">
+    <link name="${prefix}_motor">
+      <visual>
+        <geometry>
+          <cylinder length="0.070" radius="0.0185"/>
+        </geometry>
+        <origin rpy="1.57 0 0"/>
+        <material name="silver"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="0.070" radius="0.0185"/>
+        </geometry>
+        <origin rpy="1.57 0 0"/>
+      </collision>
+      <inertial>
+        <origin rpy="1.57 0 0"/>      
+        <mass value="0.206"/>    
+        <inertia ixx="0.000101743" ixy="0.0" ixz="0.0" iyy="0.000101743" iyz="0.0" izz="3.52518e-5"/>
+      </inertial>               
+    </link>
+    <joint name="${prefix}_brk_to_${prefix}_motor" type="fixed">
+      <parent link="${prefix}_motor_bracket"/>
+      <child link="${prefix}_motor"/>    
+      <origin xyz="0.0 ${reflect*0.036} -0.004"/>
+    </joint>
+  </xacro:macro>
+  
+  <xacro:macro name="wheel" params="prefix reflect">
+    <link name="${prefix}_wheel">
+      <visual>
+        <geometry>
+          <cylinder length="0.050" radius="0.050"/>
+        </geometry>
+        <origin rpy="1.57 0 0"/>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="0.050" radius="0.050"/>
+        </geometry>
+        <origin rpy="1.57 0 0"/>
+      </collision>
+      <inertial>
+        <origin rpy="1.57 0 0"/>      
+        <mass value="0.117"/>      
       <inertia ixx="0.0000975" ixy="0.0" ixz="0.0" iyy="0.0000975" iyz="0.0" izz="0.00014625"/>
-    </inertial>   
-  </link>
-
-  <joint name="l_brk_to_wheel" type="continuous">
-    <axis xyz="0 1 0"/>
-    <parent link="left_motor_bracket"/>
-    <child link="left_wheel"/>
-    <dynamic damping="200.0" friction="200.0" />
-    <origin xyz="0.0 0.029 -0.0105"/>
-  </joint> 
+      </inertial>               
+    </link>
+    <joint name="${prefix}_brk_to_${prefix}_wheel" type="continuous">
+      <parent link="${prefix}_motor_bracket"/>
+      <child link="${prefix}_wheel"/>    
+      <origin xyz="0.0 ${reflect*0.029} -0.0105"/>
+    </joint>
+  </xacro:macro>  
+  
+  <!-- left -->  
+  <xacro:motor_bracket prefix="left" reflect="1"/>
+  <xacro:motor prefix="left" reflect="-1"/>
+  <xacro:wheel prefix="left" reflect="1"/>
         
-  <!-- right -->
-  
-  <link name="right_motor_bracket">
-    <visual>
-      <geometry>
-        <box size="0.042 0.049 0.002"/>
-      </geometry>
-      <origin rpy="1.58 0 0"/>      
-      <material name="bronze"/>
-    </visual>
-    <collision>
-      <geometry>
-        <box size="0.042 0.049 0.002"/>
-      </geometry>
-      <origin rpy="1.58 0 0"/>
-    </collision>
-    <inertial>
-      <origin rpy="1.58 0 0"/>
-      <mass value="0.035"/>      
-      <inertia ixx="7.01e-6" ixy="0.0" ixz="0.0" iyy="5.16e-6" iyz="0.0" izz="1.21e-5"/>
-    </inertial>     
-  </link>
-
-  <joint name="base_to_r_motor_brk" type="fixed">
-    <parent link="base_link"/>
-    <child link="right_motor_bracket"/>
-    <origin xyz="0.0 -0.091 -0.0295"/>
-  </joint>
-           
-  <link name="right_motor">
-    <visual>
-      <geometry>
-        <cylinder length="0.070" radius="0.0185"/>
-      </geometry>
-      <origin rpy="1.57 0 0"/>      
-      <material name="silver"/>
-    </visual>
-    <collision>
-      <geometry>
-        <cylinder length="0.070" radius="0.0185"/>
-      </geometry>
-      <origin rpy="1.57 0 0"/>
-    </collision>
-    <inertial>
-      <origin rpy="1.57 0 0"/>       
-      <mass value="0.206"/>      
-      <inertia ixx="0.000101743" ixy="0.0" ixz="0.0" iyy="0.000101743" iyz="0.0" izz="3.52518e-5"/>
-    </inertial>     
-  </link>
-  
-  <joint name="r_brk_to_r_motor" type="fixed">
-    <parent link="right_motor_bracket"/>
-    <child link="right_motor"/>    
-    <origin xyz="0.0 0.036 -0.004"/>
-  </joint>
-   
-  <link name="right_wheel">
-    <visual>
-      <geometry>
-        <cylinder length="0.050" radius="0.050"/>
-      </geometry>
-      <origin rpy="1.57 0 0"/>      
-      <material name="black"/>
-    </visual>
-    <collision>
-      <geometry>
-        <cylinder length="0.050" radius="0.050"/>
-      </geometry>
-      <origin rpy="1.57 0 0"/>     
-    </collision>
-    <inertial>
-      <origin rpy="1.57 0 0"/>      
-      <mass value="0.117"/>      
-      <inertia ixx="0.0000975" ixy="0.0" ixz="0.0" iyy="0.0000975" iyz="0.0" izz="0.00014625"/>
-    </inertial>    
-  </link>
-  
-  <joint name="r_brk_to_wheel" type="continuous">
-    <axis xyz="0 1 0"/>
-    <parent link="right_motor_bracket"/>
-    <child link="right_wheel"/>
-    <dynamic damping="200.0" friction="200.0" />
-    <origin xyz="0.0 -0.029 -0.0105"/>
-  </joint>
+  <!-- right -->  
+  <xacro:motor_bracket prefix="right" reflect="-1"/>
+  <xacro:motor prefix="right" reflect="1"/>
+  <xacro:wheel prefix="right" reflect="-1"/>
 
   <!-- Casters -->
-  <!-- Front -->
-  <link name="front_caster_bracket">
-    <visual>
-      <geometry>
-        <box size="0.025 0.040 0.065"/>
-      </geometry>      
-      <material name="blue" />
-    </visual>
-    <collision>
-      <geometry>
-        <box size="0.025 0.040 0.065"/>
-      </geometry>          
-    </collision>
-    <inertial>
-      <mass value="0.030"/>      
-      <inertia ixx="1.46e-5" ixy="0.0" ixz="0.0" iyy="2.21e-5" iyz="0.0" izz="5.56e-6"/>
-    </inertial> 
-  </link>
   
-  <joint name="base_to_front_caster" type="fixed">
-    <parent link="base_link"/>
-    <child link="front_caster_bracket"/>
-    <origin xyz="0.150 0.0 -0.0375"/>
-  </joint>
-  
-  <link name="front_caster">
-    <visual>
-      <geometry>
-        <sphere radius="0.020"/>
-      </geometry>      
-      <material name="white" />
-    </visual>
-    <collision>
-      <geometry>
-        <sphere radius="0.020"/>
-      </geometry>          
-    </collision>
-    <inertial>
-      <mass value="0.003"/>      
-      <inertia ixx="4.8e-7" ixy="0.0" ixz="0.0" iyy="4.8e-7" iyz="0.0" izz="4.8e-7"/>
-    </inertial>     
-  </link>      
+  <xacro:macro name="caster_bracket" params="prefix reflect">
+    <link name="${prefix}_caster_bracket">
+      <visual>
+        <geometry>
+          <box size="0.025 0.040 0.065"/>
+        </geometry>      
+        <material name="blue" />
+      </visual>
+      <collision>
+        <geometry>
+          <box size="0.025 0.040 0.065"/>
+        </geometry>          
+      </collision>
+      <inertial>
+        <mass value="0.030"/>      
+        <inertia ixx="1.46e-5" ixy="0.0" ixz="0.0" iyy="2.21e-5" iyz="0.0" izz="5.56e-6"/>
+      </inertial> 
+    </link>
+    <joint name="base_to_${prefix}_caster" type="fixed">
+      <parent link="base_link"/>
+      <child link="${prefix}_caster_bracket"/>
+      <origin xyz="${reflect*0.150} 0.0 -0.0375"/>
+    </joint>      
+  </xacro:macro>
 
-  <joint name="front_caster_bk_to_ball" type="continuous">
-    <axis xyz="1 1 1"/>
-    <parent link="front_caster_bracket"/>
-    <child link="front_caster"/>
-    <origin xyz="0.0 0.0 -0.0325"/>
-  </joint>
+  <xacro:macro name="caster" params="prefix">  
+    <link name="${prefix}_caster">
+      <visual>
+        <geometry>
+          <sphere radius="0.020"/>
+        </geometry>      
+        <material name="white" />
+      </visual>
+      <collision>
+        <geometry>
+          <sphere radius="0.020"/>
+        </geometry>          
+      </collision>
+      <inertial>
+        <mass value="0.003"/>      
+        <inertia ixx="4.8e-7" ixy="0.0" ixz="0.0" iyy="4.8e-7" iyz="0.0" izz="4.8e-7"/>
+      </inertial>     
+    </link>      
+    <joint name="${prefix}_caster_bk_to_ball" type="continuous">
+      <axis xyz="1 1 1"/>
+      <parent link="${prefix}_caster_bracket"/>
+      <child link="${prefix}_caster"/>
+      <origin xyz="0.0 0.0 -0.0325"/>
+    </joint>
+  </xacro:macro>      
+  
+  <!-- Front -->  
+  <xacro:caster_bracket prefix="front" reflect="1"/>
+  <xacro:caster prefix="front"/>
 
   <!-- Rear -->
-  <link name="rear_caster_bracket">
-    <visual>
-      <geometry>
-        <box size="0.025 0.040 0.065"/>
-      </geometry>      
-      <material name="blue" />
-    </visual>
-    <collision>
-      <geometry>
-        <box size="0.025 0.040 0.065"/>
-      </geometry>          
-    </collision>
-    <inertial>
-      <mass value="0.030"/>      
-      <inertia ixx="1.46e-5" ixy="0.0" ixz="0.0" iyy="2.21e-5" iyz="0.0" izz="5.56e-6"/>
-    </inertial> 
-  </link>
-  
-  <joint name="base_to_rear_caster" type="fixed">
-    <parent link="base_link"/>
-    <child link="rear_caster_bracket"/>
-    <origin xyz="-0.150 0.0 -0.0375"/>
-  </joint>    
-
-  <link name="rear_caster">
-    <visual>
-      <geometry>
-        <sphere radius="0.020"/>
-      </geometry>      
-      <material name="white" />
-    </visual>
-    <collision>
-      <geometry>
-        <sphere radius="0.020"/>
-      </geometry>          
-    </collision>
-    <inertial>
-      <mass value="0.003"/>      
-      <inertia ixx="4.8e-7" ixy="0.0" ixz="0.0" iyy="4.8e-7" iyz="0.0" izz="4.8e-7"/>
-    </inertial> 
-  </link>      
-
-  <joint name="rear_caster_bk_to_ball" type="continuous">
-    <axis xyz="1 1 1"/>
-    <parent link="rear_caster_bracket"/>
-    <child link="rear_caster"/>
-    <origin xyz="0.0 0.0 -0.0325"/>
-  </joint>         
+  <xacro:caster_bracket prefix="rear" reflect="-1"/>
+  <xacro:caster prefix="rear"/>       
   
   <!-- Rear platform -->
   
@@ -720,7 +604,7 @@
   
   <joint name="fwd_platform_to_lidar" type="fixed">
     <parent link="fwd_platform"/>
-    <child link ="lidar_link"/>
+    <child link ="laser"/>
     <origin xyz="-0.015 0.0 0.0455"/>
   </joint>
   
@@ -769,9 +653,9 @@
     </inertial>    
   </link>
   
-  <joint name="lidar_base-to_lidar_link" type="fixed">
+  <joint name="lidar_base_to_lidar_link" type="fixed">
     <parent link="lidar_base"/>
-    <child link ="lidar_link"/>
+    <child link ="laser"/>
     <origin xyz="-0.01425 0.0 0.0275"/>
   </joint> 
   -->  
@@ -882,10 +766,14 @@
   </gazebo>  
   
   <!-- To control head pan/tilt -->
+  
   <gazebo>
     <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so"/>
+    <robotNamespace>/Rodney</robotNamespace>
+    <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+    <legacyModeNS>True</legacyModeNS>
   </gazebo> 
- 
+
   <transmission name="head_pan_tran">
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="head_pan">
