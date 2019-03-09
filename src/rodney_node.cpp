@@ -1,6 +1,5 @@
 // Main control node for the Rodney robot 
 #include <rodney/rodney_node.h>
-#include <std_msgs/Empty.h>
 #include <ros/package.h>
 
 // Constructor 
@@ -18,7 +17,7 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     linear_set_speed_ = 0.25f;
     angular_set_speed_ = 1.5f; 
     
-    manual_lidar_enable_ = false;
+    manual_lidar_enabled_ = true;
     
     // Obtain any configuration values from the parameter server. If they don't exist use the defaults
     nh_.param("/controller/axes/linear_speed_index", linear_speed_index_, 0);
@@ -41,11 +40,12 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     nh_.getParam("/sounds/filenames", wav_file_names_);
     nh_.getParam("/sounds/text", wav_file_texts_);
      
-    // Subscribe to receive keyboard input, joystick input, mission complete and battery state
+    // Subscribe to receive keyboard input, joystick input, mission complete, battery state and remote heartbeat
     key_sub_ = nh_.subscribe("keyboard/keydown", 5, &RodneyNode::keyboardCallBack, this);
     joy_sub_ = nh_.subscribe("joy", 1, &RodneyNode::joystickCallback, this);
     mission_sub_ = nh_.subscribe("/missions/mission_complete", 5, &RodneyNode::completeCallBack, this);
     battery_status_sub_ = nh_.subscribe("main_battery_status", 1, &RodneyNode::batteryCallback, this);
+    remote_heartbeat_sub_ = nh_.subscribe("remote_heartbeat", 1, &RodneyNode::remHeartbeatCallback, this);
     
     // The cmd_vel topic below is the command velocity message to the motor driver.
     // This can be created from either keyboard or game pad input when in manual mode or from the this 
@@ -207,17 +207,17 @@ void RodneyNode::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
     {
         std_msgs::String mission_msg;
         
-        if(manual_lidar_enable_ == true)
+        if(manual_lidar_enabled_ == true)
         {
             // Disable the LIDAR function
             mission_msg.data = "J4^disable";            
-            manual_lidar_enable_ = false;
+            manual_lidar_enabled_ = false;
         }
         else
         {
             // Enable the LIDAR function
             mission_msg.data = "J4^enable";
-            manual_lidar_enable_ = true;
+            manual_lidar_enabled_ = true;
         }
         
         mission_pub_.publish(mission_msg);        
@@ -264,8 +264,7 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         mission_pub_.publish(mission_msg);
                     
         mission_running_ = true; 
-        manual_locomotion_mode_ = false;
-        manual_lidar_enable_ = false;
+        manual_locomotion_mode_ = false;        
         
         last_interaction_time_ = ros::Time::now();                       
     }
@@ -307,17 +306,17 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
     {
                 std_msgs::String mission_msg;
         
-        if(manual_lidar_enable_ == true)
+        if(manual_lidar_enabled_ == true)
         {
             // Disable the LIDAR function
             mission_msg.data = "J4^-0";            
-            manual_lidar_enable_ = false;
+            manual_lidar_enabled_ = false;
         }
         else
         {
             // Enable the LIDAR function
             mission_msg.data = "J4^-1";
-            manual_lidar_enable_ = true;
+            manual_lidar_enabled_ = true;
         }
         
         mission_pub_.publish(mission_msg);        
@@ -572,6 +571,13 @@ void RodneyNode::motorDemandCallBack(const geometry_msgs::Twist::ConstPtr& msg)
 }
 //---------------------------------------------------------------------------
 
+// Callback for remote heartbeat
+void RodneyNode::remHeartbeatCallback(const std_msgs::Empty::ConstPtr& msg)
+{
+    // Remote heartbeat received store the time
+    remote_heartbeat_time_ = ros::Time::now();
+}
+
 // Callback for main battery status
 void RodneyNode::batteryCallback(const sensor_msgs::BatteryState::ConstPtr& msg)
 { 
@@ -655,18 +661,29 @@ void RodneyNode::sendTwist(void)
     // If in manual locomotion mode use keyboard or joystick data
     if(manual_locomotion_mode_ == true)
     {
-        // Publish message based on keyboard or joystick speeds
-        if((keyboard_linear_speed_ == 0) && (keyboard_angular_speed_ == 0))
-        {
-            // Use joystick values
-            target_twist.linear.x = joystick_linear_speed_;
-            target_twist.angular.z = joystick_angular_speed_;            
+        // Only allow stored keyboard or joystick values to set  
+        // the velocities if the remote heartbeat is running
+        if((ros::Time::now() - remote_heartbeat_time_).toSec() < 1.0)
+        {        
+            // Publish message based on keyboard or joystick speeds
+            if((keyboard_linear_speed_ == 0) && (keyboard_angular_speed_ == 0))
+            {
+                // Use joystick values
+                target_twist.linear.x = joystick_linear_speed_;
+                target_twist.angular.z = joystick_angular_speed_;            
+            }
+            else
+            {
+                // use keyboard values
+                target_twist.linear.x = keyboard_linear_speed_;
+                target_twist.angular.z = keyboard_angular_speed_;                   
+            }
         }
         else
         {
-            // use keyboard values
-            target_twist.linear.x = keyboard_linear_speed_;
-            target_twist.angular.z = keyboard_angular_speed_;                   
+            // Lost connection with remote workstation so zero the velocities
+            target_twist.linear.x = 0.0;
+            target_twist.angular.z = 0.0; 
         }
     }
     else

@@ -4,6 +4,7 @@ Changelog for package rodney
 
 Unreleased
 ------------------
+* Added remote heartbeat message which will be run on remote workstation when teleoping
 * Added RPLidar and scan filter nodes to rodney launch file
 * Added functionality to manually enable to LIDAR from keyboard or joystick
 * Added LIDAR to URDF model

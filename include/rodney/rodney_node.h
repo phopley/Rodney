@@ -6,6 +6,7 @@
 #include <sensor_msgs/Joy.h>
 #include <sensor_msgs/BatteryState.h>
 #include <std_msgs/String.h>
+#include <std_msgs/Empty.h>
 #include <geometry_msgs/Twist.h>
 
 class RodneyNode
@@ -28,9 +29,11 @@ private:
     ros::Subscriber mission_sub_;       // Topic for mission complete indication
     ros::Subscriber demand_sub_;        // Topic for autonomous motor demands
     ros::Subscriber battery_status_sub_;// Topic to monitor battery status for the main battery
+    ros::Subscriber remote_heartbeat_sub_;  // Topic to monitor the remote heartbeat when teleoping
     ros::Time last_twist_send_time_;    // Time of previous message
     ros::Time last_battery_warn_;       // Time of the last spoken battery warning message
     ros::Time last_interaction_time_;   // Time that a human last interacted with the robot
+    ros::Time remote_heartbeat_time_;   // Time that the last remote heartbeat message was received
     
     geometry_msgs::Twist last_twist_;   // The last Twist message sent   
     
@@ -41,7 +44,7 @@ private:
     bool manual_locomotion_mode_;
     bool wav_play_enabled_;
     bool pid_enabled_;
-    bool manual_lidar_enable_;  // true when operator manually enables the LIDAR function 
+    bool manual_lidar_enabled_;  // true when operator manually enables the LIDAR function 
     
     unsigned int battery_low_count_; // Counter for low battery low messages   
  
@@ -83,6 +86,7 @@ private:
     void completeCallBack(const std_msgs::String::ConstPtr& msg);
     void motorDemandCallBack(const geometry_msgs::Twist::ConstPtr& msg);
     void batteryCallback(const sensor_msgs::BatteryState::ConstPtr& msg);
+    void remHeartbeatCallback(const std_msgs::Empty::ConstPtr& msg);
     
     geometry_msgs::Twist rampedTwist(geometry_msgs::Twist prev, geometry_msgs::Twist target,
                                      ros::Time time_prev, ros::Time time_now);

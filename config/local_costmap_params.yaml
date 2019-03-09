@@ -1,0 +1,9 @@
+move_base:
+  local_costmap:
+    global_frame: odom
+    robot_base_frame: base_link
+    rolling_window: true
+    transform_tolerance: 0.6 #
+    update_frequency: 1.0 #
+
+

@@ -1,0 +1,8 @@
+footprint: [[0.170, 0.090], [0.025, 0.090], [0.025, 0.145], [-0.025, 0.145], [-0.025, 0.090], [-0.170, 0.090], [-0.170, -0.090], [-0.025, -0.090], [-0.025, -0.145], [0.025, -0.145], [0.025, -0.090], [0.170, -0.090]]
+observation_sources: laser_scan_sensor
+laser_scan_sensor:
+  sensor_frame: laser
+  data_type: LaserScan
+  topic: scan
+  marking: true
+  clearing: true
