@@ -18,37 +18,38 @@
 
   <!-- Start all the nodes that make up Rondey -->
   <!-- Starting with those written for the project -->
-  <node pkg="pan_tilt" type="pan_tilt_node" name="pan_tilt_node" output="screen"/>
-  <node pkg="face_recognition" type="face_recognition_node.py" name="face_recognition_node" output="screen"/>
-  <node pkg="head_control" type="head_control_node" name="head_control_node" output="screen"/>  
-  <node pkg="speech" type="speech_node" name="speech_node" output="screen"/>
+  <node pkg="pan_tilt" type="pan_tilt_node" name="pan_tilt_node"/>
+  <node pkg="face_recognition" type="face_recognition_node.py" name="face_recognition_node"/>
+  <node pkg="head_control" type="head_control_node" name="head_control_node"/>  
+  <node pkg="speech" type="speech_node" name="speech_node"/>
   <node pkg="rodney_missions" type="rodney_missions_node.py" name="rodney_missions" output="screen"/>
   <node pkg="rodney" type="rodney_node" name="rodney_node" output="screen" />
-  <node pkg="thunderborg" type="thunderborg_node.py" name="thunderborg" output="screen" />
+  <node pkg="thunderborg" type="thunderborg_node.py" name="thunderborg"/>
   <!-- The Arduino or Teensy. 
        For Arduino Nano use /dev/ttyUSB0 (or nano if dev rules updated) and 57600.
        For the Teensy use the defaults /dev/ttyACM0 (or teensy if dev rules updated) and 500000 -->
-  <arg name="serial_port" default="/dev/ttyACM0"/>
+  <arg name="serial_port" default="/dev/teensy"/>
   <arg name="baud_rate" default="500000"/>  
   <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
     <param name="port" value="$(arg serial_port)"/>
     <param name="baud" value="$(arg baud_rate)"/>
   </node>
   
-  <!-- The RPLidar and laser filter node -->
-  <node pkg="rplidar_ros" type="rplidarNode" name="rplidar_node" output="screen">
-    <param name="serial_port" type="string" value="/dev/ttyUSB0"/>
+  <!-- The RPLidar and laser filter node 
+       Have created symbolic link for /dev/ttyUSBn to be rplidar -->
+  <node pkg="rplidar_ros" type="rplidarNode" name="rplidar_node">
+    <param name="serial_port" type="string" value="/dev/rplidar"/>
     <param name="serial_baudrate" type="int" value="115200"/>
     <param name="frame_id" type="string" value="laser"/>
     <remap from="scan" to="scan_filter_input"/>
   </node>
-  <node pkg ="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain" output="screen">
+  <node pkg ="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain">
     <remap from="scan" to="scan_filter_input"/>
     <remap from="scan_filtered" to="scan"/>
   </node>
   
   <!-- The robot face -->
-  <node pkg="homer_robot_face" type="RobotFace" name="RobotFace" output="screen"/>
+  <node pkg="homer_robot_face" type="RobotFace" name="RobotFace"/>
   
   <!-- Static transform for the laser -> baselink -->
   <node pkg="tf" type="static_transform_publisher" name="laser_link_broadcaster" args="0.085 0 0.107 0 0 0 base_link laser 100"/>
@@ -57,7 +58,7 @@
   <arg name="no_nav" default="false"/>  
   <group unless="$(arg no_nav)"> 
     <arg name="map_file" default="second_floor"/>
-    <node pkg="map_server" type="map_server" name="map_server" args="$(find rodney)/maps/$(arg map_file).yaml"/>  
+    <node pkg="map_server" type="map_server" name="map_server" args="$(find rodney)/maps/$(arg map_file).yaml" output="screen"/>  
     <node pkg="amcl" type="amcl" name="amcl" output="screen"/>          
     <node pkg="move_base" type="move_base" name="move_base" respawn="false" output="screen">
       <rosparam command="load" file="$(find rodney)/config/costmap_common_params.yaml" ns="global_costmap"/>
@@ -65,5 +66,5 @@
       <remap from="cmd_vel" to="demand_vel"/>
     </node>   
   </group>
-  
+   
 </launch>

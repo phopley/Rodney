@@ -44,7 +44,6 @@ private:
     bool manual_locomotion_mode_;
     bool wav_play_enabled_;
     bool pid_enabled_;
-    bool manual_lidar_enabled_;  // true when operator manually enables the LIDAR function 
     
     unsigned int battery_low_count_; // Counter for low battery low messages   
  

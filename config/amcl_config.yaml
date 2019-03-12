@@ -1,13 +1,13 @@
 amcl:
   # Overall filter parameters
   min_particles: 500
-  max_particles: 3000 # 5000
+  max_particles: 3000
   kld_err: 0.05
   kld_z: 0.99
   update_min_d: 0.2
   update_min_a: 0.5
   resample_interval: 1
-  transform_tolerance: 0.5  # 0.1
+  transform_tolerance: 0.5 # Still investigating
   recovery_alpha_slow: 0.0
   recovery_alpha_fast: 0.0
   gui_publish_rate: 10.0
@@ -20,7 +20,7 @@ amcl:
   laser_sigma_hit: 0.2
   laser_lambda_short: 0.1
   laser_likelihood_max_dist: 2.0
-  laser_model_type: beam #likelihood_field
+  laser_model_type: beam
   # Odometry model parameters
   odom_model_type: diff
   odom_alpha1: 0.2

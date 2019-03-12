@@ -17,8 +17,6 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     linear_set_speed_ = 0.25f;
     angular_set_speed_ = 1.5f; 
     
-    manual_lidar_enabled_ = true;
-    
     // Obtain any configuration values from the parameter server. If they don't exist use the defaults
     nh_.param("/controller/axes/linear_speed_index", linear_speed_index_, 0);
     nh_.param("/controller/axes/angular_speed_index", angular_speed_index_, 1);
@@ -207,18 +205,8 @@ void RodneyNode::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
     {
         std_msgs::String mission_msg;
         
-        if(manual_lidar_enabled_ == true)
-        {
-            // Disable the LIDAR function
-            mission_msg.data = "J4^disable";            
-            manual_lidar_enabled_ = false;
-        }
-        else
-        {
-            // Enable the LIDAR function
-            mission_msg.data = "J4^enable";
-            manual_lidar_enabled_ = true;
-        }
+        // Toggle the LIDAR on/off
+        mission_msg.data = "J4";            
         
         mission_pub_.publish(mission_msg);        
         last_interaction_time_ = ros::Time::now();
@@ -251,7 +239,7 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
     //      'a' or 'A' - Some missions require the user to send an acknowledge
     //      'c' or 'C' - Cancel current mission
     //      'd' or 'D' - Move head/camera to the default position in manual mode
-    //      'l' or 'L' - Disable/Enable LIDAR function 
+    //      'l' or 'L' - Toggle LIDAR on/off 
     //      'm' or 'M' - Set locomotion mode to manual
     //      'r' or 'R' - Reset the odometry
     
@@ -304,23 +292,16 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
     } 
     else if((msg->code == keyboard::Key::KEY_l) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
     {
-                std_msgs::String mission_msg;
-        
-        if(manual_lidar_enabled_ == true)
+        if(manual_locomotion_mode_ == true)
         {
-            // Disable the LIDAR function
-            mission_msg.data = "J4^-0";            
-            manual_lidar_enabled_ = false;
-        }
-        else
-        {
-            // Enable the LIDAR function
-            mission_msg.data = "J4^-1";
-            manual_lidar_enabled_ = true;
-        }
+            std_msgs::String mission_msg;
         
-        mission_pub_.publish(mission_msg);        
-        last_interaction_time_ = ros::Time::now();
+            // Toggle the LIDAR on/off
+            mission_msg.data = "J4";            
+        
+            mission_pub_.publish(mission_msg);        
+            last_interaction_time_ = ros::Time::now();
+        }
     }      
     else if((msg->code == keyboard::Key::KEY_m) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
     {
