@@ -6,7 +6,6 @@
   <rosparam command="load" file="$(find face_recognition)/config/config.yaml" />
   <rosparam command="load" file="$(find head_control)/config/config.yaml" />
   <rosparam command="load" file="$(find rodney_missions)/config/config.yaml" />
-  <rosparam command="load" file="$(find thunderborg)/config/config.yaml" />
   
   <include file="$(find raspicam_node)/launch/camerav2_1280x960.launch" /> 
 
@@ -16,7 +15,17 @@
   <node pkg="head_control" type="head_control_node" name="head_control_node" output="screen"/>
   <node pkg="homer_robot_face" type="RobotFace" name="RobotFace" output="screen"/>
   <node pkg="speech" type="speech_node" name="speech_node" output="screen"/>
-  <node pkg="rodney_missions" type="rodney_missions_node.py" name="rodney_missions" output="screen"/>
+  <node pkg="rodney_missions" type="rodney_missions_node.py" name="rodney_missions" output="screen"/>  
+  <node pkg="thunderborg" type="thunderborg_node.py" name="thunderborg_node" output="screen">
+    <rosparam command="load" file="$(find thunderborg)/config/config.yaml"/>
+  </node>
   <node pkg="rodney" type="rodney_node" name="rodney_node" output="screen" />
-  <node pkg="thunderborg" type="thunderborg_node.py" name="thunderborg" output="screen" />
+  
+  <node pkg="tf2_ros" type="static_transform_publisher" name="base_footprint_broadcaster" args="0 0 0.09 0 0 0 /base_footprint /base_link"/>
+  
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization_node">
+    <remap from="odometry/filtered" to="odom"/>
+    <rosparam command="load" file="$(find rodney)/config/robot_localization.yaml"/> 
+  </node>
+  
 </launch>
