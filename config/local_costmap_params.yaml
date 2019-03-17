@@ -7,5 +7,7 @@ move_base:
     transform_tolerance: 0.7 # Still investigating
     update_frequency: 1.0
     publish_frequency: 0.5
+    width: 2.5                          # def 10.0
+    height: 2.5                         # def 10.0
 
 
