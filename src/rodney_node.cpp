@@ -32,7 +32,7 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     nh_.param("/motor/ramp/angular", ramp_for_angular_, 5.0f);
     nh_.param("/battery/warning_level", voltage_level_warning_, 9.5f);    
     nh_.param("/sounds/enabled", wav_play_enabled_, false);
-    nh_.param("/pid/use_pid", pid_enabled_, false);
+    nh_.param("/thunderborg_node/pid/use_pid", pid_enabled_, false);
     
     // Obtain the filename and text for the wav files that can be played    
     nh_.getParam("/sounds/filenames", wav_file_names_);

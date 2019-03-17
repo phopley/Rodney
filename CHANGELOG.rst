@@ -2,6 +2,11 @@
 Changelog for package rodney
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.0 (2019-03-17)
+------------------
+* Added ekf_localization_node from the robot_localization package to the launch file
+* Added the robot_localization.yaml file to the config folder
+
 0.2.0 (2019-01-24)
 ------------------
 * Improved conversion from joystick position to speed command
