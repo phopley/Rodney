@@ -3,6 +3,7 @@ Changelog for package rodney
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 0.3.1 (2019-03-18)
+------------------
 * Topic /commands/reset_odometry should have been renamed /commands/reset_raw_odometry
 
 0.3.0 (2019-03-17)
