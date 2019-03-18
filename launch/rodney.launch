@@ -1,8 +1,7 @@
 <?xml version="1.0" ?>
 <launch>    
   <!-- Load each of the config files into the parameter server -->   
-  <rosparam command="load" file="$(find rodney)/config/config.yaml"/>
-  <rosparam command="load" file="$(find rodney)/config/laser_filter_config.yaml" ns="scan_to_scan_filter_chain"/>
+  <rosparam command="load" file="$(find rodney)/config/config.yaml"/>  
   <rosparam command="load" file="$(find rodney)/config/amcl_config.yaml"/>
   <rosparam command="load" file="$(find rodney)/config/base_local_planner_params.yaml"/>
   <rosparam command="load" file="$(find rodney)/config/local_costmap_params.yaml"/>
@@ -11,7 +10,6 @@
   <rosparam command="load" file="$(find face_recognition)/config/config.yaml"/>
   <rosparam command="load" file="$(find head_control)/config/config.yaml"/>
   <rosparam command="load" file="$(find rodney_missions)/config/config.yaml"/>
-  <rosparam command="load" file="$(find thunderborg)/config/config.yaml"/>
   
   <!-- Launch the camera node from one of its launch files -->
   <include file="$(find raspicam_node)/launch/camerav2_1280x960.launch" /> 
@@ -24,7 +22,9 @@
   <node pkg="speech" type="speech_node" name="speech_node"/>
   <node pkg="rodney_missions" type="rodney_missions_node.py" name="rodney_missions" output="screen"/>
   <node pkg="rodney" type="rodney_node" name="rodney_node" output="screen" />
-  <node pkg="thunderborg" type="thunderborg_node.py" name="thunderborg"/>
+  <node pkg="thunderborg" type="thunderborg_node.py" name="thunderborg">
+    <rosparam command="load" file="$(find thunderborg)/config/config.yaml"/>
+  </node>
   <!-- The Arduino or Teensy. 
        For Arduino Nano use /dev/ttyUSB0 (or nano if dev rules updated) and 57600.
        For the Teensy use the defaults /dev/ttyACM0 (or teensy if dev rules updated) and 500000 -->
@@ -44,6 +44,7 @@
     <remap from="scan" to="scan_filter_input"/>
   </node>
   <node pkg ="laser_filters" type="scan_to_scan_filter_chain" name="scan_to_scan_filter_chain">
+    <rosparam command="load" file="$(find rodney)/config/laser_filter_config.yaml"/>
     <remap from="scan" to="scan_filter_input"/>
     <remap from="scan_filtered" to="scan"/>
   </node>
@@ -53,6 +54,14 @@
   
   <!-- Static transform for the laser -> baselink -->
   <node pkg="tf" type="static_transform_publisher" name="laser_link_broadcaster" args="0.085 0 0.107 0 0 0 base_link laser 100"/>
+  <!-- The base_link -> base_footprint -->
+  <node pkg="tf2_ros" type="static_transform_publisher" name="base_footprint_broadcaster" args="0 0 0.09 0 0 0 /base_footprint /base_link"/>
+  
+  <!-- Node to fuse motor encoder and IMU data for odom -->
+  <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization_node">
+    <remap from="odometry/filtered" to="odom"/>
+    <rosparam command="load" file="$(find rodney)/config/robot_localization.yaml"/> 
+  </node>
   
   <!-- Navigation -->
   <arg name="no_nav" default="false"/>  

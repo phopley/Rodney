@@ -40,7 +40,7 @@ Topics:
   Publishes `geometry_msgs/Twist` Velocity demands from either manaul input or the autonomous sub-system
 
 * `/commands/reset_odometry`:  
-  Publishes `std_msgs/Empty` Request to reset the odmoetry values
+  Publishes `std_msgs/Empty` Request to reset the raw odmoetry values
   
 Parameters:
 
@@ -59,6 +59,7 @@ Parameters:
 * `/sounds/enabled`: If true the robot is free to use stored wav file to get attention when inactive.
 * `/sounds/filenames`: A list of wav filenames to choose from when inactive
 * `/sounds/text`: A list of speeches which match the contents of the wav file names.
+* `/thunderborg_node/pid/use_pid`: True if the robot is using the PID to control the motors. Default = false.
 
 ## Arduino Sketch
 The `rodney_control` directory contains an Arduino sketch `rodney_control.ino` which handles some of the rodney robot function e.g. servo movements, motor encoder readings and LIDAR data.

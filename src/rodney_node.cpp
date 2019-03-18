@@ -32,7 +32,7 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     nh_.param("/motor/ramp/angular", ramp_for_angular_, 5.0f);
     nh_.param("/battery/warning_level", voltage_level_warning_, 9.5f);    
     nh_.param("/sounds/enabled", wav_play_enabled_, false);
-    nh_.param("/pid/use_pid", pid_enabled_, false);
+    nh_.param("/thunderborg_node/pid/use_pid", pid_enabled_, false);
     
     // Obtain the filename and text for the wav files that can be played    
     nh_.getParam("/sounds/filenames", wav_file_names_);
@@ -56,7 +56,7 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     cancel_pub_ = nh_.advertise<std_msgs::Empty>("/missions/mission_cancel", 5);
     ack_pub_ = nh_.advertise<std_msgs::Empty>("/missions/acknowledge", 5);
     twist_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-    reset_odom_ = nh_.advertise<std_msgs::Empty>("/commands/reset_odometry", 1);
+    reset_odom_ = nh_.advertise<std_msgs::Empty>("/commands/reset_raw_odometry", 1);
     
     battery_low_count_ = 0;
     mission_running_ = false;
