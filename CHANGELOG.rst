@@ -2,6 +2,9 @@
 Changelog for package rodney
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.1 (2019-03-18)
+* Topic /commands/reset_odometry should have been renamed /commands/reset_raw_odometry
+
 0.3.0 (2019-03-17)
 ------------------
 * Added ekf_localization_node from the robot_localization package to the launch file

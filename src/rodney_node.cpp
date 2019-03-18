@@ -55,7 +55,7 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     cancel_pub_ = nh_.advertise<std_msgs::Empty>("/missions/mission_cancel", 5);
     ack_pub_ = nh_.advertise<std_msgs::Empty>("/missions/acknowledge", 5);
     twist_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-    reset_odom_ = nh_.advertise<std_msgs::Empty>("/commands/reset_odometry", 1);
+    reset_odom_ = nh_.advertise<std_msgs::Empty>("/commands/reset_raw_odometry", 1);
     
     battery_low_count_ = 0;
     mission_running_ = false;
