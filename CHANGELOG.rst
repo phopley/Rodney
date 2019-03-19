@@ -14,6 +14,10 @@ Unreleased
 * Changed head joints in URDF model from EfforJointInterface to PositionJointInterface
 * Moved scripts to a scripts folder and create rules for remapping serial ports
 
+0.3.2 (2019-03-19)
+------------------
+* Reset of odom now uses a service call to robot_localization not /commands/reset_raw_odometry
+
 0.3.1 (2019-03-18)
 ------------------
 * Topic /commands/reset_odometry should have been renamed /commands/reset_raw_odometry
