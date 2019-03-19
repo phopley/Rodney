@@ -1,6 +1,7 @@
 // Main control node for the Rodney robot 
 #include <rodney/rodney_node.h>
 #include <ros/package.h>
+#include <robot_localization/SetPose.h>
 
 // Constructor 
 RodneyNode::RodneyNode(ros::NodeHandle n)
@@ -56,7 +57,6 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     cancel_pub_ = nh_.advertise<std_msgs::Empty>("/missions/mission_cancel", 5);
     ack_pub_ = nh_.advertise<std_msgs::Empty>("/missions/acknowledge", 5);
     twist_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-    reset_odom_ = nh_.advertise<std_msgs::Empty>("/commands/reset_raw_odometry", 1);
     
     battery_low_count_ = 0;
     mission_running_ = false;
@@ -324,9 +324,11 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
     }
     else if((msg->code == keyboard::Key::KEY_r) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
     {
-        // 'r' or 'R', reset odometry command
-        std_msgs::Empty empty_msg;
-        reset_odom_.publish(empty_msg);
+        // 'r' or 'R', reset odometry
+        ros::ServiceClient client = nh_.serviceClient<robot_localization::SetPose>("set_pose");
+        robot_localization::SetPose srv;
+        srv.request.pose.header.frame_id ="odom";
+        client.call(srv);
 
     }
     else if((msg->code == keyboard::Key::KEY_KP1) && ((msg->modifiers & keyboard::Key::MODIFIER_NUM) == 0))

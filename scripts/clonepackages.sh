@@ -8,10 +8,10 @@ git clone https://github.com/phopley/head_control.git
 git clone https://github.com/phopley/joystick.git
 git clone https://github.com/phopley/pan_tilt.git
 git clone https://github.com/phopley/rodney_missions.git
-git clone https://github.com/lrse/ros-keyboard.git
+git clone https://github.com/phopley/ros-keyboard.git
+git clone https://github.com/phopley/rplidar_ros.git
 git clone https://github.com/phopley/servo_msgs.git
 git clone https://github.com/phopley/speech.git
-git clone https://github.com/phopley/thunderborg.git
 git clone https://github.com/phopley/tacho_msgs.git
-git clone https://github.com/Slamtec/rplidar_ros.git
+git clone https://github.com/phopley/thunderborg.git
 

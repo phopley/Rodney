@@ -38,9 +38,6 @@ Topics:
   
 * `cmd_vel`:  
   Publishes `geometry_msgs/Twist` Velocity demands from either manaul input or the autonomous sub-system
-
-* `/commands/reset_odometry`:  
-  Publishes `std_msgs/Empty` Request to reset the raw odmoetry values
   
 Parameters:
 

@@ -22,7 +22,7 @@
   <node pkg="speech" type="speech_node" name="speech_node"/>
   <node pkg="rodney_missions" type="rodney_missions_node.py" name="rodney_missions" output="screen"/>
   <node pkg="rodney" type="rodney_node" name="rodney_node" output="screen" />
-  <node pkg="thunderborg" type="thunderborg_node.py" name="thunderborg">
+  <node pkg="thunderborg" type="thunderborg_node.py" name="thunderborg_node">
     <rosparam command="load" file="$(find thunderborg)/config/config.yaml"/>
   </node>
   <!-- The Arduino or Teensy. 
@@ -54,7 +54,7 @@
   
   <!-- Static transform for the laser -> baselink -->
   <node pkg="tf" type="static_transform_publisher" name="laser_link_broadcaster" args="0.085 0 0.107 0 0 0 base_link laser 100"/>
-  <!-- The base_link -> base_footprint -->
+  <!-- The base_link -> base_footprint -->  
   <node pkg="tf2_ros" type="static_transform_publisher" name="base_footprint_broadcaster" args="0 0 0.09 0 0 0 /base_footprint /base_link"/>
   
   <!-- Node to fuse motor encoder and IMU data for odom -->

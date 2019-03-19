@@ -13,8 +13,8 @@ move_base:
     min_vel_x: -0.25                    # def 0.0           linorobot -0.025
     max_vel_y: 0.0                      # def 0.1
     min_vel_y: 0.0                      # def -0.1
-    max_rot_vel: 0.30                   # def 1.0
-    min_rot_vel: -0.30                  # def 0.4           linorbot and us now have a negative value but he default is not negative
+    max_rot_vel: 1.0                    # def 1.0
+    min_rot_vel: 0.4                    # def 0.4           
     yaw_goal_tolerance: 0.1             # def 0.05
     xy_goal_tolerance: 0.25             # def 0.10
     sim_time: 3.0                       # def 1.7
