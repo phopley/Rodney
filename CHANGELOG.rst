@@ -2,6 +2,10 @@
 Changelog for package rodney
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.1 (2019-03-19)
+------------------
+* Reset of odom now uses a service call to robot_localization
+
 0.3.0 (2019-03-17)
 ------------------
 * Added ekf_localization_node from the robot_localization package to the launch file

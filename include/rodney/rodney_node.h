@@ -22,7 +22,6 @@ private:
     ros::Publisher cancel_pub_;         // Topic to cancel a mission
     ros::Publisher ack_pub_;            // Topic for user to acknowledge some mission sections
     ros::Publisher twist_pub_;          // Topic to publish twist message
-    ros::Publisher reset_odom_;         // Topic to publish a reset odometry command
     ros::Subscriber key_sub_;           // Topic for keyboard input
     ros::Subscriber joy_sub_;           // Topic for joystick/game pad input
     ros::Subscriber mission_sub_;       // Topic for mission complete indication
