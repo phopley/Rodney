@@ -1,10 +1,9 @@
-move_base:
-  global_costmap:
-    global_frame: map
-    robot_base_frame: base_link
-    static_map: true
-    transform_tolerance: 0.6 # Still investigating
-    update_frequency: 1.0
+global_costmap:
+  global_frame: map
+  robot_base_frame: base_footprint
+  static_map: true
+  transform_tolerance: 0.6          # def 0.2 Could we change thos with a Pi 3/B+
+  update_frequency: 1.0
 
     
     
