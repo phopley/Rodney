@@ -9,9 +9,10 @@ ln -s ~/git/pan_tilt ~/rodney_ws/src
 ln -s ~/git/rodney ~/rodney_ws/src
 ln -s ~/git/rodney_missions ~/rodney_ws/src
 ln -s ~/git/ros-keyboard ~/rodney_ws/src
+ln -s ~/git/rplidar_ros ~/rodney_ws/src
 ln -s ~/git/servo_msgs ~/rodney_ws/src
 ln -s ~/git/speech ~/rodney_ws/src
-ln -s ~/git/thunderborg ~/rodney_ws/src
 ln -s ~/git/tacho_msgs ~/rodney_ws/src
-ln -s ~/git/rplidar_ros ~/rodney_ws/src
+ln -s ~/git/thunderborg ~/rodney_ws/src
+
 

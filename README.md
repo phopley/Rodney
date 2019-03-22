@@ -24,6 +24,9 @@ Topics:
 * `demand_vel`:  
   Subscribes `geometry_msgs/Twist` Velocity demands from autonomous sub-system
   
+* `remote_heartbeat`:  
+  subscribes `std_msgsEmpty` Message to tell robot all is well with WiFi and it's safe to use remote control velocities
+  
 * `/robot_face/expected_input`:  
   Publishes `std_msgs/String` Status messages
   
@@ -38,9 +41,6 @@ Topics:
   
 * `cmd_vel`:  
   Publishes `geometry_msgs/Twist` Velocity demands from either manaul input or the autonomous sub-system
-
-* `/commands/reset_odometry`:  
-  Publishes `std_msgs/Empty` Request to reset the odmoetry values
   
 Parameters:
 
@@ -59,6 +59,7 @@ Parameters:
 * `/sounds/enabled`: If true the robot is free to use stored wav file to get attention when inactive.
 * `/sounds/filenames`: A list of wav filenames to choose from when inactive
 * `/sounds/text`: A list of speeches which match the contents of the wav file names.
+* `/thunderborg_node/pid/use_pid`: True if the robot is using the PID to control the motors. Default = false.
 
 ## Arduino Sketch
 The `rodney_control` directory contains an Arduino sketch `rodney_control.ino` which handles some of the rodney robot function e.g. servo movements, motor encoder readings and LIDAR data.
