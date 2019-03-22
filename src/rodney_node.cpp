@@ -329,7 +329,6 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         robot_localization::SetPose srv;
         srv.request.pose.header.frame_id ="odom";
         client.call(srv);
-
     }
     else if((msg->code == keyboard::Key::KEY_KP1) && ((msg->modifiers & keyboard::Key::MODIFIER_NUM) == 0))
     {
