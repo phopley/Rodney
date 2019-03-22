@@ -1,4 +1,4 @@
-controller_frequency: 1.4  # Can we move this back to 5.0 if using different Pi
+controller_frequency: 1.5  # Can we move this back to 5.0 if using different Pi
 use_grid_path: true
 base_global_planner: global_planner/GlobalPlanner
 base_local_planner: dwa_local_planner/DWAPlannerROS
@@ -7,14 +7,14 @@ DWAPlannerROS:
   acc_lim_y: 0.0                      # def 2.5
   acc_lim_theta: 1.5                  # def 3.2           wiki calls it acc_lim_th but it is acc_lim_theta
   acc_lim_trans: 1.0                  # def 0.1           not in the wiki
-  max_trans_vel: 0.50                 # def 0.55
-  min_trans_vel: 0.01                 # def 0.1
-  max_vel_x: 0.2                      # def 0.55          The maximum foward velocity
-  min_vel_x: -0.15                    # def 0.0           Too high a value robot will travel backwards a long way
+  max_trans_vel: 0.25                 # def 0.55
+  min_trans_vel: 0.16                 # def 0.1
+  max_vel_x: 0.25                     # def 0.55          The maximum foward velocity
+  min_vel_x: -0.16                    # def 0.0           Too high a value robot will travel backwards a long way
   max_vel_y: 0.0                      # def 0.1
   min_vel_y: 0.0                      # def -0.1
   max_rot_vel: 1.5                    # def 1.0
-  min_rot_vel: 1.0                    # def 0.4           
+  min_rot_vel: 1.3                    # def 0.4           
   yaw_goal_tolerance: 0.3             # def 0.05
   xy_goal_tolerance: 0.25             # def 0.10
   sim_time: 3.0                       # def 1.7
