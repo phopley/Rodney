@@ -134,6 +134,7 @@ include_directories(
 
 ## Declare a C++ executable
 add_executable(${PROJECT_NAME}_node src/rodney_node.cpp)
+add_executable(remote_heartbeat_node src/remote_heartbeat_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -147,6 +148,7 @@ add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catk
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES})
+target_link_libraries(remote_heartbeat_node ${catkin_LIBRARIES})
 
 #############
 ## Install ##

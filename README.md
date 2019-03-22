@@ -24,6 +24,9 @@ Topics:
 * `demand_vel`:  
   Subscribes `geometry_msgs/Twist` Velocity demands from autonomous sub-system
   
+* `remote_heartbeat`:  
+  subscribes `std_msgsEmpty` Message to tell robot all is well with WiFi and it's safe to use remote control velocities
+  
 * `/robot_face/expected_input`:  
   Publishes `std_msgs/String` Status messages
   
@@ -59,4 +62,4 @@ Parameters:
 * `/thunderborg_node/pid/use_pid`: True if the robot is using the PID to control the motors. Default = false.
 
 ## Arduino Sketch
-The `rodney_control` directory contains an Arduino sketch `rodney_control.ino` which handles some of the rodney robot function e.g. servo movements and motor encoder readings.
+The `rodney_control` directory contains an Arduino sketch `rodney_control.ino` which handles some of the rodney robot function e.g. servo movements, motor encoder readings and LIDAR data.

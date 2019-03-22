@@ -2,6 +2,19 @@
 Changelog for package rodney
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Unreleased
+------------------
+* Added configuration and launching of the nav stack
+* Added remote heartbeat message which will be run on remote workstation when teleoping
+* Added RPLidar and scan filter nodes to rodney launch file
+* Added functionality to manually enable the LIDAR from keyboard or joystick
+* Added LIDAR to URDF model
+* Added rodney.xacro and now auto generate rodney.urdf file
+* "Arduino" code changed to use either an Arduino Nano or a Teensy. Nano uses smaller buffer sizes a Teensy use higher baud rate
+* Increased tacho message publish rate to 40Hz on a Teensy
+* Changed head joints in URDF model from EfforJointInterface to PositionJointInterface
+* Moved scripts to a scripts folder and create rules for remapping serial ports
+
 0.3.2 (2019-03-19)
 ------------------
 * Reset of odom now uses a service call to robot_localization not /commands/reset_raw_odometry

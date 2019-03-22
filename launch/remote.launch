@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<launch> 
+  <node pkg="joystick" type="joystick_node" name="joystick_node"/>
+  <node pkg="keyboard" type="keyboard" name="keyboard"/>
+  <node pkg="rodney" type="remote_heartbeat_node" name="remote_heartbeat_node" output="screen"/>
+</launch>

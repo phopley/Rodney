@@ -1,106 +1,129 @@
 /*
- * This version controls upto four RC Servos and publishes the tacho message monitoring
- * two motors.
+ * This version: 
+ * - Controls upto four RC Servos on the servo topic
+ * - Publishes the tacho on the tacho topic monitoring two motors with Hall sensors.
  * 
  * The node subscribes to the servo topic and acts on a rodney_msgs::servo_array message.
  * This message contains two elements, index and angle. Index references the servos 0-3 and 
  * angle is the angle to set the servo to 0-180.
+ * 
  *
- * D2 -> INT0 used for monitoring right motor speed
- * D3 -> INT1 used for monitoring left motor speed
- * D4 -> Digital input used for sensing right motor direction
- * D5 -> PWM servo indexed 2
- * D6 -> PWM servo indexed 1
- * D7 -> Digital input used for sensing left motor direction
- * D9 -> PWM servo indexed 0
- * D10 -> PWM servo indexed 3
+ * The connections to a Teensy 3.5 are:  
+ * Pin 0 (INT)   -> used for monitoring right motor speed
+ * Pin 1 (Input) -> used for sensing right motor direction
+ * Pin 3 (INT)   -> used for monitoring left motor speed
+ * Pin 4 (Input) -> used for sensing left motor direction 
+ * Pin 20 (PWM)  -> servo indexed 3
+ * Pin 21 (PWM)  -> servo indexed 2 
+ * Pin 22 (PWM)  -> servo indexed 1
+ * PIN 23 (PWM)  -> servo indexed 0 
+ * 
+ * The connections to a Nano are:
+ * D2 (INT)   -> used for monitoring right motor speed
+ * D4 (Input) -> used for sensing right motor direction
+ * D3 (INT)   -> used for monitoring left motor speed
+ * D7 (Input) -> used for sensing left motor direction 
+ * D10 (PWM)  -> servo indexed 3
+ * D5 (PWM)  -> servo indexed 2 
+ * D6 (PWM)  -> servo indexed 1
+ * D9 (PWM)  -> servo indexed 0
+ * 
  */
-
-#if (ARDUINO >= 100)
- #include <Arduino.h>
+#if defined(__MK64FX512__) || defined(__MK66FX1M0__)
+#include <PWMServo.h> // Use PWMServo if using a Teensy
 #else
- #include <WProgram.h>
+#include <Servo.h>
 #endif
-
-#include <Servo.h> 
-#include <ros.h>
+// Use "ros.h" not <ros.h> so that by using our local version 
+// we can increase/decrease buffer size if required and 
+// increased the baud rate on faster boards.
+#include "ros.h"
 #include <servo_msgs/servo_array.h>
 #include <tacho_msgs/tacho.h>
 
-// Define the PWM pins that the servos are connected to
+void servo_cb( const servo_msgs::servo_array& cmd_msg);
+void WheelSpeed0();
+void WheelSpeed1();
+
+#define LED_PIN 13  // Onboard LED
+
+#define GEAR_BOX_COUNTS_PER_REV 1440.0f
+
+#if defined(__MK64FX512__) || defined(__MK66FX1M0__)  // Teensy
+// Define the period in milliseconds between tacho messages
+#define TACHO_PERIOD_MS 25  // Publish at 40Hz
+
+// Define the PWM pins that the other servos are connected to
+#define SERVO_0 23
+#define SERVO_1 22
+#define SERVO_2 21
+#define SERVO_3 20
+
+// Define pins used for two Hall sensors
+#define ENCODER0_PINA 0  // Interrupt
+#define ENCODER0_PINB 1  // Digital pin
+#define ENCODER1_PINA 3  // Interrupt
+#define ENCODER1_PINB 4  // Digital pin
+
+PWMServo  servo0;
+PWMServo  servo1;
+PWMServo  servo2;
+PWMServo  servo3;
+#else // Arduino Nano
+// Define the period in milliseconds between tacho messages
+#define TACHO_PERIOD_MS 50  // Publish at 20Hz
+
+// Define the PWM pins that the other servos are connected to
 #define SERVO_0 9
-#define SERVO_1 6
+#define SERVO_1 9
 #define SERVO_2 5
 #define SERVO_3 10
 
 // Define pins used for two Hall sensors
-#define ENCODER0_PINA 2 // Interrupt 0
-#define ENCODER0_PINB 4
-#define ENCODER1_PINA 3 // Interrupt 1
-#define ENCODER1_PINB 7
+#define ENCODER0_PINA 2  // Interrupt 0
+#define ENCODER0_PINB 4  // Digital pin
+#define ENCODER1_PINA 3  // Interrupt 1
+#define ENCODER1_PINB 7  // Digital pin
 
-#define GEAR_BOX_COUNTS_PER_REV 1440.0f
+Servo  servo0;
+Servo  servo1;
+Servo  servo2;
+Servo  servo3;
+#endif
 
-ros::NodeHandle  nh;
+tacho_msgs::tacho      tachoMsg;
 
-Servo servo0;
-Servo servo1;
-Servo servo2;
-Servo servo3;
+ros::NodeHandle nh;
 
-tacho_msgs::tacho tachoMsg;
+ros::Publisher tachoPub("tacho", &tachoMsg);
+ros::Subscriber<servo_msgs::servo_array> subServo("servo", servo_cb);
 
-byte encoder0PinALast;
-byte encoder1PinALast;
+byte  encoder0PinALast;
+byte  encoder1PinALast;
 volatile int encoder0Count; // Number of pulses
 volatile int encoder1Count; // Number of pulses
 volatile boolean encoder0Direction; //Rotation direction
 volatile boolean encoder1Direction; //Rotation direction
+unsigned long publisherTime;
+unsigned long currentTime;
+unsigned long lastTime;
 
-void servo_cb( const servo_msgs::servo_array& cmd_msg)
-{  
-  /* Which servo to drive */
-  switch(cmd_msg.index)
-  {
-    case 0:
-      nh.logdebug("Servo 0 ");
-      servo0.write(cmd_msg.angle); //set servo 0 angle, should be from 0-180
-      break;
 
-    case 1:
-      nh.logdebug("Servo 1 ");
-      servo1.write(cmd_msg.angle); //set servo 1 angle, should be from 0-180
-      break;
-
-    case 2:
-      nh.logdebug("Servo 2 ");
-      servo2.write(cmd_msg.angle); //set servo 2 angle, should be from 0-180
-      break;
-
-    case 3:
-      nh.logdebug("Servo 3 ");
-      servo3.write(cmd_msg.angle); //set servo 3 angle, should be from 0-180
-      break;
-      
-    default:
-      nh.logdebug("No Servo");
-      break;
-  }
-}
-
-ros::Subscriber<servo_msgs::servo_array> sub("servo", servo_cb);
-ros::Publisher pub("tacho", &tachoMsg);
-
-void setup()
+void setup() 
 {
   nh.initNode();
-  nh.subscribe(sub);
-  nh.advertise(pub);
-    
+  nh.advertise(tachoPub);
+  nh.subscribe(subServo);
+
+  // Attach servos
   servo0.attach(SERVO_0); //attach it to the pin
   servo1.attach(SERVO_1);
   servo2.attach(SERVO_2);
   servo3.attach(SERVO_3);
+  servo0.write(90);
+  servo1.write(120);
+  servo2.write(90);
+  servo3.write(90);
 
   encoder0Direction = true;   // default is forward
   encoder1Direction = true;
@@ -109,26 +132,24 @@ void setup()
 
   pinMode(ENCODER0_PINB, INPUT);
   pinMode(ENCODER1_PINB, INPUT);
-  
+
   // Attach the interrupts for the Hall sensors
-  attachInterrupt(0, WheelSpeed0, CHANGE); // Int0 is pin 2
-  attachInterrupt(1, WheelSpeed1, CHANGE); // Int1 is pin 3
-  
-  // Defaults
-  servo0.write(90);
-  servo1.write(120);
+  attachInterrupt(digitalPinToInterrupt(ENCODER0_PINA), WheelSpeed0, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENCODER1_PINA), WheelSpeed1, CHANGE);
+
+  // Turn on the onboard LED to show we are running 
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, HIGH);
 }
 
-unsigned long publisherTime;
-unsigned long currentTime;
-unsigned long lastTime;
-float deltaTime;
 
 void loop()
 {
   // Is it time to publish the tacho message
   if(millis() > publisherTime)
   {
+    float deltaTime;
+    
     currentTime = micros();
     deltaTime = (float)(currentTime - lastTime)/1000000.0;
 
@@ -142,14 +163,44 @@ void loop()
 
     lastTime = currentTime;
     
-    pub.publish(&tachoMsg);
-    publisherTime = millis() + 50; // Publish at 20Hz
+    tachoPub.publish(&tachoMsg);
+    publisherTime = millis() + TACHO_PERIOD_MS;
   }
   
   nh.spinOnce();
 }
 
-// ISR 0
+
+// Callback for when servo array message received
+void servo_cb( const servo_msgs::servo_array& cmd_msg)
+{
+  /* Which servo to drive */
+  switch(cmd_msg.index)
+  {
+    case 0:      
+      servo0.write(cmd_msg.angle); //set servo 0 angle, should be from 0-180
+      break;
+
+    case 1:
+      servo1.write(cmd_msg.angle); //set servo 1 angle, should be from 0-180
+      break;
+
+    case 2:
+      servo2.write(cmd_msg.angle); //set servo 2 angle, should be from 0-180
+      break;
+
+    case 3:
+      servo3.write(cmd_msg.angle); //set servo 3 angle, should be from 0-180
+      break;
+      
+    default:
+      nh.logdebug("Error incorrect servo index");
+      break;
+  }
+}
+
+
+// ISR
 void WheelSpeed0()
 {
   int state = digitalRead(ENCODER0_PINA);
@@ -180,7 +231,8 @@ void WheelSpeed0()
   }
 }
 
-// ISR 1
+
+// ISR
 void WheelSpeed1()
 {
   int state = digitalRead(ENCODER1_PINA);

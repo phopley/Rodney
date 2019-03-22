@@ -1,0 +1,10 @@
+# Set the udev rules. 
+#
+# Arduino Nano
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", MODE:="0777", SYMLINK+="nano"
+#
+# Teensy
+KERNEL=="ttyACM*", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="0483", MODE:="0777", SYMLINK+="teensy"
+#
+# RPLidar
+KERNEL=="ttyUSB*", ATTRS{idVendor}=="10c4", ATTRS{idProduct}=="ea60", MODE:="0777", SYMLINK+="rplidar"

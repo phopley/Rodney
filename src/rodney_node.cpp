@@ -1,6 +1,5 @@
 // Main control node for the Rodney robot 
 #include <rodney/rodney_node.h>
-#include <std_msgs/Empty.h>
 #include <ros/package.h>
 #include <robot_localization/SetPose.h>
 
@@ -26,6 +25,7 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     nh_.param("/controller/axes/camera_y_index", camera_y_index_, 3);
     nh_.param("/controller/buttons/manual_mode_select", manual_mode_select_, 0);
     nh_.param("/controller/buttons/default_camera_pos_select", default_camera_pos_select_, 1);
+    nh_.param("/controller/buttons/lidar_enable", lidar_enable_select_, 2);
     nh_.param("/controller/dead_zone", dead_zone_, 2000);
     nh_.param("/teleop/max_linear_speed", max_linear_speed_, 1.0f);
     nh_.param("/teleop/max_angular_speed", max_angular_speed_, 8.7f);
@@ -39,11 +39,12 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     nh_.getParam("/sounds/filenames", wav_file_names_);
     nh_.getParam("/sounds/text", wav_file_texts_);
      
-    // Subscribe to receive keyboard input, joystick input, mission complete and battery state
+    // Subscribe to receive keyboard input, joystick input, mission complete, battery state and remote heartbeat
     key_sub_ = nh_.subscribe("keyboard/keydown", 5, &RodneyNode::keyboardCallBack, this);
     joy_sub_ = nh_.subscribe("joy", 1, &RodneyNode::joystickCallback, this);
     mission_sub_ = nh_.subscribe("/missions/mission_complete", 5, &RodneyNode::completeCallBack, this);
     battery_status_sub_ = nh_.subscribe("main_battery_status", 1, &RodneyNode::batteryCallback, this);
+    remote_heartbeat_sub_ = nh_.subscribe("remote_heartbeat", 1, &RodneyNode::remHeartbeatCallback, this);
     
     // The cmd_vel topic below is the command velocity message to the motor driver.
     // This can be created from either keyboard or game pad input when in manual mode or from the this 
@@ -198,6 +199,18 @@ void RodneyNode::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
         
         last_interaction_time_ = ros::Time::now();
     }
+    
+    // Button on controller selects to enable/disable the lidar function
+    if((manual_locomotion_mode_ == true) && (msg->buttons[lidar_enable_select_] == 1))
+    {
+        std_msgs::String mission_msg;
+        
+        // Toggle the LIDAR on/off
+        mission_msg.data = "J4";            
+        
+        mission_pub_.publish(mission_msg);        
+        last_interaction_time_ = ros::Time::now();
+    }
 }
 //---------------------------------------------------------------------------
 
@@ -225,7 +238,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
     //      '1' to '9' - Run a mission (1 -9)
     //      'a' or 'A' - Some missions require the user to send an acknowledge
     //      'c' or 'C' - Cancel current mission
-    //      'd' or 'D' - Move head/camera to the default position in manual mode 
+    //      'd' or 'D' - Move head/camera to the default position in manual mode
+    //      'l' or 'L' - Toggle LIDAR on/off 
     //      'm' or 'M' - Set locomotion mode to manual
     //      'r' or 'R' - Reset the odometry
     
@@ -238,7 +252,7 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         mission_pub_.publish(mission_msg);
                     
         mission_running_ = true; 
-        manual_locomotion_mode_ = false;
+        manual_locomotion_mode_ = false;        
         
         last_interaction_time_ = ros::Time::now();                       
     }
@@ -275,7 +289,20 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         }    
         
         last_interaction_time_ = ros::Time::now();   
-    }       
+    } 
+    else if((msg->code == keyboard::Key::KEY_l) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
+    {
+        if(manual_locomotion_mode_ == true)
+        {
+            std_msgs::String mission_msg;
+        
+            // Toggle the LIDAR on/off
+            mission_msg.data = "J4";            
+        
+            mission_pub_.publish(mission_msg);        
+            last_interaction_time_ = ros::Time::now();
+        }
+    }      
     else if((msg->code == keyboard::Key::KEY_m) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
     {
         // 'm' or 'M', set locomotion mode to manual (any missions going to auto should set manual_locomotion_mode_ to false)
@@ -301,7 +328,7 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         ros::ServiceClient client = nh_.serviceClient<robot_localization::SetPose>("set_pose");
         robot_localization::SetPose srv;
         srv.request.pose.header.frame_id ="odom";
-        client.call(srv);         
+        client.call(srv);
     }
     else if((msg->code == keyboard::Key::KEY_KP1) && ((msg->modifiers & keyboard::Key::MODIFIER_NUM) == 0))
     {
@@ -526,6 +553,13 @@ void RodneyNode::motorDemandCallBack(const geometry_msgs::Twist::ConstPtr& msg)
 }
 //---------------------------------------------------------------------------
 
+// Callback for remote heartbeat
+void RodneyNode::remHeartbeatCallback(const std_msgs::Empty::ConstPtr& msg)
+{
+    // Remote heartbeat received store the time
+    remote_heartbeat_time_ = ros::Time::now();
+}
+
 // Callback for main battery status
 void RodneyNode::batteryCallback(const sensor_msgs::BatteryState::ConstPtr& msg)
 { 
@@ -609,18 +643,29 @@ void RodneyNode::sendTwist(void)
     // If in manual locomotion mode use keyboard or joystick data
     if(manual_locomotion_mode_ == true)
     {
-        // Publish message based on keyboard or joystick speeds
-        if((keyboard_linear_speed_ == 0) && (keyboard_angular_speed_ == 0))
-        {
-            // Use joystick values
-            target_twist.linear.x = joystick_linear_speed_;
-            target_twist.angular.z = joystick_angular_speed_;            
+        // Only allow stored keyboard or joystick values to set  
+        // the velocities if the remote heartbeat is running
+        if((ros::Time::now() - remote_heartbeat_time_).toSec() < 1.0)
+        {        
+            // Publish message based on keyboard or joystick speeds
+            if((keyboard_linear_speed_ == 0) && (keyboard_angular_speed_ == 0))
+            {
+                // Use joystick values
+                target_twist.linear.x = joystick_linear_speed_;
+                target_twist.angular.z = joystick_angular_speed_;            
+            }
+            else
+            {
+                // use keyboard values
+                target_twist.linear.x = keyboard_linear_speed_;
+                target_twist.angular.z = keyboard_angular_speed_;                   
+            }
         }
         else
         {
-            // use keyboard values
-            target_twist.linear.x = keyboard_linear_speed_;
-            target_twist.angular.z = keyboard_angular_speed_;                   
+            // Lost connection with remote workstation so zero the velocities
+            target_twist.linear.x = 0.0;
+            target_twist.angular.z = 0.0; 
         }
     }
     else

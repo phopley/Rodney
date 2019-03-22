@@ -1,0 +1,882 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="Rodney">
+
+  <material name="blue">
+    <color rgba="0 0 0.8 1"/>
+  </material>
+  
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+  
+  <material name="black">
+    <color rgba="0 0 0 1"/>
+  </material>  
+  
+  <material name="silver">
+    <color rgba="0.75 0.75 0.75 1"/>
+  </material>   
+  
+  <material name="bronze">
+    <color rgba="0.8 0.498 0.196 1"/>
+  </material>  
+  
+  <xacro:property name="base_x" value="0.340"/>
+  <xacro:property name="base_y" value="0.180"/>
+  <xacro:property name="base_z" value="0.010"/>
+      
+  <link name="base_link">
+    <visual>      
+      <geometry>        
+        <mesh filename="package://rodney/meshes/rodneyBase.dae"/>        
+      </geometry>
+      <origin xyz="0.0 0.0 -${base_z/2.0}"/>      
+    </visual>
+    <collision>
+      <geometry>
+        <box size="${base_x} ${base_y} ${base_z}"/>
+      </geometry>      
+    </collision>
+    <inertial>             
+      <mass value="0.300"/>      
+      <inertia ixx="0.000813" ixy="0.0" ixz="0.0" iyy="0.002893" iyz="0.0" izz="0.0037"/>            
+    </inertial>
+  </link>
+  
+  <!-- Battery packs -->
+
+  <link name="AAx10">
+    <visual>
+      <geometry>
+        <box size="0.075 0.056 0.030"/>
+      </geometry>      
+      <material name="black" />
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.075 0.056 0.030"/>
+      </geometry>          
+    </collision>
+    <inertial>      
+      <mass value="0.259"/>            
+      <inertia ixx="8.71e-5" ixy="0.0" ixz="0.0" iyy="0.000141" iyz="0.0" izz="0.000189"/>
+    </inertial>    
+  </link>
+  
+  <joint name="base_to_AAx10" type="fixed">
+    <parent link="base_link"/>
+    <child link="AAx10"/>
+    <origin xyz="0.070 0.0 -0.020"/>
+  </joint>  
+       
+  <link name="USB_PACK">
+    <visual>
+      <geometry>
+        <box size="0.146 0.074 0.020"/>
+      </geometry>      
+      <material name="black" />
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.146 0.074 0.020"/>
+      </geometry>          
+    </collision>
+    <inertial>
+      <mass value="0.358"/>      
+      <inertia ixx="0.000175" ixy="0.0" ixz="0.0" iyy="0.000648" iyz="0.0" izz="0.000799"/>
+    </inertial>    
+  </link>
+  
+  <joint name="base_to_USB_PACK" type="fixed">
+    <parent link="base_link"/>
+    <child link="USB_PACK"/>
+    <origin xyz="0.060 0.0 0.015"/>
+  </joint>  
+           
+  <!-- Motors and wheels -->
+  
+  <xacro:macro name="motor_bracket" params="prefix reflect">
+    <link name="${prefix}_motor_bracket">
+      <visual>
+        <geometry>
+          <box size="0.042 0.049 0.002"/>
+        </geometry>
+        <origin rpy="1.58 0 0"/>           
+        <material name="bronze"/>
+      </visual>
+      <collision>
+        <geometry>
+          <box size="0.042 0.049 0.002"/>
+        </geometry>
+        <origin rpy="1.58 0 0"/>      
+      </collision>
+      <inertial>
+        <origin rpy="1.58 0 0"/>
+        <mass value="0.035"/>      
+        <inertia ixx="7.01e-6" ixy="0.0" ixz="0.0" iyy="5.16e-6" iyz="0.0" izz="1.21e-5"/>
+      </inertial>           
+    </link>      
+    <joint name="base_to_${prefix}_motor_bracket" type="fixed">
+      <parent link="base_link"/>
+      <child link="${prefix}_motor_bracket"/>
+      <origin xyz="0.0 ${reflect*0.091} -0.0291"/>
+    </joint>
+  </xacro:macro>
+  
+  <xacro:macro name="motor" params="prefix reflect">
+    <link name="${prefix}_motor">
+      <visual>
+        <geometry>
+          <cylinder length="0.070" radius="0.0185"/>
+        </geometry>
+        <origin rpy="1.57 0 0"/>
+        <material name="silver"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="0.070" radius="0.0185"/>
+        </geometry>
+        <origin rpy="1.57 0 0"/>
+      </collision>
+      <inertial>
+        <origin rpy="1.57 0 0"/>      
+        <mass value="0.206"/>    
+        <inertia ixx="0.000101743" ixy="0.0" ixz="0.0" iyy="0.000101743" iyz="0.0" izz="3.52518e-5"/>
+      </inertial>               
+    </link>
+    <joint name="${prefix}_brk_to_${prefix}_motor" type="fixed">
+      <parent link="${prefix}_motor_bracket"/>
+      <child link="${prefix}_motor"/>    
+      <origin xyz="0.0 ${reflect*0.036} -0.004"/>
+    </joint>
+  </xacro:macro>
+  
+  <xacro:macro name="wheel" params="prefix reflect">
+    <link name="${prefix}_wheel">
+      <visual>
+        <geometry>
+          <cylinder length="0.050" radius="0.050"/>
+        </geometry>
+        <origin rpy="1.57 0 0"/>
+        <material name="black"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="0.050" radius="0.050"/>
+        </geometry>
+        <origin rpy="1.57 0 0"/>
+      </collision>
+      <inertial>
+        <origin rpy="1.57 0 0"/>      
+        <mass value="0.117"/>      
+      <inertia ixx="0.0000975" ixy="0.0" ixz="0.0" iyy="0.0000975" iyz="0.0" izz="0.00014625"/>
+      </inertial>               
+    </link>
+    <joint name="${prefix}_brk_to_${prefix}_wheel" type="continuous">
+      <axis xyz="0 1 0"/>
+      <parent link="${prefix}_motor_bracket"/>
+      <child link="${prefix}_wheel"/>    
+      <origin xyz="0.0 ${reflect*0.029} -0.0105"/>
+    </joint>
+  </xacro:macro>  
+  
+  <!-- left -->  
+  <xacro:motor_bracket prefix="left" reflect="1"/>
+  <xacro:motor prefix="left" reflect="-1"/>
+  <xacro:wheel prefix="left" reflect="1"/>
+        
+  <!-- right -->  
+  <xacro:motor_bracket prefix="right" reflect="-1"/>
+  <xacro:motor prefix="right" reflect="1"/>
+  <xacro:wheel prefix="right" reflect="-1"/>
+
+  <!-- Casters -->
+  
+  <xacro:macro name="caster_bracket" params="prefix reflect">
+    <link name="${prefix}_caster_bracket">
+      <visual>
+        <geometry>
+          <box size="0.025 0.040 0.065"/>
+        </geometry>      
+        <material name="blue" />
+      </visual>
+      <collision>
+        <geometry>
+          <box size="0.025 0.040 0.065"/>
+        </geometry>          
+      </collision>
+      <inertial>
+        <mass value="0.030"/>      
+        <inertia ixx="1.46e-5" ixy="0.0" ixz="0.0" iyy="2.21e-5" iyz="0.0" izz="5.56e-6"/>
+      </inertial> 
+    </link>
+    <joint name="base_to_${prefix}_caster" type="fixed">
+      <parent link="base_link"/>
+      <child link="${prefix}_caster_bracket"/>
+      <origin xyz="${reflect*0.150} 0.0 -0.037"/>
+    </joint>      
+  </xacro:macro>
+
+  <xacro:macro name="caster" params="prefix">  
+    <link name="${prefix}_caster">
+      <visual>
+        <geometry>
+          <sphere radius="0.020"/>
+        </geometry>      
+        <material name="white" />
+      </visual>
+      <collision>
+        <geometry>
+          <sphere radius="0.020"/>
+        </geometry>          
+      </collision>
+      <inertial>
+        <mass value="0.003"/>      
+        <inertia ixx="4.8e-7" ixy="0.0" ixz="0.0" iyy="4.8e-7" iyz="0.0" izz="4.8e-7"/>
+      </inertial>     
+    </link>      
+    <joint name="${prefix}_caster_bk_to_ball" type="continuous">
+      <axis xyz="1 1 1"/>
+      <parent link="${prefix}_caster_bracket"/>
+      <child link="${prefix}_caster"/>
+      <origin xyz="0.0 0.0 -0.0325"/>
+    </joint>
+  </xacro:macro>      
+  
+  <!-- Front -->  
+  <xacro:caster_bracket prefix="front" reflect="1"/>
+  <xacro:caster prefix="front"/>
+
+  <!-- Rear -->
+  <xacro:caster_bracket prefix="rear" reflect="-1"/>
+  <xacro:caster prefix="rear"/>       
+  
+  <!-- Rear platform -->
+  
+  <xacro:property name="rear_post_height" value="0.020"/>
+  <xacro:property name="rear_post_radius" value="0.005"/>  
+  
+  <xacro:macro name="rear_post" params="postfix pos_x reflect_y">
+    <link name="rear_post_${postfix}">
+      <visual>
+        <geometry>
+          <cylinder length="${rear_post_height}" radius="${rear_post_radius}"/>
+        </geometry>
+        <origin xyz="0.0 0.0 ${rear_post_height/2.0}"/>           
+        <material name="blue"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="${rear_post_height}" radius="${rear_post_radius}"/>
+        </geometry>
+        <origin xyz="0.0 0.0 ${rear_post_height/2.0}"/>      
+      </collision>
+      <inertial>
+        <!-- Move centre of gravity back to middle of link -->
+        <origin xyz="0.0 0.0 ${rear_post_height/2.0}"/>
+        <mass value="0.001"/>      
+        <inertia ixx="3.95833e-8" ixy="0.0" ixz="0.0" iyy="3.95833e-8" iyz="0.0" izz="1.25e-8"/>
+      </inertial>           
+    </link>      
+    <joint name="base_to_rear_post_${postfix}" type="fixed">
+      <parent link="base_link"/>
+      <child link="rear_post_${postfix}"/>
+      <origin xyz="${pos_x} ${reflect_y*((base_y/2.0)-0.010)} ${base_z/2.0}"/>
+    </joint>
+  </xacro:macro>
+  
+  <xacro:rear_post postfix="1" pos_x="-0.06" reflect_y="1"/>
+  <xacro:rear_post postfix="2" pos_x="-0.14" reflect_y="1"/>
+  <xacro:rear_post postfix="3" pos_x="-0.06" reflect_y="-1"/>
+  <xacro:rear_post postfix="4" pos_x="-0.14" reflect_y="-1"/>
+  
+  <xacro:property name="rear_platf_z" value="0.003"/>
+
+  <link name="rear_platform">
+    <visual>      
+      <geometry>        
+        <mesh filename="package://rodney/meshes/smallRearPlatform.dae"/>
+      </geometry>
+      <origin rpy="0 0 1.57" xyz="0.050 0.0 -${rear_platf_z/2.0}"/>              
+    </visual>
+    <collision>      
+      <geometry>        
+        <box size="0.180 0.098 0.003"/>
+      </geometry>                    
+    </collision> 
+    <inertial>      
+      <mass value="0.050"/>      
+      <inertia ixx="4.01e-5" ixy="0.0" ixz="0.0" iyy="0.000135" iyz="0.0" izz="0.000175"/>
+    </inertial>        
+  </link>  
+
+  <joint name="rear_post_1_to_rear_platform" type="fixed">
+    <parent link="rear_post_1"/>
+    <child link="rear_platform"/>
+    <origin xyz="-0.040 -0.080 ${rear_post_height+(rear_platf_z/2.0)}"/>
+  </joint>
+
+  <!-- Neck and head -->
+  
+  <link name="neck">
+    <visual>
+      <geometry>
+        <cylinder length="0.30" radius="0.011"/>
+      </geometry>           
+      <material name="white"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder length="0.30" radius="0.011"/>
+      </geometry>                  
+    </collision>
+    <inertial>
+      <mass value="0.033"/>      
+      <inertia ixx="0.000248498" ixy="0.0" ixz="0.0" iyy="1.9965e-6" iyz="0.0" izz="0.000248498"/>
+    </inertial>         
+  </link>
+  
+  <joint name="rear_platform_to_neck" type="fixed">
+    <parent link="rear_platform"/>
+    <child link="neck"/>
+    <origin xyz="-0.030 0.0 0.1205"/>
+  </joint>
+  
+  <link name="head_fixing">
+    <visual>      
+      <geometry>        
+        <mesh filename="package://rodney/meshes/headFixing.dae"/>
+      </geometry>
+      <origin xyz="0.0 0.0 -0.040"/>            
+    </visual>
+    <collision>
+      <geometry>        
+        <box size="0.03 0.04 0.1"/>
+      </geometry>       
+    </collision>
+    <inertial>      
+      <mass value="0.015"/>      
+      <inertia ixx="1.45e-5" ixy="0.0" ixz="0.0" iyy="1.36e-5" iyz="0.0" izz="3.13e-6"/>
+    </inertial>    
+  </link>  
+
+  <joint name="neck_to_head_fixing" type="fixed">
+    <parent link="neck"/>
+    <child link="head_fixing"/>
+    <origin xyz="0.0 0.0 0.150"/>
+  </joint>  
+ 
+  <link name="head_pan_servo_block">
+    <visual>
+      <geometry>
+        <box size="0.057 0.032 0.066"/>        
+      </geometry>                  
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.057 0.032 0.066"/>        
+      </geometry>      
+    </collision>
+    <inertial>
+      <mass value="0.084"/>      
+      <inertia ixx="3.77e-5" ixy="0.0" ixz="0.0" iyy="5.23e-5" iyz="0.0" izz="2.99e-5"/>
+    </inertial>               
+  </link>      
+
+  <joint name="head_fixing_to_servo_block" type="fixed">
+    <parent link="head_fixing"/>
+    <child link="head_pan_servo_block"/>
+    <origin xyz="0.008 0.0 0.039"/>
+  </joint>   
+ 
+  <link name="head_pan_bracket">
+    <visual>      
+      <geometry>        
+        <mesh filename="package://rodney/meshes/headPanBracket.dae"/>
+      </geometry>                 
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.025 0.068 0.045"/>
+      </geometry>
+      <origin xyz="0.0 0.0 0.0225"/>       
+    </collision>
+    <inertial>      
+      <mass value="0.010"/>      
+      <inertia ixx="5.54e-6" ixy="0.0" ixz="0.0" iyy="2.21e-6" iyz="0.0" izz="4.37e-6"/> 
+    </inertial>           
+  </link>
+   
+  <joint name="head_pan" type="revolute">
+    <axis xyz="0 0 1"/>
+    <limit effort="1000.0" lower="-1.5708" upper="1.5708" velocity="0.5"/>
+    <parent link="head_pan_servo_block"/>
+    <child link="head_pan_bracket"/>
+    <origin xyz="-0.008 0.0 0.033"/>    
+  </joint>   
+
+  <link name="head_tilt_arm">
+    <visual>      
+      <geometry>        
+        <mesh filename="package://rodney/meshes/headTiltArm.dae"/>
+      </geometry>
+      <!-- Using origin of mesh which helps to line up the peices connected to this odd shape -->            
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.075 0.065 0.020"/>
+      </geometry>        
+      <origin rpy="1.58 0 0" xyz="0.018 0.0 0.00"/> 
+    </collision>
+    <inertial>
+      <mass value="0.019"/>   
+      <origin rpy="1.58 0 0" xyz="0.018 0.0 0.00"/> 
+      <inertia ixx="7.32e-6" ixy="0.0" ixz="0.0" iyy="9.54e-6" iyz="0.0" izz="1.56e-5"/> 
+    </inertial>            
+  </link>    
+
+  <joint name="head_tilt" type="revolute">
+    <axis xyz="0 1 0"/>    
+    <limit effort="1000.0" lower="-1.39626" upper="0.5" velocity="0.698132"/>
+    <parent link="head_pan_bracket"/>
+    <child link="head_tilt_arm"/>    
+    <origin xyz="0.0 -0.009 0.035"/>
+  </joint>   
+
+  <link name="display_bracket">
+    <visual>      
+      <geometry>        
+        <mesh filename="package://rodney/meshes/displayBracket.dae"/>
+      </geometry>
+      <origin xyz="0.003 0.008 0.0"/>            
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.010 0.146 0.045"/>        
+      </geometry>
+      <origin xyz="-0.002 0.008 0.015"/>  
+    </collision>    
+    <inertial>
+      <mass value="0.012"/>      
+      <inertia ixx="2.33e-5" ixy="0.0" ixz="0.0" iyy="2.13e-6" iyz="0.0" izz="2.14e-5"/> 
+    </inertial> 
+  </link>    
+
+  <joint name="head_tilt_arm_to_display_bracket" type="fixed">
+    <parent link="head_tilt_arm"/>
+    <child link="display_bracket"/>
+    <origin xyz="0.056 0.0 0.0"/>
+  </joint>  
+
+  <link name="display">
+    <visual>      
+      <geometry>        
+        <box size="0.005 0.192 0.110"/>
+      </geometry>      
+      <material name="black"/>           
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.005 0.192 0.110"/>        
+      </geometry>        
+    </collision>  
+    <inertial>
+      
+      <mass value="0.338"/>
+      <inertia ixx="0.001379" ixy="0.0" ixz="0.0" iyy="0.000342" iyz="0.0" izz="0.001039"/>
+    </inertial>    
+  </link>    
+
+  <joint name="display_bracket_to_display" type="fixed">
+    <parent link="display_bracket"/>
+    <child link="display"/>
+    <origin xyz="0.0055 0.008 0.060"/>
+  </joint> 
+    
+  <link name="camera">
+    <visual>      
+      <geometry>        
+        <box size="0.005 0.025 0.020"/>
+      </geometry>      
+      <material name="blue"/>           
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.005 0.025 0.020"/>        
+      </geometry>        
+    </collision>
+    <inertial>
+      <mass value="0.001"/>
+      <inertia ixx="3.52e-7" ixy="0.0" ixz="0.0" iyy="3.02e-7" iyz="0.0" izz="5.42e-8"/>
+    </inertial>    
+  </link>
+  
+  <joint name="camera_joint" type="fixed">
+    <parent link="display"/>
+    <child link="camera"/>
+    <origin xyz="0.0 0.0 0.065"/>
+  </joint>
+
+  <!-- Front platform -->
+  
+  <xacro:property name="fwd_post_height" value="0.055"/>
+  <xacro:property name="fwd_post_radius" value="0.005"/>  
+  
+  <xacro:macro name="fwd_post" params="postfix pos_x reflect_y">
+    <link name="fwd_post_${postfix}">
+      <visual>
+        <geometry>
+          <cylinder length="${fwd_post_height}" radius="${fwd_post_radius}"/>
+        </geometry>
+        <origin xyz="0.0 0.0 ${fwd_post_height/2.0}"/>           
+        <material name="blue"/>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="${fwd_post_height}" radius="${fwd_post_radius}"/>
+        </geometry>
+        <origin xyz="0.0 0.0 ${fwd_post_height/2.0}"/>      
+      </collision>
+      <inertial>
+        <!-- Move centre of gravity back to middle of link -->
+        <origin xyz="0.0 0.0 ${fwd_post_height/2.0}"/>
+        <mass value="0.0015"/>      
+        <inertia ixx="1.12594e-7" ixy="0.0" ixz="0.0" iyy="1.12594e-7" iyz="0.0" izz="1.875e-10"/>
+      </inertial>           
+    </link>      
+    <joint name="base_to_fwd_post_${postfix}" type="fixed">
+      <parent link="base_link"/>
+      <child link="fwd_post_${postfix}"/>
+      <origin xyz="${pos_x} ${reflect_y*((base_y/2.0)-0.010)} ${base_z/2.0}"/>
+    </joint>
+  </xacro:macro>
+  
+  <xacro:fwd_post postfix="1" pos_x="0.14" reflect_y="1"/>
+  <xacro:fwd_post postfix="2" pos_x="0.14" reflect_y="-1"/>
+  <xacro:fwd_post postfix="3" pos_x="0.085" reflect_y="-1"/>
+  <xacro:fwd_post postfix="4" pos_x="0.085" reflect_y="1"/>
+  
+  <xacro:property name="fwd_platf_z" value="0.003"/>
+
+  <link name="fwd_platform">
+    <visual>
+      <geometry>      
+        <mesh filename="package://rodney/meshes/fwdPlatform.dae"/>
+      </geometry>
+      <origin xyz="-0.0125 0.0 0.0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.075 0.018 0.003"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.030"/>
+      <inertia ixx="8.1e-5" ixy="0.0" ixz="0.0" iyy="4.02e-6" iyz="0.0" izz="0.000085" />
+    </inertial>  
+  </link>
+  
+  <joint name="fwd_post_1_to_fwd_platform" type="fixed">
+    <parent link="fwd_post_1"/>
+    <child link="fwd_platform"/>
+    <origin xyz="-0.040 -0.080 ${fwd_post_height+(fwd_platf_z/2.0)}"/>
+  </joint> 
+  
+  <!-- LIDAR -->
+  <!-- Using mesh of a model --> 
+  <link name="laser">
+    <visual>
+      <geometry>
+        <mesh filename="package://rodney/meshes/rplidar.dae"/>
+      </geometry>
+      <origin rpy="1.57 0 0" xyz="-0.035 0.035 -0.044"/>            
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.0985 0.070 0.060"/>
+      </geometry>
+    </collision>
+    <inertial>      
+      <mass value="0.213"/>
+      <inertia ixx="0.000151" ixy="0.0" ixz="0.0" iyy="0.000236" iyz="0.0" izz="0.000259" />
+    </inertial>  
+  </link>
+  
+  <joint name="fwd_platform_to_lidar" type="fixed">
+    <parent link="fwd_platform"/>
+    <child link ="laser"/>
+    <origin xyz="-0.015 0.0 0.0455"/>
+  </joint>
+  
+    
+  <!-- Using Box and cylinder -->
+  <!--
+  <link name="lidar_base">
+    <visual>
+      <geometry>
+        <box size="0.0985 0.070 0.032"/>
+      </geometry>
+      <material name="black"/>           
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.0985 0.070 0.032"/>        
+      </geometry>        
+    </collision>
+    <inertial>
+      <mass value="0.142"/>
+      <inertia ixx="7.01e-5" ixy="0.0" ixz="0.0" iyy="0.000127" iyz="0.0" izz="0.00173"/>
+    </inertial>    
+  </link>
+  
+  <joint name="fwd_platform_to_lidar_base" type="fixed">
+    <parent link="fwd_platform"/>
+    <child link ="lidar_base"/>
+    <origin xyz="0.0 0.0 0.0175"/>
+  </joint>      
+  
+  <link name="laser">
+    <visual>
+      <geometry>    
+        <cylinder length="0.023" radius="0.035"/>
+      </geometry>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>    
+        <cylinder length="0.023" radius="0.035"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.071"/>
+      <inertia ixx="2.48737e-5" ixy="0.0" ixz="0.0" iyy="2.48737e-5" iyz="0.0" izz="4.34875e-5"/>
+    </inertial>    
+  </link>
+  
+  <joint name="lidar_base_to_lidar_link" type="fixed">
+    <parent link="lidar_base"/>
+    <child link ="laser"/>
+    <origin xyz="-0.01425 0.0 0.0275"/>
+  </joint> 
+  -->  
+        
+  <!-- Gazebo stuff -->
+  
+  <gazebo reference="left_wheel">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  
+  <gazebo reference="right_wheel">
+    <material>Gazebo/Black</material>
+  </gazebo>     
+  
+  <gazebo reference="rear_post_1">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+
+  <gazebo reference="rear_post_2">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+  
+  <gazebo reference="rear_post_3">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+  
+  <gazebo reference="rear_post_4">
+    <material>Gazebo/Blue</material>
+  </gazebo>  
+
+  <gazebo reference="display">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  
+  <gazebo reference="head_pan_servo_block">
+    <material>Gazebo/Black</material>
+  </gazebo>    
+    
+  <gazebo reference="AAx10">
+    <material>Gazebo/Black</material>
+  </gazebo> 
+  
+  <gazebo reference="USB_PACK">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  
+  <gazebo reference="front_caster_bracket">
+    <material>Gazebo/Blue</material>
+  </gazebo>   
+      
+  <gazebo reference="rear_caster_bracket">
+    <material>Gazebo/Blue</material>
+  </gazebo> 
+  
+  <gazebo reference="camera">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+  
+  <gazebo reference="fwd_post_1">
+    <material>Gazebo/Blue</material>
+  </gazebo>  
+
+  <gazebo reference="fwd_post_2">
+    <material>Gazebo/Blue</material>
+  </gazebo>   
+  
+  <gazebo reference="fwd_post_3">
+    <material>Gazebo/Blue</material>
+  </gazebo>     
+  
+  <gazebo reference="fwd_post_4">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+    
+  <gazebo reference="lidar_servo">
+    <material>Gazebo/Black</material>
+  </gazebo>
+    
+  <gazebo reference="lidar_link">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  
+  <gazebo reference="lidar_base">
+    <material>Gazebo/Black</material>
+  </gazebo>       
+     
+  <!-- To control the wheels -->  
+  <gazebo>
+    <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">      
+      <alwaysOn>true</alwaysOn>
+      <legacyMode>false</legacyMode>
+      <updateRate>100.0</updateRate>            
+      <rosDebugLevel>na</rosDebugLevel>
+      <publishWheelTF>false</publishWheelTF>
+      <publishOdomTF>true</publishOdomTF>
+      <publishWheelJointState>false</publishWheelJointState>
+      <wheelAcceleration>0</wheelAcceleration>
+      <wheelTorque>5</wheelTorque>      
+      <leftJoint>left_brk_to_left_wheel</leftJoint>
+      <rightJoint>right_brk_to_right_wheel</rightJoint>      
+      <wheelSeparation>0.230</wheelSeparation>      
+      <wheelDiameter>0.106</wheelDiameter>      
+      <commandTopic>cmd_vel</commandTopic>      
+      <odometryTopic>odom</odometryTopic>
+      <odometryFrame>odom</odometryFrame>      
+      <robotBaseFrame>base_footprint</robotBaseFrame>                       
+    </plugin>    
+  </gazebo>  
+  
+  <!-- To control head pan/tilt -->
+  
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">      
+      <legacyModeNS>true</legacyModeNS>
+    </plugin>
+  </gazebo> 
+
+  <transmission name="head_pan_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="head_pan">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="pan">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+ 
+  <transmission name="head_tilt_tran">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="head_tilt">
+      <hardwareInterface>hardware_interface/PositionJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="tilt">
+      <hardwareInterface>PositionJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+ 
+  <gazebo>
+    <plugin name="joint_state_publisher"
+            filename="libgazebo_ros_joint_state_publisher.so">      
+      <jointName>head_pan, head_tilt, front_caster_bk_to_ball, rear_caster_bk_to_ball, left_brk_to_left_wheel, right_brk_to_right_wheel</jointName>
+      <updateRate>20.0</updateRate>      
+    </plugin>
+  </gazebo>  
+
+  <!-- camera -->
+  <gazebo reference="camera">
+    <sensor type="camera" name="camera1">
+      <update_rate>30.0</update_rate>
+      <camera name="head">
+        <horizontal_fov>1.3962634</horizontal_fov>
+        <image>         
+          <width>800</width>
+          <height>800</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <!-- Noise is sampled independently per pixel on each frame.
+               That pixel's noise value is added to each of its color
+               channels, which at that point lie in the range [0,1]. -->
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>raspicam_node</cameraName>
+        <imageTopicName>image</imageTopicName>
+        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+        <frameName>camera</frameName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>  
+  
+  <!-- LIDAR -->
+  <gazebo reference="laser">
+    <sensor type="ray" name="base_lidar_sensor">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>false</visualize>
+      <update_rate>10</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>720</samples>
+            <resolution>1</resolution>
+            <min_angle>-2.70526</min_angle>
+            <max_angle>2.70526</max_angle>            
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.15</min>
+          <max>12.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_head_hokuyo_controller" filename="libgazebo_ros_laser.so">
+        <topicName>scan</topicName>
+        <frameName>laser</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+  
+</robot>
+

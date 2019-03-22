@@ -1,0 +1,12 @@
+local_costmap:
+  global_frame: odom
+  robot_base_frame: base_footprint
+  static_map: false
+  rolling_window: true
+  transform_tolerance: 0.7            # def 0.2 Could we change thos with a Pi 3/B+
+  update_frequency: 1.0
+  publish_frequency: 0.5
+  width: 2.5                          # def 10.0
+  height: 2.5                         # def 10.0
+
+
