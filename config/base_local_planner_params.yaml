@@ -1,4 +1,4 @@
-controller_frequency: 1.5  # Can we move this back to 5.0 if using different Pi
+controller_frequency: 5.0  # Can we move this back to 5.0 if using different Pi
 use_grid_path: true
 base_global_planner: global_planner/GlobalPlanner
 base_local_planner: dwa_local_planner/DWAPlannerROS
