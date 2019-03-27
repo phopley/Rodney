@@ -12,12 +12,13 @@
 class RodneyNode
 {
 public:
-    RodneyNode(ros::NodeHandle n);
+    RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private);
     void sendTwist(void);
     void checkTimers(void);
     
 private:
     ros::NodeHandle nh_;
+    ros::NodeHandle nh_private_;
     ros::Publisher face_status_pub_;    // Topic to publish status to be displayed by RobotFace
     ros::Publisher mission_pub_;        // Topic to start a mission or small task
     ros::Publisher cancel_pub_;         // Topic to cancel a mission

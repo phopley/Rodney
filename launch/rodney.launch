@@ -1,7 +1,6 @@
 <?xml version="1.0" ?>
 <launch>    
-  <!-- Load each of the config files into the parameter server -->   
-  <rosparam command="load" file="$(find rodney)/config/config.yaml"/>       
+  <!-- Load each of the config files into the parameter server -->           
   <rosparam command="load" file="$(find pan_tilt)/config/config.yaml"/>
   <rosparam command="load" file="$(find face_recognition)/config/config.yaml"/>
   <rosparam command="load" file="$(find head_control)/config/config.yaml"/>
@@ -17,7 +16,9 @@
   <node pkg="head_control" type="head_control_node" name="head_control_node"/>  
   <node pkg="speech" type="speech_node" name="speech_node"/>
   <node pkg="rodney_missions" type="rodney_missions_node.py" name="rodney_missions" output="screen"/>
-  <node pkg="rodney" type="rodney_node" name="rodney_node" output="screen" />
+  <node pkg="rodney" type="rodney_node" name="rodney" output="screen">
+    <rosparam command="load" file="$(find rodney)/config/config.yaml"/> 
+  </node>
   <node pkg="thunderborg" type="thunderborg_node.py" name="thunderborg_node">
     <rosparam command="load" file="$(find thunderborg)/config/config.yaml"/>
   </node>
@@ -48,10 +49,13 @@
   <!-- The robot face -->
   <node pkg="homer_robot_face" type="RobotFace" name="RobotFace"/>
   
-  <!-- Static transform for the laser -> baselink -->
-  <node pkg="tf2_ros" type="static_transform_publisher" name="laser_link_broadcaster" args="0.085 0 0.107 0 0 0 /base_link /laser"/>
-  <!-- The base_link -> base_footprint -->  
-  <node pkg="tf2_ros" type="static_transform_publisher" name="base_footprint_broadcaster" args="0 0 0.09 0 0 0 /base_footprint /base_link"/>
+  <!-- Static transform in the system -->
+  <node pkg="rodney" type="static_broadcaster.py" name="static_broadcaster_node"/>
+  
+  <!-- Node to add orientation to IMU data -->
+  <node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter" output="screen">
+    <rosparam command="load" file="$(find rodney)/config/imu_filter_config.yaml.yaml"/> 
+  </node>
   
   <!-- Node to fuse motor encoder and IMU data for odom -->
   <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization_node">
