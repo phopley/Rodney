@@ -35,8 +35,7 @@ RodneyNode::RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private)
     nh_private_.param("motor/ramp/angular", ramp_for_angular_, 5.0f);
     nh_private_.param("battery/warning_level", voltage_level_warning_, 9.5f);    
     nh_private_.param("sounds/enabled", wav_play_enabled_, false);
-    // TODO This would be improved by adding a service to thunderborg which allowed us to ask if the pid is enabled
-    nh_.param("/thunderborg_node/pid/use_pid", pid_enabled_, false);
+    nh_private_.param("use_ramp", ramp_enabled_, false);
     
     // Obtain the filename and text for the wav files that can be played    
     nh_private_.getParam("/rodney/sounds/filenames", wav_file_names_);
@@ -678,8 +677,8 @@ void RodneyNode::sendTwist(void)
         target_twist.angular.z = angular_mission_demand_;
     }
 
-    // If not using the PID ramp to the target value. 
-    if (false == pid_enabled_)
+    // Should we ramp to the required velocoties.
+    if (true == ramp_enabled_)
     {
         ros::Time time_now = ros::Time::now();
         

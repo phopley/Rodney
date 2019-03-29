@@ -2,6 +2,7 @@
  * This version: 
  * - Controls upto four RC Servos on the servo topic
  * - Publishes the tacho on the tacho topic monitoring two motors with Hall sensors.
+ * - Publish imu data on the imu/data_raw topic
  * 
  * The node subscribes to the servo topic and acts on a rodney_msgs::servo_array message.
  * This message contains two elements, index and angle. Index references the servos 0-3 and 
@@ -68,14 +69,12 @@ PWMServo  servo3;
 MPU9250 myIMU(MPU9250_ADDRESS, I2Cport, I2Cclock);
 
 tacho_msgs::tacho tachoMsg;
-sensor_msgs::Imu  imuMsg;
-sensor_msgs::MagneticField magMsg;  
+sensor_msgs::Imu  imuMsg;  
 
 ros::NodeHandle nh;
 
 ros::Publisher tachoPub("tacho", &tachoMsg);
 ros::Publisher imuPub("imu/data_raw", &imuMsg);
-ros::Publisher magPub("imu/mag", &magMsg);
 ros::Subscriber<servo_msgs::servo_array> subServo("servo", servo_cb);
 
 bool  imuSelfTestPass;
@@ -98,7 +97,6 @@ void setup()
   nh.initNode();
   nh.advertise(tachoPub);
   nh.advertise(imuPub);
-  nh.advertise(magPub);
   nh.subscribe(subServo);
 
   // Attach servos
@@ -247,48 +245,29 @@ void loop()
       imuMsg.header.frame_id = imu_link;
       imuMsg.header.stamp = nh.now();
 
-      //imuMsg.orientation.w = *getQ();
-      //imuMsg.orientation.x = *(getQ()+1);
-      //imuMsg.orientation.y = *(getQ()+2);
-      //imuMsg.orientation.z = *(getQ()+3);
-
-      // TODO should something be set to -1
-      // TODO imuMsg.orientation_covariance
-      //imuMsg.orientation_covariance[0] = 0.0025;
-      //imuMsg.orientation_covariance[4] = 0.0025;
-      //imuMsg.orientation_covariance[8] = 0.0025;                                     ;
+      // We are not providing orientation so the 
+      // first element of the this matrix should be -1
+      imuMsg.orientation_covariance[0] = -1;
 
       imuMsg.angular_velocity.x = myIMU.gx * DEG_TO_RAD;
       imuMsg.angular_velocity.y = myIMU.gy * DEG_TO_RAD;
       imuMsg.angular_velocity.z = myIMU.gz * DEG_TO_RAD;
 
-      // TODO imuMsg.angular_velocity_covariance
-      imuMsg.angular_velocity_covariance[0] = 0.02;
-      imuMsg.angular_velocity_covariance[4] = 0.02;
-      imuMsg.angular_velocity_covariance[8] = 0.02;
+      // angular velocity covariance
+      imuMsg.angular_velocity_covariance[0] = 0.00002;
+      imuMsg.angular_velocity_covariance[4] = 0.00002;
+      imuMsg.angular_velocity_covariance[8] = 0.00002;
 
       imuMsg.linear_acceleration.x = myIMU.ax * G_TO_MS2;
       imuMsg.linear_acceleration.y = myIMU.ay * G_TO_MS2;
       imuMsg.linear_acceleration.z = myIMU.az * G_TO_MS2;
       
-      // TODO imuMsg.linear_acceleration_covariance
-      imuMsg.linear_acceleration_covariance[0] = 0.04;
-      imuMsg.linear_acceleration_covariance[4] = 0.04;
-      imuMsg.linear_acceleration_covariance[8] = 0.04;
+      // linear acceleration covariance
+      imuMsg.linear_acceleration_covariance[0] = 0.01;
+      imuMsg.linear_acceleration_covariance[4] = 0.01;
+      imuMsg.linear_acceleration_covariance[8] = 0.01;
 
       imuPub.publish(&imuMsg);
-
-      // Magnetic field
-      magMsg.header.frame_id = imu_link;
-      magMsg.header.stamp = nh.now();
-      // Convert from milli Gauss to Tesla and allow for different orientation
-      magMsg.magnetic_field.x = myIMU.my / 10000000.0;
-      magMsg.magnetic_field.y = myIMU.mx / 10000000.0;
-      magMsg.magnetic_field.z = -(myIMU.mz / 10000000.0);
-
-      // TODO magnetic_field_covariance
-
-      magPub.publish(&magMsg);
 
       myIMU.count = millis();
     }    
