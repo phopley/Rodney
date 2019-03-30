@@ -78,6 +78,8 @@ ros::Publisher imuPub("imu/data_raw", &imuMsg);
 ros::Subscriber<servo_msgs::servo_array> subServo("servo", servo_cb);
 
 bool  imuSelfTestPass;
+bool  mpu9250ReadPassed;
+bool  ak8963ReadPassed;
 byte  encoder0PinALast;
 byte  encoder1PinALast;
 volatile int encoder0Count; // Number of pulses
@@ -120,12 +122,14 @@ void setup()
   // Attach the interrupts for the Hall sensors
   attachInterrupt(digitalPinToInterrupt(ENCODER0_PINA), WheelSpeed0, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENCODER1_PINA), WheelSpeed1, CHANGE);
-
+  
   // Read the WHO_AM_I register of the IMU, this is a good test of communication
   byte c = myIMU.readByte(MPU9250_ADDRESS, WHO_AM_I_MPU9250);
   
   if(c == 0x71) // WHO_AM_I should always be 0x71
   {
+    mpu9250ReadPassed = true;
+    
     // Start by performing self test
     myIMU.MPU9250SelfTest(myIMU.selfTest);
 
@@ -157,19 +161,21 @@ void setup()
       // Get sensor resolutions, only need to do this once
       myIMU.getAres();
       myIMU.getGres();
-      myIMU.getMres();      
+      myIMU.getMres();
+
+      ak8963ReadPassed = true;
     }
     else
     {
-      imuSelfTestPass = false;
+      ak8963ReadPassed = false;
     }
   }
   else
   {
-    imuSelfTestPass = false;
+    mpu9250ReadPassed = false;
   }
 
-  if(imuSelfTestPass == true)
+  if((imuSelfTestPass == true) && (mpu9250ReadPassed == true) && (ak8963ReadPassed == true))
   {
     // Turn on the onboard LED to show we are running 
     pinMode(LED_PIN, OUTPUT);
@@ -180,6 +186,31 @@ void setup()
 
 void loop()
 {
+  static bool setup = false;
+
+  if(setup == false)
+  {
+    // Log only gets reported in loop
+    nh.loginfo("Teensy code started");
+
+    if(imuSelfTestPass == false)
+    {
+      nh.loginfo("IMU self test failed");        
+    }
+
+    if(mpu9250ReadPassed == false)
+    {
+      nh.loginfo("Can not read MPU9250");
+    }
+
+    if(ak8963ReadPassed == false)
+    {
+      nh.loginfo("Can not read AK8963");
+    }
+    
+    setup = true;
+  }
+  
   // Is it time to publish the tacho message
   if(millis() > publisherTime)
   {
