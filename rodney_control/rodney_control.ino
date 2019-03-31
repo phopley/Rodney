@@ -77,9 +77,7 @@ ros::Publisher tachoPub("tacho", &tachoMsg);
 ros::Publisher imuPub("imu/data_raw", &imuMsg);
 ros::Subscriber<servo_msgs::servo_array> subServo("servo", servo_cb);
 
-bool  imuSelfTestPass;
-bool  mpu9250ReadPassed;
-bool  ak8963ReadPassed;
+bool  imuTestPassed;
 byte  encoder0PinALast;
 byte  encoder1PinALast;
 volatile int encoder0Count; // Number of pulses
@@ -122,24 +120,22 @@ void setup()
   // Attach the interrupts for the Hall sensors
   attachInterrupt(digitalPinToInterrupt(ENCODER0_PINA), WheelSpeed0, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENCODER1_PINA), WheelSpeed1, CHANGE);
+
+  imuTestPassed = true;
   
   // Read the WHO_AM_I register of the IMU, this is a good test of communication
   byte c = myIMU.readByte(MPU9250_ADDRESS, WHO_AM_I_MPU9250);
   
   if(c == 0x71) // WHO_AM_I should always be 0x71
-  {
-    mpu9250ReadPassed = true;
-    
+  { 
     // Start by performing self test
     myIMU.MPU9250SelfTest(myIMU.selfTest);
-
-    imuSelfTestPass = true;
     
     for(int i = 0; i < 6; i++)
     {
       if(abs(myIMU.selfTest[i]) > 14.0f)
       {
-        imuSelfTestPass = false;
+        imuTestPassed = false;
       }
     }
 
@@ -162,20 +158,18 @@ void setup()
       myIMU.getAres();
       myIMU.getGres();
       myIMU.getMres();
-
-      ak8963ReadPassed = true;
     }
     else
     {
-      ak8963ReadPassed = false;
+      imuTestPassed = false;
     }
   }
   else
   {
-    mpu9250ReadPassed = false;
+    imuTestPassed = false;
   }
 
-  if((imuSelfTestPass == true) && (mpu9250ReadPassed == true) && (ak8963ReadPassed == true))
+  if(imuTestPassed == true)
   {
     // Turn on the onboard LED to show we are running 
     pinMode(LED_PIN, OUTPUT);
@@ -193,19 +187,9 @@ void loop()
     // Log only gets reported in loop
     nh.loginfo("Teensy code started");
 
-    if(imuSelfTestPass == false)
+    if(imuTestPassed == false)
     {
       nh.loginfo("IMU self test failed");        
-    }
-
-    if(mpu9250ReadPassed == false)
-    {
-      nh.loginfo("Can not read MPU9250");
-    }
-
-    if(ak8963ReadPassed == false)
-    {
-      nh.loginfo("Can not read AK8963");
     }
     
     setup = true;
@@ -234,7 +218,7 @@ void loop()
   }
 
   // IMU 
-  if(imuSelfTestPass == true)
+  if(imuTestPassed == true)
   {
     // Check to see if all data registers have new data
     if (myIMU.readByte(MPU9250_ADDRESS, INT_STATUS) & 0x01)
@@ -260,6 +244,7 @@ void loop()
       // Calculate the magnetometer values in milliGauss
       // Include factory calibration per data sheet and user environmental corrections
       // Get actual magnetometer value, this depends on scale being set
+      // Reading mag data but not currently publishing it
       myIMU.mx = (float)myIMU.magCount[0] * myIMU.mRes
                  * myIMU.factoryMagCalibration[0] - myIMU.magBias[0];
       myIMU.my = (float)myIMU.magCount[1] * myIMU.mRes
@@ -285,18 +270,18 @@ void loop()
       imuMsg.angular_velocity.z = myIMU.gz * DEG_TO_RAD;
 
       // angular velocity covariance
-      imuMsg.angular_velocity_covariance[0] = 0.00002;
-      imuMsg.angular_velocity_covariance[4] = 0.00002;
-      imuMsg.angular_velocity_covariance[8] = 0.00002;
+      imuMsg.angular_velocity_covariance[0] = 0.000001;
+      imuMsg.angular_velocity_covariance[4] = 0.000001;
+      imuMsg.angular_velocity_covariance[8] = 0.000001;
 
       imuMsg.linear_acceleration.x = myIMU.ax * G_TO_MS2;
       imuMsg.linear_acceleration.y = myIMU.ay * G_TO_MS2;
       imuMsg.linear_acceleration.z = myIMU.az * G_TO_MS2;
       
       // linear acceleration covariance
-      imuMsg.linear_acceleration_covariance[0] = 0.01;
-      imuMsg.linear_acceleration_covariance[4] = 0.01;
-      imuMsg.linear_acceleration_covariance[8] = 0.01;
+      imuMsg.linear_acceleration_covariance[0] = 0.0001;
+      imuMsg.linear_acceleration_covariance[4] = 0.0001;
+      imuMsg.linear_acceleration_covariance[8] = 0.0001;
 
       imuPub.publish(&imuMsg);
 
