@@ -1,4 +1,17 @@
-/*
+/* Copyright 2019 Philip Hopley
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
+ * use this file except in compliance with the License. You may obtain a  copy
+ * of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software 
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
  * This version: 
  * - Controls upto four RC Servos on the servo topic
  * - Publishes the tacho on the tacho topic monitoring two motors with Hall sensors.
@@ -241,10 +254,11 @@ void loop()
 
       myIMU.readMagData(myIMU.magCount);  // Read the x/y/z adc values
 
+      // Reading mag data but not currently publishing it
+      
       // Calculate the magnetometer values in milliGauss
       // Include factory calibration per data sheet and user environmental corrections
-      // Get actual magnetometer value, this depends on scale being set
-      // Reading mag data but not currently publishing it
+      // Get actual magnetometer value, this depends on scale being set      
       myIMU.mx = (float)myIMU.magCount[0] * myIMU.mRes
                  * myIMU.factoryMagCalibration[0] - myIMU.magBias[0];
       myIMU.my = (float)myIMU.magCount[1] * myIMU.mRes
@@ -270,18 +284,18 @@ void loop()
       imuMsg.angular_velocity.z = myIMU.gz * DEG_TO_RAD;
 
       // angular velocity covariance
-      imuMsg.angular_velocity_covariance[0] = 0.000001;
-      imuMsg.angular_velocity_covariance[4] = 0.000001;
-      imuMsg.angular_velocity_covariance[8] = 0.000001;
+      imuMsg.angular_velocity_covariance[0] = 0.003;
+      imuMsg.angular_velocity_covariance[4] = 0.003;
+      imuMsg.angular_velocity_covariance[8] = 0.003;
 
       imuMsg.linear_acceleration.x = myIMU.ax * G_TO_MS2;
       imuMsg.linear_acceleration.y = myIMU.ay * G_TO_MS2;
       imuMsg.linear_acceleration.z = myIMU.az * G_TO_MS2;
       
       // linear acceleration covariance
-      imuMsg.linear_acceleration_covariance[0] = 0.0001;
-      imuMsg.linear_acceleration_covariance[4] = 0.0001;
-      imuMsg.linear_acceleration_covariance[8] = 0.0001;
+      imuMsg.linear_acceleration_covariance[0] = 0.1;
+      imuMsg.linear_acceleration_covariance[4] = 0.1;
+      imuMsg.linear_acceleration_covariance[8] = 0.1;
 
       imuPub.publish(&imuMsg);
 

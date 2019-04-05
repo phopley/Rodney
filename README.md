@@ -62,4 +62,8 @@ Parameters:
 * `~use_ramp`: True if the robot use ramp function to reach velocities. Turn off if using a PID to control the motors. Default = false.
 
 ## Arduino Sketch
-The `rodney_control` directory contains an Arduino sketch `rodney_control.ino` which handles some of the rodney robot function e.g. servo movements, motor encoder readings and imu readings
+The `rodney_control` directory contains an Arduino sketch `rodney_control.ino` which handles some of the rodney robot function e.g. servo movements, motor encoder readings and imu readings.
+
+## License
+Software source and object files are licensed under the Apache License, Version 2.0. See the License for the specific language governing permissions and limitations under the License.  
+The modified Arduino library files are covered by the original BSD license.

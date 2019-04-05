@@ -43,7 +43,6 @@
   <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
     <param name="port" value="$(arg serial_port)"/>
     <param name="baud" value="$(arg baud_rate)"/>
-    <remap from="imu/data_raw" to="raw"/>
   </node>
   
   <!-- The RPLidar and laser filter node 
@@ -66,8 +65,6 @@
   <!-- Add calibration to raw imu data -->
   <node pkg="imu_calib" type="apply_calib" name="imu_calib" output="screen">
     <param name="calib_file" value="$(find rodney)/config/imu_calib.yaml"/>
-    <param name="calibrate_gyros" value="false"/>
-    <remap from="corrected" to="imu/data"/>
   </node>
     
   <!-- Node to fuse motor encoder and IMU data for odom -->

@@ -8,25 +8,25 @@ print_diagnostics: false    # Set to true for debug
 
 odom_frame: odom
 base_link_frame: base_footprint
-word_frame: odom
+world_frame: odom
 
 odom0: /raw_odom
 imu0: /imu/data
 
 odom0_config: [false, false, false,
                false, false, false,
-               true,  true, false,
-               false, false, true,
+               true,  true,  false,
+               false, false, true,               
                false, false, false]
                
 odom0_differential: false               
-
-# Currently just using IMU yaw velocity               
+              
 imu0_config: [false, false, false,
               false, false, false,
               false, false, false,
               false, false, true,
               false, false, false]
+
               
 imu0_differential: false
 
