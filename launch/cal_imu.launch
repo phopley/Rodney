@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<launch> 
+
+  <!-- Teensy. 
+       Use the defaults /dev/ttyACM0 (or teensy if dev rules updated) and 500000 -->
+  <arg name="serial_port" default="/dev/ttyACM0"/>
+  <arg name="baud_rate" default="500000"/>  
+  <node pkg="rosserial_python" type="serial_node.py" name="serial_node" output="screen">
+    <param name="port" value="$(arg serial_port)"/>
+    <param name="baud" value="$(arg baud_rate)"/>
+    <remap from="/imu/data_raw" to="imu"/>
+  </node>
+  
+  <!-- now "rosrun imu_calib do_calib" in a shell -->
+
+</launch>

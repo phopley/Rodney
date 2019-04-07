@@ -1,3 +1,19 @@
+/* Copyright 2019 Philip Hopley
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
+ * use this file except in compliance with the License. You may obtain a  copy
+ * of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software 
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ * Main control node for the Rodney robot 
+ */
 #ifndef RODNEY_NODE_H_
 #define RODNEY_NODE_H_
 
@@ -12,12 +28,13 @@
 class RodneyNode
 {
 public:
-    RodneyNode(ros::NodeHandle n);
+    RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private);
     void sendTwist(void);
     void checkTimers(void);
     
 private:
     ros::NodeHandle nh_;
+    ros::NodeHandle nh_private_;
     ros::Publisher face_status_pub_;    // Topic to publish status to be displayed by RobotFace
     ros::Publisher mission_pub_;        // Topic to start a mission or small task
     ros::Publisher cancel_pub_;         // Topic to cancel a mission
@@ -42,7 +59,7 @@ private:
     bool mission_running_;
     bool manual_locomotion_mode_;
     bool wav_play_enabled_;
-    bool pid_enabled_;
+    bool ramp_enabled_;
     
     unsigned int battery_low_count_; // Counter for low battery low messages   
  

@@ -44,22 +44,26 @@ Topics:
   
 Parameters:
 
-* `/controller/axes/linear_speed_index`: Index of the controller axes used for requesting forward and backward movement. 
-* `/controller/axes/angular_speed_index`: Index of the controller axes used for requesting clockwise and anti-clockwise movement.
-* `/controller/axes/camera_x_index`: Index of the controller axes used for requesting head up and down movement. 
-* `/controller/axes/camera_y_index`: Index of the controller axes used for requesting head left and right movement.
-* `/controller/buttons/manual_mode_select`: Index of the controller button used for setting manaul mode.
-* `/controller/buttons/default_camera_pos_select`: Index of the controller button used for rquesting that the head returns to default position.
-* `/controller/dead_zone`: Controller axes dead zone value, until the controller value is greater than this value it is considered to be at zero.
-* `/teleop/max_linear_speed`: The linear velocity which is requested when the controller axes is at its maxium range.
-* `/teleop/max_angular_speed`: The angular velocity which is requested when the controller axes is at its maxium range.
-* `/motor/ramp/linear`: The ramp rate used to increase or decrease the linear velocity.
-* `/motor/ramp/angular`: The ramp rate used to increase or decrease the angular velocity.
-* `/battery/warning_level`: The battery voltage level at which to issue a low battery warning. 
-* `/sounds/enabled`: If true the robot is free to use stored wav file to get attention when inactive.
-* `/sounds/filenames`: A list of wav filenames to choose from when inactive
-* `/sounds/text`: A list of speeches which match the contents of the wav file names.
-* `/thunderborg_node/pid/use_pid`: True if the robot is using the PID to control the motors. Default = false.
+* `~controller/axes/linear_speed_index`: Index of the controller axes used for requesting forward and backward movement. 
+* `~controller/axes/angular_speed_index`: Index of the controller axes used for requesting clockwise and anti-clockwise movement.
+* `~controller/axes/camera_x_index`: Index of the controller axes used for requesting head up and down movement. 
+* `~controller/axes/camera_y_index`: Index of the controller axes used for requesting head left and right movement.
+* `~controller/buttons/manual_mode_select`: Index of the controller button used for setting manaul mode.
+* `~controller/buttons/default_camera_pos_select`: Index of the controller button used for rquesting that the head returns to default position.
+* `~controller/dead_zone`: Controller axes dead zone value, until the controller value is greater than this value it is considered to be at zero.
+* `~teleop/max_linear_speed`: The linear velocity which is requested when the controller axes is at its maxium range.
+* `~teleop/max_angular_speed`: The angular velocity which is requested when the controller axes is at its maxium range.
+* `~motor/ramp/linear`: The ramp rate used to increase or decrease the linear velocity.
+* `~motor/ramp/angular`: The ramp rate used to increase or decrease the angular velocity.
+* `~battery/warning_level`: The battery voltage level at which to issue a low battery warning. 
+* `~sounds/enabled`: If true the robot is free to use stored wav file to get attention when inactive.
+* `~sounds/filenames`: A list of wav filenames to choose from when inactive
+* `~sounds/text`: A list of speeches which match the contents of the wav file names.
+* `~use_ramp`: True if the robot use ramp function to reach velocities. Turn off if using a PID to control the motors. Default = false.
 
 ## Arduino Sketch
-The `rodney_control` directory contains an Arduino sketch `rodney_control.ino` which handles some of the rodney robot function e.g. servo movements, motor encoder readings and LIDAR data.
+The `rodney_control` directory contains an Arduino sketch `rodney_control.ino` which handles some of the rodney robot function e.g. servo movements, motor encoder readings and imu readings.
+
+## License
+Software source and object files are licensed under the Apache License, Version 2.0. See the License for the specific language governing permissions and limitations under the License.  
+The modified Arduino library files are covered by the original BSD license.

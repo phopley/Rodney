@@ -1,12 +1,28 @@
-// Main control node for the Rodney robot 
+/* Copyright 2019 Philip Hopley
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not 
+ * use this file except in compliance with the License. You may obtain a  copy
+ * of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software 
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
+ *
+ * Main control node for the Rodney robot 
+ */
 #include <rodney/rodney_node.h>
 #include <ros/package.h>
 #include <robot_localization/SetPose.h>
 
 // Constructor 
-RodneyNode::RodneyNode(ros::NodeHandle n)
+RodneyNode::RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private)
 {
     nh_ = n;
+    nh_private_ = n_private;
 
     joystick_linear_speed_ = 0.0f;
     joystick_angular_speed_ = 0.0f;
@@ -19,25 +35,26 @@ RodneyNode::RodneyNode(ros::NodeHandle n)
     angular_set_speed_ = 1.5f; 
     
     // Obtain any configuration values from the parameter server. If they don't exist use the defaults
-    nh_.param("/controller/axes/linear_speed_index", linear_speed_index_, 0);
-    nh_.param("/controller/axes/angular_speed_index", angular_speed_index_, 1);
-    nh_.param("/controller/axes/camera_x_index", camera_x_index_, 2);
-    nh_.param("/controller/axes/camera_y_index", camera_y_index_, 3);
-    nh_.param("/controller/buttons/manual_mode_select", manual_mode_select_, 0);
-    nh_.param("/controller/buttons/default_camera_pos_select", default_camera_pos_select_, 1);
-    nh_.param("/controller/buttons/lidar_enable", lidar_enable_select_, 2);
-    nh_.param("/controller/dead_zone", dead_zone_, 2000);
-    nh_.param("/teleop/max_linear_speed", max_linear_speed_, 1.0f);
-    nh_.param("/teleop/max_angular_speed", max_angular_speed_, 8.7f);
-    nh_.param("/motor/ramp/linear", ramp_for_linear_, 5.0f);
-    nh_.param("/motor/ramp/angular", ramp_for_angular_, 5.0f);
-    nh_.param("/battery/warning_level", voltage_level_warning_, 9.5f);    
-    nh_.param("/sounds/enabled", wav_play_enabled_, false);
-    nh_.param("/thunderborg_node/pid/use_pid", pid_enabled_, false);
+    // Using the private node handle in this way means the <node_name> will prefix the parameter
+    nh_private_.param("controller/axes/linear_speed_index", linear_speed_index_, 0);
+    nh_private_.param("controller/axes/angular_speed_index", angular_speed_index_, 1);
+    nh_private_.param("controller/axes/camera_x_index", camera_x_index_, 2);
+    nh_private_.param("controller/axes/camera_y_index", camera_y_index_, 3);
+    nh_private_.param("controller/buttons/manual_mode_select", manual_mode_select_, 0);
+    nh_private_.param("controller/buttons/default_camera_pos_select", default_camera_pos_select_, 1);
+    nh_private_.param("controller/buttons/lidar_enable", lidar_enable_select_, 2);
+    nh_private_.param("controller/dead_zone", dead_zone_, 2000);
+    nh_private_.param("teleop/max_linear_speed", max_linear_speed_, 1.0f);
+    nh_private_.param("teleop/max_angular_speed", max_angular_speed_, 8.7f);
+    nh_private_.param("motor/ramp/linear", ramp_for_linear_, 5.0f);
+    nh_private_.param("motor/ramp/angular", ramp_for_angular_, 5.0f);
+    nh_private_.param("battery/warning_level", voltage_level_warning_, 9.5f);    
+    nh_private_.param("sounds/enabled", wav_play_enabled_, false);
+    nh_private_.param("use_ramp", ramp_enabled_, false);
     
     // Obtain the filename and text for the wav files that can be played    
-    nh_.getParam("/sounds/filenames", wav_file_names_);
-    nh_.getParam("/sounds/text", wav_file_texts_);
+    nh_private_.getParam("/rodney/sounds/filenames", wav_file_names_);
+    nh_private_.getParam("/rodney/sounds/text", wav_file_texts_);
      
     // Subscribe to receive keyboard input, joystick input, mission complete, battery state and remote heartbeat
     key_sub_ = nh_.subscribe("keyboard/keydown", 5, &RodneyNode::keyboardCallBack, this);
@@ -675,8 +692,8 @@ void RodneyNode::sendTwist(void)
         target_twist.angular.z = angular_mission_demand_;
     }
 
-    // If not using the PID ramp to the target value. 
-    if (false == pid_enabled_)
+    // Should we ramp to the required velocoties.
+    if (true == ramp_enabled_)
     {
         ros::Time time_now = ros::Time::now();
         
@@ -746,8 +763,9 @@ float RodneyNode::rampedVel(float velocity_prev, float velocity_target, ros::Tim
 int main(int argc, char **argv)
 {   
     ros::init(argc, argv, "rodney");
-    ros::NodeHandle n;    
-    RodneyNode rodney_node(n);   
+    ros::NodeHandle nh;
+    ros::NodeHandle nh_private("~");    
+    RodneyNode rodney_node(nh, nh_private);   
     std::string node_name = ros::this_node::getName();
     ROS_INFO("%s started", node_name.c_str());
 	

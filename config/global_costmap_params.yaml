@@ -2,7 +2,7 @@ global_costmap:
   global_frame: map
   robot_base_frame: base_footprint
   static_map: true
-  transform_tolerance: 0.6          # def 0.2 Could we change thos with a Pi 3/B+
+  transform_tolerance: 0.5
   update_frequency: 1.0
 
     
