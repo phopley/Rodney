@@ -5,6 +5,7 @@ cd ../..
 git clone https://github.com/phopley/face_recognition.git
 git clone https://github.com/phopley/face_recognition_msgs.git
 git clone https://github.com/phopley/head_control.git
+git clone https://github.com/phopley/imu_calib.git
 git clone https://github.com/phopley/joystick.git
 git clone https://github.com/phopley/pan_tilt.git
 git clone https://github.com/phopley/rodney_missions.git

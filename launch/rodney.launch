@@ -7,17 +7,7 @@
   <rosparam command="load" file="$(find pan_tilt)/config/config.yaml"/>
   <rosparam command="load" file="$(find face_recognition)/config/config.yaml"/>
   <rosparam command="load" file="$(find head_control)/config/config.yaml"/>
-  <rosparam command="load" file="$(find rodney_missions)/config/config.yaml"/>
-
-  <!-- map and localization system -->
-  <arg name="no_nav" default="false"/>  
-  <group unless="$(arg no_nav)">
-    <arg name="map_file" default="second_floor"/>
-    <node pkg="map_server" type="map_server" name="map_server" args="$(find rodney)/maps/$(arg map_file).yaml" output="screen"/> 
-    <node pkg="amcl" type="amcl" name="amcl" output="screen">
-      <rosparam command="load" file="$(find rodney)/config/amcl_config.yaml"/>
-    </node>     
-  </group>    
+  <rosparam command="load" file="$(find rodney_missions)/config/config.yaml"/>  
     
   <!-- Launch the camera node from one of its launch files -->
   <include file="$(find raspicam_node)/launch/camerav2_1280x960.launch" /> 
@@ -72,17 +62,5 @@
     <remap from="odometry/filtered" to="odom"/>
     <rosparam command="load" file="$(find rodney)/config/robot_localization.yaml"/> 
   </node>
-  
-  <!-- Navigation --> 
-  <group unless="$(arg no_nav)">   
-    <node pkg="move_base" type="move_base" name="move_base" respawn="false" output="screen">
-      <rosparam command="load" file="$(find rodney)/config/base_local_planner_params.yaml"/>
-      <rosparam command="load" file="$(find rodney)/config/costmap_common_params.yaml" ns="global_costmap"/>
-      <rosparam command="load" file="$(find rodney)/config/costmap_common_params.yaml" ns="local_costmap"/>
-      <rosparam command="load" file="$(find rodney)/config/global_costmap_params.yaml"/>
-      <rosparam command="load" file="$(find rodney)/config/local_costmap_params.yaml"/>       
-      <remap from="cmd_vel" to="demand_vel"/>
-    </node>   
-  </group>
    
 </launch>

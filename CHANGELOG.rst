@@ -5,7 +5,6 @@ Changelog for package rodney
 Unreleased
 ------------------
 * Added IMU calibration node to launch file
-* Added configuration and launching of the nav stack
 * Added remote heartbeat message which will be run on remote workstation when teleoping
 * Added RPLidar and scan filter nodes to rodney launch file
 * Added functionality to manually enable the LIDAR from keyboard or joystick
