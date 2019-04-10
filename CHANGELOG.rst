@@ -2,7 +2,7 @@
 Changelog for package rodney
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Unreleased
+1.0.0 (2019-04-10)
 ------------------
 * Added IMU calibration node to launch file
 * Added remote heartbeat message which will be run on remote workstation when teleoping
