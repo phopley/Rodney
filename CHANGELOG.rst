@@ -2,6 +2,10 @@
 Changelog for package rodney
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Unreleased
+------------------
+* Added configuration and launching of the nav stack
+
 1.0.0 (2019-04-10)
 ------------------
 * Added IMU calibration node to launch file
