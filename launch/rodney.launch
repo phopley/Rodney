@@ -4,10 +4,8 @@
   <node pkg="rodney" type="static_broadcaster.py" name="static_broadcaster_node"/>
   
   <!-- Load each of the config files into the parameter server -->           
-  <rosparam command="load" file="$(find pan_tilt)/config/config.yaml"/>
-  <rosparam command="load" file="$(find face_recognition)/config/config.yaml"/>
-  <rosparam command="load" file="$(find head_control)/config/config.yaml"/>
-  <rosparam command="load" file="$(find rodney_missions)/config/config.yaml"/>
+  <rosparam command="load" file="$(find pan_tilt)/config/config.yaml"/>         <!-- used by more than one package so can't be private -->
+  <rosparam command="load" file="$(find face_recognition)/config/config.yaml"/>  
 
   <!-- map and localization system -->
   <arg name="no_nav" default="false"/>  
@@ -26,9 +24,13 @@
   <!-- Starting with those written for the project -->
   <node pkg="pan_tilt" type="pan_tilt_node" name="pan_tilt_node"/>
   <node pkg="face_recognition" type="face_recognition_node.py" name="face_recognition_node"/>
-  <node pkg="head_control" type="head_control_node" name="head_control_node"/>  
+  <node pkg="head_control" type="head_control_node" name="head_control_node">
+    <rosparam command="load" file="$(find head_control)/config/config.yaml"/>
+  </node>
   <node pkg="speech" type="speech_node" name="speech_node"/>
-  <node pkg="rodney_missions" type="rodney_missions_node.py" name="rodney_missions" output="screen"/>
+  <node pkg="rodney_missions" type="rodney_missions_node.py" name="rodney_missions" output="screen">
+    <rosparam command="load" file="$(find rodney_missions)/config/config.yaml"/>
+  </node>
   <node pkg="rodney" type="rodney_node" name="rodney" output="screen">
     <rosparam command="load" file="$(find rodney)/config/config.yaml"/> 
   </node>
