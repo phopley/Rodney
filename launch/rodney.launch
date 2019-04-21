@@ -3,8 +3,10 @@
   <!-- Static transforms in the system -->
   <node pkg="rodney" type="static_broadcaster.py" name="static_broadcaster_node"/>
   
-  <!-- Load each of the config files into the parameter server -->           
-  <rosparam command="load" file="$(find pan_tilt)/config/config.yaml"/>         <!-- used by more than one package so can't be private -->
+  <!-- config values used by more than one package so can't be private -->  
+  <rosparam command="load" file="$(find pan_tilt)/config/common_config.yaml" />
+  <rosparam command="load" file="$(find head_control)/config/common_config.yaml" />
+  
   <rosparam command="load" file="$(find face_recognition)/config/config.yaml"/>  
 
   <!-- map and localization system -->
@@ -22,7 +24,9 @@
   
   <!-- Start all the nodes that make up Rondey -->
   <!-- Starting with those written for the project -->
-  <node pkg="pan_tilt" type="pan_tilt_node" name="pan_tilt_node"/>
+  <node pkg="pan_tilt" type="pan_tilt_node" name="pan_tilt_node">
+    <rosparam command="load" file="$(find pan_tilt)/config/config.yaml" />  
+  </node>
   <node pkg="face_recognition" type="face_recognition_node.py" name="face_recognition_node"/>
   <node pkg="head_control" type="head_control_node" name="head_control_node">
     <rosparam command="load" file="$(find head_control)/config/config.yaml"/>
