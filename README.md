@@ -1,49 +1,37 @@
 # rodney
-
 ROS node responsible for the main control of Rodney robot
 
 ## Running the Node
-
 Once you have the node built you can run the rodney robot by launching the rodney.launch file.
 
 ## Node Information
 Topics:
-
 * `keyboard/keydown`:  
-  Subscribes `keyboard/Key` keyboard key presses
-  
+  Subscribes `keyboard/Key` keyboard key presses 
 * `joy`:  
   Subscribes `sensor_msgs/Joy` Joystick/game pad controller input
-  
 * `/missions/mission_complete`:  
   Subscribes `std_msgs/String` Message indicating that the current mission completed
-  
 * `main_battery_status`:  
   Subscribes `sensor_msgs/BatteryState` Status of the main battery
-  
 * `demand_vel`:  
   Subscribes `geometry_msgs/Twist` Velocity demands from autonomous sub-system
-  
 * `remote_heartbeat`:  
   subscribes `std_msgsEmpty` Message to tell robot all is well with WiFi and it's safe to use remote control velocities
-  
+* `gpio/input_cmd`:  
+  subscribes `pi_io/gpio_input` Message when a monitored Raspberry Pi GPIO input changes
 * `/robot_face/expected_input`:  
-  Publishes `std_msgs/String` Status messages
-  
+  Publishes `std_msgs/String` Status messages  
 * `missions/mission_request`:  
-  Publishes `std_msgs/String` Request to carry out robot missions or simple jobs
-  
+  Publishes `std_msgs/String` Request to carry out robot missions or simple jobs  
 * `/missions/mission_cancel`:  
-  Publishes `std_msgs/Empty` Request to cancel the current robot mission
-  
+  Publishes `std_msgs/Empty` Request to cancel the current robot mission  
 * `/missions/acknowledge`:  
-  Publishes `std_msgs/Empty` Acknowledge that a mission can move on
-  
+  Publishes `std_msgs/Empty` Acknowledge that a mission can move on  
 * `cmd_vel`:  
   Publishes `geometry_msgs/Twist` Velocity demands from either manaul input or the autonomous sub-system
   
 Parameters:
-
 * `~controller/axes/linear_speed_index`: Index of the controller axes used for requesting forward and backward movement. 
 * `~controller/axes/angular_speed_index`: Index of the controller axes used for requesting clockwise and anti-clockwise movement.
 * `~controller/axes/camera_x_index`: Index of the controller axes used for requesting head up and down movement. 

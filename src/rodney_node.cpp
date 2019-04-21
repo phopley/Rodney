@@ -67,6 +67,9 @@ RodneyNode::RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private)
     // This can be created from either keyboard or game pad input when in manual mode or from the this 
     // subscribed topic when in autonomous mode. It will probably be remapped from the navigation stack
     demand_sub_ = nh_.subscribe("demand_vel", 5, &RodneyNode::motorDemandCallBack, this);
+    
+    // Raspberry Pi GPIO push buttons
+    gpio_sub_ =  nh_.subscribe("gpio/input_cmd", 5, &RodneyNode::gpioCallBack, this);
 
     // Advertise the topics we publish
     face_status_pub_ = nh_.advertise<std_msgs::String>("/robot_face/expected_input", 5);
@@ -576,6 +579,53 @@ void RodneyNode::remHeartbeatCallback(const std_msgs::Empty::ConstPtr& msg)
     // Remote heartbeat received store the time
     remote_heartbeat_time_ = ros::Time::now();
 }
+//---------------------------------------------------------------------------
+
+// callback for change in GPIO input
+void RodneyNode::gpioCallBack(const pi_io::gpio_input::ConstPtr& msg)
+{
+    switch(msg->index)
+    {
+        case 0:
+            // Black push button changed state
+            // If button pressed
+            if(msg->value == true)
+            {
+                // If mission running cancel mission            
+                if(mission_running_ == true)
+                {
+                    // Cancel the ongoing mission
+                    std_msgs::Empty empty_msg;
+                    cancel_pub_.publish(empty_msg); 
+                }
+            
+                // Move head to user input position
+                std_msgs::String mission_msg;
+                mission_msg.data = "J3^i^-";
+                mission_pub_.publish(mission_msg);
+            
+                last_interaction_time_ = ros::Time::now();
+            }
+            break;  
+            
+        case 1:
+            // Yellow push button 
+            // If mission running and button pressed,  send acknowledge
+            if((mission_running_ == true) && (msg->value == true))
+            {
+                // Acknowledge a mission step
+                std_msgs::Empty empty_msg;
+                ack_pub_.publish(empty_msg);                
+               
+                last_interaction_time_ = ros::Time::now();
+            }
+            break;
+            
+        default:
+            break;             
+    }
+}
+//---------------------------------------------------------------------------
 
 // Callback for main battery status
 void RodneyNode::batteryCallback(const sensor_msgs::BatteryState::ConstPtr& msg)
