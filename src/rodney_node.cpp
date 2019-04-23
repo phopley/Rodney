@@ -17,6 +17,7 @@
 #include <rodney/rodney_node.h>
 #include <ros/package.h>
 #include <robot_localization/SetPose.h>
+#include <pi_io/gpio_output.h>
 
 // Constructor 
 RodneyNode::RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private)
@@ -90,7 +91,12 @@ RodneyNode::RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private)
     ayintercept_ = -(aslope_*dead_zone_);
     
     // Seed the random number generator
-    srand((unsigned)time(0));
+    srand((unsigned)time(0));    
+    
+    // Waiting for GPIO service to be available
+    ros::service::waitForService("gpio/output_cmd");
+    
+    indicateAuto();
     
     last_interaction_time_ = ros::Time::now();
 }
@@ -207,6 +213,8 @@ void RodneyNode::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
         
         manual_locomotion_mode_ = true;
         
+        indicateManual();
+        
         last_interaction_time_ = ros::Time::now(); 
     }
     
@@ -272,7 +280,9 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         mission_pub_.publish(mission_msg);
                     
         mission_running_ = true; 
-        manual_locomotion_mode_ = false;        
+        manual_locomotion_mode_ = false;
+        
+        indicateAuto();       
         
         last_interaction_time_ = ros::Time::now();                       
     }
@@ -339,6 +349,8 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         keyboard_angular_speed_ = 0.0f;
         
         manual_locomotion_mode_ = true;
+        
+        indicateManual();
         
         last_interaction_time_ = ros::Time::now();
     }
@@ -807,6 +819,38 @@ float RodneyNode::rampedVel(float velocity_prev, float velocity_target, ros::Tim
     }        
     
     return retVal;
+}
+//---------------------------------------------------------------------------
+
+void RodneyNode::indicateManual(void)
+{
+    // Red LED off, Green LED on
+    ros::ServiceClient client = nh_.serviceClient<pi_io::gpio_output>("gpio/output_cmd");
+    pi_io::gpio_output srv;
+    
+    srv.request.index = 0;
+    srv.request.value = true;
+    client.call(srv);
+    
+    srv.request.index = 1;
+    srv.request.value = false;
+    client.call(srv);
+}
+//---------------------------------------------------------------------------
+
+void RodneyNode::indicateAuto(void)
+{
+    // Red LED on, Green LED off
+    ros::ServiceClient client = nh_.serviceClient<pi_io::gpio_output>("gpio/output_cmd");
+    pi_io::gpio_output srv;
+    
+    srv.request.index = 0;
+    srv.request.value = false;
+    client.call(srv);
+    
+    srv.request.index = 1;
+    srv.request.value = true;
+    client.call(srv);
 }
 //---------------------------------------------------------------------------
 

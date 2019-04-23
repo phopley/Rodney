@@ -106,6 +106,9 @@ private:
     void remHeartbeatCallback(const std_msgs::Empty::ConstPtr& msg);
     void gpioCallBack(const pi_io::gpio_input::ConstPtr& msg);
     
+    void indicateManual(void);
+    void indicateAuto(void);
+    
     geometry_msgs::Twist rampedTwist(geometry_msgs::Twist prev, geometry_msgs::Twist target,
                                      ros::Time time_prev, ros::Time time_now);
     float rampedVel(float velocity_prev, float velocity_target, ros::Time time_prev, ros::Time time_now, float ramp_rate);   

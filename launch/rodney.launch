@@ -22,8 +22,6 @@
   <!-- Launch the camera node from one of its launch files -->
   <include file="$(find raspicam_node)/launch/camerav2_1280x960.launch" /> 
   
-  <!-- Start all the nodes that make up Rondey -->
-  <!-- Starting with those written for the project -->
   <node pkg="pan_tilt" type="pan_tilt_node" name="pan_tilt_node">
     <rosparam command="load" file="$(find pan_tilt)/config/config.yaml" />  
   </node>
@@ -41,6 +39,7 @@
   <node pkg="thunderborg" type="thunderborg_node.py" name="thunderborg_node">
     <rosparam command="load" file="$(find thunderborg)/config/config.yaml"/>
   </node>
+  <node pkg="pi_io" type="pi_io_node.py" name="pi_io_node"/>
   
   <!-- Teensy. 
        Use the defaults /dev/ttyACM0 (or teensy if dev rules updated) and 500000 -->
