@@ -20,10 +20,11 @@
 #include <pi_io/gpio_output.h>
 
 // Constructor 
-RodneyNode::RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private)
+RodneyNode::RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private, std::string waypoints_filename)
 {
     nh_ = n;
     nh_private_ = n_private;
+    waypoints_filename_ = waypoints_filename;
 
     joystick_linear_speed_ = 0.0f;
     joystick_angular_speed_ = 0.0f;
@@ -277,6 +278,19 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         // Start a mission 
         std_msgs::String mission_msg;
         mission_msg.data = "M" + std::to_string(msg->code-keyboard::Key::KEY_0);
+        
+        // Add on parameters for different missions
+        switch(msg->code)
+        {
+            case keyboard::Key::KEY_1:
+                // Mission 1 "M1^patrol poses file|id of person to search for|message to deliver                
+                mission_msg.data += "^" + waypoints_filename_ + "|1|Please walk Bonnie";
+                break;
+                
+            default:
+                break;
+        }
+        
         mission_pub_.publish(mission_msg);
                     
         mission_running_ = true; 
@@ -662,8 +676,7 @@ void RodneyNode::batteryCallback(const sensor_msgs::BatteryState::ConstPtr& msg)
     {
         // If the battery level goes low we wait a number of messages to confirm it was not a dip as the motors started
         if(battery_low_count_ > 1)
-        {
-        
+        {        
             status_msg.data = "Battery level LOW ";
         
             // Speak warning every 5 minutes        
@@ -857,9 +870,24 @@ void RodneyNode::indicateAuto(void)
 int main(int argc, char **argv)
 {   
     ros::init(argc, argv, "rodney");
+    
     ros::NodeHandle nh;
     ros::NodeHandle nh_private("~");    
-    RodneyNode rodney_node(nh, nh_private);   
+    std::string waypoints_filename;
+    int opt;
+    
+    /* argument -m gives the file containing the patrol pose positions */
+    while((opt = getopt(argc, argv, ":m:")) != -1)
+    {
+        switch(opt)
+        {
+            case 'm':
+                waypoints_filename = std::string(optarg);                
+                break;
+        }
+    }
+        
+    RodneyNode rodney_node(nh, nh_private, waypoints_filename);   
     std::string node_name = ros::this_node::getName();
     ROS_INFO("%s started", node_name.c_str());
 	

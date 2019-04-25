@@ -29,7 +29,7 @@
 class RodneyNode
 {
 public:
-    RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private);
+    RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private, std::string);
     void sendTwist(void);
     void checkTimers(void);
     
@@ -56,7 +56,9 @@ private:
     geometry_msgs::Twist last_twist_;   // The last Twist message sent   
     
     std::map<std::string,std::string> wav_file_names_; 
-    std::map<std::string,std::string> wav_file_texts_;  
+    std::map<std::string,std::string> wav_file_texts_;
+    
+    std::string waypoints_filename_;  
             
     bool mission_running_;
     bool manual_locomotion_mode_;
