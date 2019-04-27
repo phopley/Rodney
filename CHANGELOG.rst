@@ -2,6 +2,12 @@
 Changelog for package rodney
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Unreleased
+------------------
+* changes to send mission data with mission 1 and 4
+* Add LED indication if mission running or not
+* Add the two pushbuttons
+
 1.1.0 (2019-04-18)
 ------------------
 * Added configuration and launching of the nav stack
