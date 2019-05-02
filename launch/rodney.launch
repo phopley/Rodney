@@ -52,7 +52,7 @@
   
   <!-- The RPLidar and laser filter node 
        Have created symbolic link for /dev/ttyUSBn to be rplidar -->
-  <node pkg="rplidar_ros" type="rplidarNode" name="rplidar_node" output="screen">
+  <node pkg="rplidar_ros" type="rplidarNode" name="rplidar_node" respawn="true" output="screen">
     <param name="serial_port" type="string" value="/dev/rplidar"/>
     <param name="serial_baudrate" type="int" value="115200"/>
     <param name="frame_id" type="string" value="laser"/>
