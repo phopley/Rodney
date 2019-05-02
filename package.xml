@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>rodney</name>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
   <description>The rodney package including the main control node</description>
 
   <maintainer email="sleepyserver6@gmail.com">Philip Hopley</maintainer>

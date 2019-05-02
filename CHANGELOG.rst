@@ -2,11 +2,12 @@
 Changelog for package rodney
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Unreleased
+1.2.0 (2019-05-02)
 ------------------
 * changes to send mission data with mission 1 and 4
-* Add LED indication if mission running or not
-* Add the two pushbuttons
+* Added LED indication if mission running or not
+* Added the two pushbuttons
+* LIDAR node now respawns from launch file
 
 1.1.0 (2019-04-18)
 ------------------
