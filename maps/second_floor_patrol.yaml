@@ -1,0 +1,47 @@
+# Waypoints must start at w1 and be consecutive
+# Also have an home location
+w1:
+  position:
+    x: -0.328835725784
+    y: -0.529747009277
+  orientation:
+    x: 0.0
+    y: 0.0
+    z: 0.273852223218
+    w: 0.961771781577
+w2:
+  position:
+    x: 1.31689155102
+    y: -0.944578707218
+  orientation:
+    x: 0.0
+    y: 0.0
+    z: 0.732759099845
+    w: 0.680488134793  
+w3:
+  position:
+    x: 3.66307258606
+    y: -0.040109038353
+  orientation:
+    x: 0.0
+    y: 0.0
+    z: 0.413215093458
+    w: 0.910633453448
+w4:
+  position:
+    x: 6.55329608917
+    y: 1.04117441177
+  orientation:
+    x: 0.0
+    y: 0.0
+    z: 0.914737463209
+    w: -0.404048726519
+home:
+  position:
+    x: 0.0
+    y: 0.0
+  orientation:
+    x: 0.0
+    y: 0.0
+    z: 0.224733375634
+    w: 0.974420294265   

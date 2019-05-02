@@ -17,12 +17,14 @@
 #include <rodney/rodney_node.h>
 #include <ros/package.h>
 #include <robot_localization/SetPose.h>
+#include <pi_io/gpio_output.h>
 
 // Constructor 
-RodneyNode::RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private)
+RodneyNode::RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private, std::string waypoints_filename)
 {
     nh_ = n;
     nh_private_ = n_private;
+    waypoints_filename_ = waypoints_filename;
 
     joystick_linear_speed_ = 0.0f;
     joystick_angular_speed_ = 0.0f;
@@ -67,6 +69,9 @@ RodneyNode::RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private)
     // This can be created from either keyboard or game pad input when in manual mode or from the this 
     // subscribed topic when in autonomous mode. It will probably be remapped from the navigation stack
     demand_sub_ = nh_.subscribe("demand_vel", 5, &RodneyNode::motorDemandCallBack, this);
+    
+    // Raspberry Pi GPIO push buttons
+    gpio_sub_ =  nh_.subscribe("gpio/input_cmd", 5, &RodneyNode::gpioCallBack, this);
 
     // Advertise the topics we publish
     face_status_pub_ = nh_.advertise<std_msgs::String>("/robot_face/expected_input", 5);
@@ -76,7 +81,6 @@ RodneyNode::RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private)
     twist_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
     
     battery_low_count_ = 0;
-    mission_running_ = false;
     
     // Calculate the slope and y-intercept of the joytick input against linear speed
     lslope_ = max_linear_speed_/(MAX_AXES_VALUE_-dead_zone_);
@@ -87,7 +91,11 @@ RodneyNode::RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private)
     ayintercept_ = -(aslope_*dead_zone_);
     
     // Seed the random number generator
-    srand((unsigned)time(0));
+    srand((unsigned)time(0));    
+    
+    // Waiting for GPIO service to be available
+    ros::service::waitForService("gpio/output_cmd");
+    missionNotRunning();
     
     last_interaction_time_ = ros::Time::now();
 }
@@ -202,7 +210,7 @@ void RodneyNode::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
         keyboard_linear_speed_ = 0.0f; 
         keyboard_angular_speed_ = 0.0f;
         
-        manual_locomotion_mode_ = true;
+        manual_locomotion_mode_ = true;                
         
         last_interaction_time_ = ros::Time::now(); 
     }
@@ -266,10 +274,31 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         // Start a mission 
         std_msgs::String mission_msg;
         mission_msg.data = "M" + std::to_string(msg->code-keyboard::Key::KEY_0);
+        
+        // Add on parameters for different missions
+        switch(msg->code)
+        {
+            case keyboard::Key::KEY_1:
+                // Mission 1 "Take a message to.."
+                // "M1^patrol poses file|id of person to search for|message to deliver"                
+                mission_msg.data += "^" + waypoints_filename_ + "|1|Please walk Bonnie";
+                break;
+                
+            case keyboard::Key::KEY_4:
+                // Mission 4 "Go Home"
+                // "M4^patrol poses file""
+                mission_msg.data += "^" + waypoints_filename_;
+                break;
+                
+            default:
+                break;
+        }
+        
         mission_pub_.publish(mission_msg);
                     
-        mission_running_ = true; 
-        manual_locomotion_mode_ = false;        
+        missionRunning(); 
+        
+        manual_locomotion_mode_ = false;   
         
         last_interaction_time_ = ros::Time::now();                       
     }
@@ -335,7 +364,7 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         keyboard_linear_speed_ = 0.0f; 
         keyboard_angular_speed_ = 0.0f;
         
-        manual_locomotion_mode_ = true;
+        manual_locomotion_mode_ = true;        
         
         last_interaction_time_ = ros::Time::now();
     }
@@ -576,6 +605,60 @@ void RodneyNode::remHeartbeatCallback(const std_msgs::Empty::ConstPtr& msg)
     // Remote heartbeat received store the time
     remote_heartbeat_time_ = ros::Time::now();
 }
+//---------------------------------------------------------------------------
+
+// callback for change in GPIO input
+void RodneyNode::gpioCallBack(const pi_io::gpio_input::ConstPtr& msg)
+{
+    switch(msg->index)
+    {
+        case 0:
+            // Black push button changed state
+            // If mission running and button pressed, send cancel mission message          
+            if((mission_running_ == true) && (msg->value == true))
+            {
+                // Cancel the ongoing mission
+                std_msgs::Empty empty_msg;
+                cancel_pub_.publish(empty_msg); 
+            }
+            // If mission not running and button pressed, move head to user input position
+            else if((mission_running_ == false) && (msg->value == true))
+            {
+                std_msgs::String mission_msg;
+                mission_msg.data = "J3^i^-";
+                mission_pub_.publish(mission_msg);                            
+            }
+            break;  
+            
+        case 1:
+            // Yellow push button 
+            // If mission running and button pressed, send acknowledge mission stage message
+            if((mission_running_ == true) && (msg->value == true))
+            {
+                // Acknowledge a mission step
+                std_msgs::Empty empty_msg;
+                ack_pub_.publish(empty_msg);                               
+            }
+            // If mission not running and button pressed, send mission 4 command
+            else if((mission_running_ == false) && (msg->value == true))
+            {                
+                std_msgs::String mission_msg;
+                mission_msg.data = "M4^"+ waypoints_filename_;
+                
+                mission_pub_.publish(mission_msg);                    
+                missionRunning();                
+                manual_locomotion_mode_ = false;                                                
+            }
+            
+            break;
+            
+        default:
+            break;             
+    }
+    
+    last_interaction_time_ = ros::Time::now();
+}
+//---------------------------------------------------------------------------
 
 // Callback for main battery status
 void RodneyNode::batteryCallback(const sensor_msgs::BatteryState::ConstPtr& msg)
@@ -600,8 +683,7 @@ void RodneyNode::batteryCallback(const sensor_msgs::BatteryState::ConstPtr& msg)
     {
         // If the battery level goes low we wait a number of messages to confirm it was not a dip as the motors started
         if(battery_low_count_ > 1)
-        {
-        
+        {        
             status_msg.data = "Battery level LOW ";
         
             // Speak warning every 5 minutes        
@@ -627,7 +709,7 @@ void RodneyNode::batteryCallback(const sensor_msgs::BatteryState::ConstPtr& msg)
 
 void RodneyNode::completeCallBack(const std_msgs::String::ConstPtr& msg)
 {
-    mission_running_ = false;
+    missionNotRunning();
     
     last_interaction_time_ = ros::Time::now();
 }
@@ -760,12 +842,63 @@ float RodneyNode::rampedVel(float velocity_prev, float velocity_target, ros::Tim
 }
 //---------------------------------------------------------------------------
 
+void RodneyNode::missionNotRunning(void)
+{
+    mission_running_ = false;
+    
+    // Red LED off, Green LED on
+    ros::ServiceClient client = nh_.serviceClient<pi_io::gpio_output>("gpio/output_cmd");
+    pi_io::gpio_output srv;
+    
+    srv.request.index = 0;
+    srv.request.value = true;
+    client.call(srv);
+    
+    srv.request.index = 1;
+    srv.request.value = false;
+    client.call(srv);
+}
+//---------------------------------------------------------------------------
+
+void RodneyNode::missionRunning(void)
+{
+    mission_running_ = true;
+    
+    // Red LED on, Green LED off
+    ros::ServiceClient client = nh_.serviceClient<pi_io::gpio_output>("gpio/output_cmd");
+    pi_io::gpio_output srv;
+    
+    srv.request.index = 0;
+    srv.request.value = false;
+    client.call(srv);
+    
+    srv.request.index = 1;
+    srv.request.value = true;
+    client.call(srv);
+}
+//---------------------------------------------------------------------------
+
 int main(int argc, char **argv)
 {   
     ros::init(argc, argv, "rodney");
+    
     ros::NodeHandle nh;
     ros::NodeHandle nh_private("~");    
-    RodneyNode rodney_node(nh, nh_private);   
+    std::string waypoints_filename;
+    int opt;
+    
+    /* argument -m gives the file containing the patrol pose positions */
+    while((opt = getopt(argc, argv, ":m:")) != -1)
+    {
+        switch(opt)
+        {
+            case 'm':
+                waypoints_filename = std::string(optarg);                
+                break;
+        }
+    }
+        
+    RodneyNode rodney_node(nh, nh_private, waypoints_filename);   
     std::string node_name = ros::this_node::getName();
     ROS_INFO("%s started", node_name.c_str());
 	

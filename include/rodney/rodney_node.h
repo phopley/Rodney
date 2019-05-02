@@ -24,11 +24,12 @@
 #include <std_msgs/String.h>
 #include <std_msgs/Empty.h>
 #include <geometry_msgs/Twist.h>
+#include <pi_io/gpio_input.h>
 
 class RodneyNode
 {
 public:
-    RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private);
+    RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private, std::string);
     void sendTwist(void);
     void checkTimers(void);
     
@@ -46,6 +47,7 @@ private:
     ros::Subscriber demand_sub_;        // Topic for autonomous motor demands
     ros::Subscriber battery_status_sub_;// Topic to monitor battery status for the main battery
     ros::Subscriber remote_heartbeat_sub_;  // Topic to monitor the remote heartbeat when teleoping
+    ros::Subscriber gpio_sub_;          // Topic to monitor for changes in Rapsberry Pi GPIO input
     ros::Time last_twist_send_time_;    // Time of previous message
     ros::Time last_battery_warn_;       // Time of the last spoken battery warning message
     ros::Time last_interaction_time_;   // Time that a human last interacted with the robot
@@ -54,7 +56,9 @@ private:
     geometry_msgs::Twist last_twist_;   // The last Twist message sent   
     
     std::map<std::string,std::string> wav_file_names_; 
-    std::map<std::string,std::string> wav_file_texts_;  
+    std::map<std::string,std::string> wav_file_texts_;
+    
+    std::string waypoints_filename_;  
             
     bool mission_running_;
     bool manual_locomotion_mode_;
@@ -102,6 +106,10 @@ private:
     void motorDemandCallBack(const geometry_msgs::Twist::ConstPtr& msg);
     void batteryCallback(const sensor_msgs::BatteryState::ConstPtr& msg);
     void remHeartbeatCallback(const std_msgs::Empty::ConstPtr& msg);
+    void gpioCallBack(const pi_io::gpio_input::ConstPtr& msg);
+    
+    void missionRunning(void);
+    void missionNotRunning(void);
     
     geometry_msgs::Twist rampedTwist(geometry_msgs::Twist prev, geometry_msgs::Twist target,
                                      ros::Time time_prev, ros::Time time_now);
