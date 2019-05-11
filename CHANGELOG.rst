@@ -2,6 +2,10 @@
 Changelog for package rodney
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Unreleased
+------------------
+* Add control from web browser page control
+
 1.2.0 (2019-05-02)
 ------------------
 * changes to send mission data with mission 1 and 4

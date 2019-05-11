@@ -1,0 +1,1139 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+
+    <!--  load these links without specifying http or https i.e. using local copies -->
+    <link rel="stylesheet" type="text/css" href="scripts/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" href="scripts/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="scripts/font-awesome.min.css" />
+
+    <style>
+        * {
+            font-family: Verdana, Arial, sans-serif;
+        }
+
+        a:link {
+            color: #000;
+            text-decoration: none;
+        }
+
+        a:visited {
+            color: #000;
+        }
+
+        a:hover {
+            color: #33F;
+        }
+
+        .button {
+            background: -webkit-linear-gradient(top, #008dfd 0, #0370ea 100%);
+            border: 1px solid #076bd2;
+            border-radius: 3px;
+            color: #fff;
+            display: none;
+            font-size: 13px;
+            font-weight: bold;
+            line-height: 1.3;
+            padding: 8px 25px;
+            text-align: center;
+            text-shadow: 1px 1px 1px #076bd2;
+            letter-spacing: normal;
+        }
+
+        .center {
+            padding: 10px;
+            text-align: center;
+        }
+
+        .final {
+            color: black;
+            padding-right: 3px;
+        }
+
+        .cmd_err {
+            color: red;
+        }
+
+        .info {
+            font-size: 14px;
+            text-align: center;
+            color: #777;
+            display: none;
+        }
+
+        .right {
+            float: right;
+        }
+
+        .vcenter {
+            display: inline-block;
+            vertical-align: middle;
+            float: none;
+        }
+
+        #headline {
+            font-size: 40px;
+            font-weight: 300;
+        }
+
+        #info {
+            font-size: 20px;
+            text-align: center;
+            color: #777;
+            visibility: hidden;
+        }
+
+        #results {
+            font-size: 14px;
+            font-weight: bold;
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: left;
+            min-height: 100px;
+        }
+
+        #menu001.navbar-default .navbar-brand {
+            color: rgba(119, 119, 119, 1);
+        }
+
+        #menu001.navbar-default {
+            font-size: 20px;
+            background-color: rgba(224, 224, 224, 1);
+            border-width: 1px;
+            border-radius: 4px;
+        }
+
+        #menu001.navbar-default .navbar-nav > li > a {
+            color: rgba(119, 119, 119, 1);
+            background-color: rgba(248, 248, 248, 0);
+            padding-right: 50px;
+        }
+
+        #menu001.navbar-default .navbar-nav > li > a:hover,
+        #menu001.navbar-default .navbar-nav > li > a:focus {
+            color: rgba(51, 51, 51, 1);
+            background-color: rgba(248, 248, 248, 0);
+        }
+
+        #menu001.navbar-default .navbar-nav > .active > a,
+        #menu001.navbar-default .navbar-nav > .active > a:hover,
+        #menu001.navbar-default .navbar-nav > .active > a:focus {
+            color: rgba(85, 85, 85, 1);
+            background-color: rgba(231, 231, 231, 1);
+        }
+
+        #menu001.navbar-default .navbar-toggle {
+            border-color: #ddd;
+        }
+
+        #menu001.navbar-default .navbar-toggle:hover,
+        #menu001.navbar-default .navbar-toggle:focus {
+            background-color: #ddd;
+        }
+
+        #menu001.navbar-default .navbar-toggle .icon-bar {
+            background-color: #888;
+        }
+
+        #menu001.navbar-default .navbar-toggle:hover .icon-bar,
+        #menu001.navbar-default .navbar-toggle:focus .icon-bar {
+            background-color: #888;
+        }
+
+        #robot-url {
+            font-size: 25px;
+        }
+
+        #url {
+            font-size: 25px;
+        }
+    </style>
+</head>
+
+<body onload="init()">
+
+    <div class="page-header" style="text-align:center;margin-bottom:0" role="navigation">
+        <h1><b>Rodney Robot Control </b></h1>        
+    </div>
+
+    <div id="menu001" class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-menubuilder">
+                    <span class="sr-only">Toggle navigation</span><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span>
+                </button>
+            </div>
+            <div class="collapse navbar-collapse navbar-menubuilder">
+                <ul class="nav navbar-nav navbar-left">                   
+                    <li><a href="#" role="button" onclick="manualMode()">Manual Mode</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Mission <span class="caret"></span></a> 
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a class="dropdown-item" href="#" role="button" onclick="takeMessage()">Take a message to</a></li>
+                            <li><a href="#" role="button" onclick="greetAll()">Scan faces</a></li>
+                            <li><a href="#" role="button" onclick="goTo()">Go to</a></li>                            
+                            <li><a href="#" role="button" onclick="cancelMission()">Cancel Mission</a></li>
+                            <li><a href="#" role="button" onclick="acknowledgeMission()">Acknowledge Mission</a></li>
+                        </ul>
+                    </li>                           
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" onclick="setWakeupButton()" aria-expanded="false">Settings <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">                            
+                            <li><a href="#" id="wakeupButton" role="button" onclick="toggleWakeup()"> nil</a></li>
+                            <li><a href="#" id="showUnrecognizedButton" role="button" onclick="toggleUnrecognized()">Show Unrecognized Speech</a></li>                            
+                        </ul>
+                    </li>                    
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Help <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu"> 
+                            <li><a href="#" data-toggle="modal" data-target="#helpModal">Help</a></li>
+                            <li><a href="#" data-toggle="modal" data-target="#aboutModal">About</a></li>                        
+                        </ul>
+                    </li>                    
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <form role="form" class="form-horizontal" autocomplete="on" onsubmit="connect()">
+            <div id="robot-url" class="form-group form-group-lg">
+                <label for="robotUrlEntry" class="control-label col-xs-3">Robot URL:</label>
+                <div class="col-xs-6">
+                    <input type="url" name="url" id="robotUrlEntry" class="form-control input-lg"
+                           placeholder="https://" />
+                </div>
+                <div class="col-xs-3">
+                    <button type="button" id="connectButton" class="btn btn-primary btn-lg" style="font-size:25" onclick="connect()">
+                        <strong>Connect</strong>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="container-fluid">
+        <p id="missionTitle">Mission</p>
+        <form role="form" class="form-inline">
+            <div class="form-group">
+                <label for="us1r" id="dataName1"> </label>
+                <input type="text" class="form-control" id="data1">
+            </div>
+            <div class="form-group">
+                <label for="urs2" id="dataName2"> </label>
+                <input type="text" class="form-control" id="data2">
+            </div>
+            <button type="button" btn btn-default" id="submitButton" onclick="submitMission()">Submit</button>
+        </form>
+    </div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-4">
+            </div>
+            <div class="col-xs-4" style="text-align:center">
+                <p>
+                    <a class="fa fa-arrow-up fa-4x" id="arrowUp" onclick="arrowUp()" data-toggle="tooltip" data-placement="left" title="Forward"></a>
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-4" style="text-align:center">
+                <p>
+                    <a class="fa fa-rotate-left fa-4x vcenter" onclick="arrowLeft() " data-toggle="tooltip" data-placement="left" title="Rotate Left"></a>
+                </p>
+            </div>
+
+            <div class="col-xs-4" style="text-align:center">
+                <span id='start_button' class="fa-stack fa-3x vcenter"
+                      onclick="startButton(event)" alt="Start">
+                    <i id='mic-bg' class="fa fa-circle fa-stack-2x" style="color:#A8A8A8;"></i>
+                    <i id='mic' class="fa fa-microphone fa-stack-1x fa-inverse"></i>
+                    <i id='mic-slash' class="fa fa-microphone-slash fa-stack-1x
+	  		    	fa-inverse" style="display:none;"></i>
+                </span>
+            </div>
+
+            <div class="col-xs-4 vcenter" style="text-align:center">
+                <p>
+                    <a class="fa fa-rotate-right fa-4x" onclick="arrowRight()" data-toggle="tooltip" data-placement="left" title="Rotate Right"></a>
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-4">
+            </div>
+            <div class="col-xs-4 vcenter" style="text-align:center">
+                <p>
+                    <a class="fa fa-arrow-down fa-4x" onclick="arrowDown()" data-toggle="tooltip" data-placement="left" title="Back"></a>
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-2">
+            </div>
+            <div class="col-xs-8 vcenter" style="text-align:center">
+                <button type="button" class="btn btn-danger btn-lg btn-block" style="font-size:25" onclick="stopButton()">
+                    <strong>Stop</strong>
+                </button>
+            </div>
+        </div>
+
+        <div id="info">
+            <p id="info_none"><br><br></p>
+            <p id="info_start">Click on the microphone and begin speaking.</p>
+            <p id="info_speak_now">Speak now.<br><br></p>
+            <p id="info_no_speech">
+                No speech was detected. You may need to adjust your
+                <a href="//support.google.com/chrome/bin/answer.py?hl=en&amp;answer=1407892">
+                    microphone settings
+                </a>.
+            </p>
+            <p id="info_no_microphone" style="display:none">
+                No microphone was found. Check that one is installed and that
+                <a href="//support.google.com/chrome/bin/answer.py?hl=en&amp;answer=1407892">
+                    microphone settings
+                </a> are correct.
+            </p>
+            <p id="info_allow">Click the "Allow" button to enable your microphone. Using the https version helps avoid this.</p>
+            <p id="info_denied">Permission to use microphone was denied.</p>
+            <p id="info_blocked">Permission to use microphone is blocked. To change, go to chrome://settings/contentExceptions#media-stream</p>
+            <p id="info_upgrade">This browser doesn't support the Web Speech API. Use <a href="//www.google.com/chrome">Chrome</a> version 25 or later.</p>
+        </div>
+        <div class="modal" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="usingSpeech"><strong>Using Speech Commands</strong></h4>
+                    </div>
+                    <div class="modal-body">
+                        <p id="commandHeader"><strong>Commands</strong></p>
+                        <p>forward, ahead, go ahead</p>
+                        <p>reverse, backward, back, go back</p>                        
+                        <p>rotate right</p>
+                        <p>rotate left</p>
+                        <p>stop, halt, cancel</p>
+                        <p>faster, speed up</p>
+                        <p>slower, slow down</p>
+                        <p>camera left, camera right, camera up, camera down, camera forward, camera centre</p>
+                        <p>head left, head right, head up, head down, head forward, head centre</p>
+                        <p>manual mode</p>
+                        <p>go home, go to ____ (Mission 4)</p>
+                        <p>acknowledge</p>                        
+                        <p>scan faces (Mission 2)</p>
+                        <p>help</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="aboutModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="aboutSpeech">About Speech Commands</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Rodney Robot Control is for controlling the ROS Rodney Robot designed by Phil Hopley</p>
+                        <p>Project Wiki https://github.com/phopley/rodney-project/wiki</p>
+                        <p>The control idea is based on Ubiquity Robotics Speech Commands</p>
+                        <p>Repository: https://github.com/UbiquityRobotics/speech_commands</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Camera/head control -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-xs-4">
+                </div>
+                <div class="col-xs-4" style="text-align:center">
+                    <p>
+                        <a class="fa fa-arrow-circle-up fa-4x" id="headDown" onclick="headDown()" data-toggle="tooltip" data-placement="left" title="Camera Down"></a>
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-4" style="text-align:center">
+                    <p>
+                        <a class="fa fa-arrow-circle-left fa-4x" id="headLeft" onclick="headLeft()" data-toggle="tooltip" data-placement="left" title="Camera Left"></a>
+                    </p>
+                </div>
+                <div class="col-xs-4" style="text-align:center">
+                    <p>
+                        <a class="fa fa-stop fa-4x" id="headCentre" onclick="headCentre()" data-toggle="tooltip" data-placement="left" title="Camera Centre"></a>
+                    </p>
+                </div>
+                <div class="col-xs-4" style="text-align:center">
+                    <p>
+                        <a class="fa fa-arrow-circle-right fa-4x" id="headRight" onclick="headRight()" data-toggle="tooltip" data-placement="left" title="Camera Right"></a>
+                    </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-4">
+                </div>
+                <div class="col-xs-4" style="text-align:center">
+                    <p>
+                        <a class="fa fa-arrow-circle-down fa-4x" id="headUp" onclick="headUp()" data-toggle="tooltip" data-placement="left" title="Camera Up"></a>
+                    </p>
+                </div>
+            </div>        
+        </div>
+        
+        <!-- Command log area -->
+        <div id="results">
+            Command Log:
+            <div style="height: 100px; overflow: auto;">
+                <table id="commandLog"></table>
+            </div>
+            <br>
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="scripts/jquery.min.js"></script>
+    <script type="text/javascript" src="scripts/bootstrap.min.js"></script>
+    <script type="text/javascript" src="scripts/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="scripts/eventemitter2.min.js"></script>
+    <script type="text/javascript" src="scripts/roslib.min.js"></script>
+    <script type="text/javascript" src="scripts/bootbox.min.js"></script>
+
+    <script type="text/javascript">
+
+        var mission = "";
+        var connected = false;
+        var ros;									    // this will be the connection to ROS
+        var linearSpeed = 0.25, angularSpeed = 1.0;		// initial speed        					        
+        var robotUrl;
+        var mic, micSlash, micBg;
+        var recognizing = false;
+        var recognition;
+        var noRestartReco;
+        var startTimestamp;
+        var useWakeup = false;                                               
+        var speedFactor = 1.0;                          // multiplies or divides speed to go faster or slower                                             
+        var wakeup = ["robot", "rodney"];            
+        var showUnrecognized = false;
+            
+
+        function takeMessage() {
+            // Mission 1
+            // setup and wait for submit button
+            mission = "M1";
+            document.getElementById('missionTitle').textContent = "Mission1 'Take message to'. Enter Subject ID, Message and click Submit";
+            var element = document.getElementById('data1');
+            element.disabled = false;
+            element.value = "";
+            element = document.getElementById('data2');
+            element.disabled = false;
+            element.value = "";
+            document.getElementById('dataName1').textContent = "Subject ID:";
+            document.getElementById('dataName2').textContent = "Message:";
+            document.getElementById('submitButton').disabled = false;
+        }
+
+        function greetAll() {
+            // Mision 2
+            // setup and run
+            mission = "M2";
+            document.getElementById('missionTitle').textContent = "Mission";
+            var element = document.getElementById('data1');
+            element.disabled = true;
+            element.value = "";
+            element = document.getElementById('data2');
+            element.disabled = true;
+            element.value = "";
+            document.getElementById('dataName1').textContent = " ";
+            document.getElementById('dataName2').textContent = " ";
+            document.getElementById('submitButton').disabled = true;
+            
+            if (connected) { 
+                getMissionStatus();                   
+                sendCommandMessage("M2");
+                addLog("Mission 2");
+            }              
+        }
+
+        function goTo() {
+            // Mission 4
+            // setup and wait for submit button
+            mission = "M4";
+            document.getElementById('missionTitle').textContent = "Mission4 'Go to'. Leave blank for 'home' or enter waypoint and click Submit";
+            var element = document.getElementById('data1');
+            element.disabled = false;
+            element.value = "";
+            element = document.getElementById('data2');
+            element.disabled = true;
+            element.value = "";
+            document.getElementById('dataName1').textContent = "Waypoint:";
+            document.getElementById('dataName2').textContent = " ";
+            document.getElementById('submitButton').disabled = false;                
+        }
+
+        function submitMission() {
+            if (connected) {
+                if (mission == "M1") {
+                    // Form the complete message
+                    mission += "^" + document.getElementById('data1').value + "^" + document.getElementById('data2').value;                        
+                    // Before sending the command subscribe to the message that will report when mission complete
+                    getMissionStatus();                                                
+                    sendCommandMessage(mission);
+                    addLog("Mission " + mission);
+                }
+                else if (mission == "M4") {
+                    if (document.getElementById('data1').value != "") {
+                        mission += "^" + document.getElementById('data1').value;
+                    }                        
+                    getMissionStatus();
+                    sendCommandMessage(mission);
+                    addLog("Mission " + mission);
+                }
+            }                                  
+        }
+            
+        function getMissionStatus() {
+            // Subscribe to message we want to see from the robot
+            var missionStatusListener = new ROSLIB.Topic({
+                ros : ros,
+                name : '/missions/mission_complete',
+                messageType : 'std_msgs/String'
+            });
+             
+            // When roslibjs receives the message it will call the inline function given here   
+            missionStatusListener.subscribe(function(message) {
+                addLog(message.data);
+                missionStatusListener.unsubscribe();
+            }); 
+        }
+
+        function headDown() {
+            // Send command to move head/camera down
+            if (connected) {
+                sendCommandMessage("J3^d^-");
+                addLog("Camera down");
+            }
+        }
+            
+        function headUp() {
+            // Send command to move head/camera up
+            if (connected) {
+                sendCommandMessage("J3^u^-");
+                addLog("Camera up");
+            }
+        }            
+
+        function headLeft() {
+            // Send command to move head/camera left
+            if (connected) {
+                sendCommandMessage("J3^-^l");
+                addLog("Camera left");
+            }
+        }
+
+        function headRight() {
+            // Send command to move head/camera right
+            if (connected) {                
+                sendCommandMessage("J3^-^r");
+                addLog("Camera right");
+            }
+        }
+          
+        function headCentre() {
+            // Send command to move head/camera to centre position
+            if (connected) {
+                sendCommandMessage("J3^c^-");
+                addLog("Camera centre");
+            }
+        }         
+                                         
+        function setMicInactive() {
+            micBg.style.color = "Gray";
+            micSlash.style.display = "none";
+        }
+        
+        function setMicActive() {
+            micBg.style.color = "#00cc00";    // green
+            micSlash.style.display = "none";
+        }
+        
+        function setMicOff() {
+            micBg.style.color = "Gray";
+            micSlash.style.display = "inline";
+        }
+        
+        function addLog(text, textColor) {
+            var table = document.getElementById("commandLog");
+            var row = table.insertRow(0);
+            var cell1 = row.insertCell(0);
+            if (textColor) {
+                cell1.style.color = "red";
+            }
+            cell1.innerHTML = text;
+        }
+
+        /**
+        * Setup GUI elements when the page is loaded and start a timer for the heartbeat message
+        */
+        function init() {
+            var temp;
+            micBg = document.getElementById("mic-bg");
+            mic = document.getElementById("mic");
+            micSlash = document.getElementById("mic-slash");
+            if (localStorage.firstResultOK === undefined) {
+                localStorage.firstResultOK = 0;
+            }
+            if (localStorage.otherResultOK === undefined) {
+                localStorage.otherResultOK = 0;
+            }
+            if (localStorage.robotUrl !== undefined) {
+                temp = localStorage.robotUrl;		// use the last robot address
+            } else {
+                temp = "wss://" + location.hostname + ":9090";  //guess at it
+            }
+            document.getElementById("robotUrlEntry").value = temp;
+            showInfo("info_none")
+
+            var dataForm = document.getElementById('data1');
+            dataForm.disabled = true;
+            dataForm = document.getElementById('data2');
+            dataForm.disabled = true;
+            dataForm = document.getElementById('submitButton');
+            dataForm.disabled = true;
+
+            window.setInterval(function () {
+                if (connected) {
+                    sendHeartbeat();
+                }
+            }, 500); // 0.5 seconds
+        }
+
+        // Function to send the remote heartbeat message
+        // If this message is not received by Rodney at least once a second
+        // the robor will stop using the stored manual twist message.
+        function sendHeartbeat() {
+            var beat = new ROSLIB.Topic({
+                ros: ros,
+                name: 'remote_heartbeat',
+                messageType: 'std_msgs/Empty'
+            });
+
+            var heartbeat = new ROSLIB.Message({
+
+            });
+
+            beat.publish(heartbeat);
+        }
+
+        // Function to send robot command message.
+        // This message contains a command and command message data
+        function sendCommandMessage(messageData) {
+            console.log("sending command: " + messageData);
+
+            var cmdMsg = new ROSLIB.Topic({
+                ros: ros,
+                name: 'rodney/web_command',
+                messageType: 'std_msgs/String'
+            });
+
+            var message = new ROSLIB.Message({
+                data: messageData
+            });
+
+            cmdMsg.publish(message);
+        }
+
+        function manualMode() {
+            if (connected) {
+                sendCommandMessage('t');
+                addLog("Manual mode selected");
+            }
+        }
+
+        function cancelMission() {
+            if (connected) {
+                sendCommandMessage('c');
+                addLog("cancel mission button");
+            }
+        }
+        
+        function acknowledgeMission() {
+            if (connected) {
+                sendCommandMessage('a');
+                addLog("Acknowledge mission");
+            }       
+        }
+
+        function connect() {
+            var connectButton;
+            if (connected) {			// disconnect                    
+                ros.close();
+            } 
+            else {
+                robotUrl = document.getElementById("robotUrlEntry").value.trim();
+                if (robotUrl == '') {
+                    bootbox.alert("Please supply the robot's URL and port");
+                    return;
+                }
+                robotUrl = robotUrl.replace("https:", "wss:");
+                robotUrl = robotUrl.replace("http:", "ws:");
+                if ((robotUrl.slice(0, 5) != "wss://") && (robotUrl.slice(0, 4) != "ws://") &&
+                        (robotUrl.charAt(robotUrl.length - 5) != ":")) {
+
+                    var r = bootbox.alert
+                        ("The robot's URL should begin with http, https, ws, or wss, " +
+                         "and end with a port number, like ':9090'.");
+                    return;
+                }
+                ros = new ROSLIB.Ros({  // Connecting to ROS
+                    url: robotUrl
+                });
+            }
+
+            ros.on('connection', function () {
+                var connectButton;
+                console.log('Connected to websocket server.');
+                localStorage.robotUrl = robotUrl;
+                connectButton = document.getElementById("connectButton");
+                connectButton.innerHTML = "Disconnect";
+                connectButton.style.background = "#00cc00";    		// green
+                connected = true;                                           
+            });
+
+            ros.on('error', function (error) {
+                console.log(error);
+                bootbox.alert('Error connecting to websocket server. ' + error);
+            });
+
+            ros.on('close', function () {
+                var connectButton;
+                if (connected) {			// throw away a second call
+                    connected = false;
+                    connectButton = document.getElementById("connectButton");
+                    connectButton.style.background = "#006dcc";
+                    connectButton.innerHTML = "Connect";
+                    console.log('Connection to websocket server closed.');                        
+                }
+            });
+
+        }
+
+        function startRecognition() {
+
+            if (!('webkitSpeechRecognition' in window)) {
+                showInfo('info_upgrade');
+            } else {
+
+                recognition = new webkitSpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 10;
+                showInfo('info_start');
+
+                recognition.onstart = function () {
+                    recognizing = true;
+                    showInfo('info_speak_now');
+                    console.log('onstart');
+                    setMicActive();
+                };
+                recognition.onerror = function (event) {
+                    console.log('speech recognition error:' + ' ' + event.error);
+
+                    if (event.error == 'no-speech') {
+                        setMicInactive();                            
+                        noRestartReco = false;
+                    }
+                    if (event.error == 'audio-capture') {
+                        setMicInactive();
+                        showInfo('info_no_microphone');
+                        noRestartReco = true;
+                    }
+                    if (event.error == 'not-allowed') {
+                        if (event.timeStamp - startTimestamp < 100) {
+                            showInfo('info_blocked');
+                        } else {speedFactor
+                            showInfo('info_denied');
+                        }
+                        noRestartReco = true;
+                    }
+                }
+
+                recognition.onend = function () {
+                    console.log('onend; ' + (noRestartReco ? "dont restart" : "do restart"));
+                    recognizing = false;
+                    if (noRestartReco) {
+                        return;
+                    }
+                    showInfo('');
+                    restartReco();
+                }
+
+                recognition.onresult = function (event) {
+                    console.log('recognition.onresult');
+                    
+                    var message = "";
+                    
+                    var commands = '';
+                    var x = 0, y = 0, z = 0; 		// linear x and y movement and angular z movement
+
+                    var commandFound = false;
+                    var result;
+                    var topCandidate = "";
+                    var allResults = "";
+                    var dist = 0;
+                    var altNumber;
+                    if (event.results.length > 0) {		// we have an array of recognition candidates
+                        result = event.results[0];
+                        if (recognition.continuous == true) { recognition.stop() }
+
+                        testAllCandidates:
+                            for (var i = 0; i < result.length; ++i) {
+                                candidate = result[i].transcript.toLowerCase().trim();
+                                var words = candidate.match(/[-\w]+/g); 				// parses candidate to array of words
+                                if (useWakeup) {
+                                    if (wakeup.indexOf(words[0]) >= 0) {			// if the first word is a wakeup word
+                                        words.splice(0, 1);							// remove it
+                                        if (i == 0) {
+                                            topCandidate = words.join(' ');
+                                        }
+                                    } else {
+                                        continue;
+                                    }
+                                }
+                                if (words.length >= 2) {
+                                    if (words[0] == 'go' && words[1] != 'to' && words[1] != 'home') {
+                                        words.splice(0, 1);		// remove superfluous "go"
+                                    }
+                                }
+                                commandFound = true;
+                                testCandidate: switch (words[0]) {
+                                    case 'forward':
+                                    case 'foreword':                                       
+                                    case 'ahead':
+                                        arrowUp();
+                                        break testCandidate;
+                                        
+                                    case "reverse":
+                                    case "backward":
+                                    case "back":
+                                        arrowDown();
+                                        break testCandidate;
+                                        
+                                    case "rotate":
+                                        if (words.length != 2) {                                                
+                                            commandFound = false;
+                                            break testCandidate;
+                                        }
+
+                                        rotswitch: switch (words[1]) {
+                                            case "right":
+                                                arrowRight();
+                                                break rotswitch;
+                                            case "left":
+                                                arrowLeft();
+                                                break rotswitch;
+                                            default:
+                                                commandFound = false;
+                                                break testCandidate;
+                                        }                                            
+                                        break testCandidate;
+                                        
+                                    case "stop":
+                                    case "cancel":
+                                    case "halt":
+                                        stopButton();
+                                        break testCandidate;
+                                        
+                                    case "acknowledge":                                    
+                                        acknowledgeMission();
+                                        break testCandidate;
+                                        
+                                    case "camera":
+                                    case "head":
+                                        if (words.length != 2) {                                                
+                                            commandFound = false;
+                                            break testCandidate;
+                                        }
+                                        
+                                        camswitch: switch (words[1]) {
+                                            case "left":
+                                                headLeft();
+                                                break camswitch;
+                                            case "right":
+                                                headRight();
+                                                break camswitch;
+                                            case "up":
+                                                headUp();
+                                                break camswitch;
+                                            case "down":
+                                                headDown();
+                                                break camswitch;
+                                            case "forward":
+                                            case "foreword":
+                                            case "centre":
+                                            case "center":
+                                                headCentre();
+                                                break camswitch;
+                                            default:
+                                                commandFound = false;
+                                                break testCandidate;
+                                        }
+                                        
+                                    case "manual":
+                                        if (words.length == 2) {                                                                                         
+                                            if (words[1] == "mode")
+                                            {                                                
+                                                manualMode();
+                                            } else {
+                                                commandFound = false;
+                                            }
+                                            
+                                        } else {
+                                            commandFound = false;
+                                        }
+                                        break testCandidate;
+                                        
+                                    case "scan":
+                                        if (words.length == 2) {                                                                                         
+                                            if (words[1] == "faces")
+                                            {                                                
+                                                if (connected) {
+                                                    getMissionStatus();
+                                                    sendCommandMessage("M2");
+                                                    addLog("Mission - Scan for known faces");
+                                                }
+                                            } else {
+                                                commandFound = false;
+                                            }
+                                            
+                                        } else {
+                                            commandFound = false;
+                                        }
+                                        break testCandidate;                                        
+                                    
+                                    case "faster":
+                                        speedFactor *= 1.1;
+                                        addLog("Speed rate changed");                                        
+                                        break testCandidate;
+                                    case "speed":
+                                        if (words[1] == "up") {
+                                            speedFactor *= 1.1;
+                                            addLog("Speed rate changed");                                            
+                                        } else {
+                                            commandFound = false;
+                                        }
+                                        break testCandidate;
+                                    case "slower":
+                                        speedFactor /= 1.1;
+                                        addLog("Speed rate changed");                                        
+                                        break testCandidate;
+                                    case "slow":
+                                        if (words[1] == "down") {
+                                            speedFactor /= 1.1;
+                                            addLog("Speed rate changed");                                            
+                                        } else {
+                                            commandFound = false;
+                                        }
+                                        break testCandidate;
+                                        
+                                    case "help":
+                                        $('#helpModal').modal('show');
+                                        break testAllCandidates;
+                                        
+                                    default:
+                                        commandFound = false;
+                                        break testCandidate;
+                                }
+
+                                // it may yet be a go to waypoint command
+                                if (!commandFound) {
+                                    if (words && words.length > 1) {
+                                        if (words.length > 2 && words[0] == "go" && words[1] == "to") {		// go to waypoint
+                                            commandFound = true;
+                                            if (connected) {
+                                                getMissionStatus();
+                                                var wayPointCommand = "M4^" + words.slice(2).join("_");
+                                                sendCommandMessage(wayPointCommand);
+                                                addLog("Mission - Go to waypoint");
+                                            }
+                                        } else if (words.length == 2 && words[0] == "go" && words[1] == "home") {	// go home
+                                            commandFound = true;
+                                            if (connected) {
+                                                getMissionStatus();
+                                                sendCommandMessage("M4");
+                                                addLog("Mission - Go home");
+                                            }
+                                        }
+                                    }
+                                }
+                                allResults += "/" + candidate;
+                                if (commandFound === true) {
+                                    altNumber = i;
+                                    break testAllCandidates;
+                                }
+                            }		// end of for loop
+
+                        console.log(allResults);
+                        if (showUnrecognized) { addLog(allResults); }
+                        if (commandFound) {								// publish the command
+                            commands = candidate + " (alt. #" + (altNumber + 1) + " of " + results.length + ") " + commands;
+                            commands = commands.slice(0, 50);                                
+                            addLog(commands);
+
+                            // Research: Keep count of how often we used the first result
+                            if (altNumber == 0) {
+                                localStorage.firstResultOK = Number(localStorage.firstResultOK) + 1;
+                            } else {
+                                localStorage.otherResultOK = Number(localStorage.otherResultOK) + 1;
+                            }
+                            console.log("First answer recognition rate is " + ((100 * Number(localStorage.firstResultOK)) /
+                                (Number(localStorage.firstResultOK) + Number(localStorage.otherResultOK))).toFixed(2) + "%");
+                        } else if (topCandidate != "") {
+                            addLog(topCandidate.toLowerCase() + " is not recognized as a command", "red");
+                        }
+                    } // end of recognition candidates
+
+                }	// end of onresult
+            }
+        }		// end of function startRecpgnition
+
+
+        // Function to display text information below the Stop button (not the command log)
+        function showInfo(s) {
+            if (s) {
+                for (var child = info.firstChild; child; child = child.nextSibling) {
+                    if (child.style) {
+                        child.style.display = child.id == s ? 'inline' : 'none';
+                    }
+                }
+                info.style.visibility = 'visible';
+            } else {
+                info.style.visibility = 'hidden';
+            }
+        }
+
+        function startButton(event) {
+            console.log('startButton event');
+
+            if (recognizing) {
+                recognition.stop();
+                console.log('recognition stopped');
+                noRestartReco = true;
+                setMicInactive()
+                showInfo('info_none');
+                return;
+            }
+            if (!(recognition || 0)) {
+                startRecognition();
+            }
+            if (recognition || 0) {
+                recognition.lang = "en-UK";
+                recognition.start();
+                noRestartReco = false;
+                setMicOff()
+                showInfo('info_allow');                    
+                startTimestamp = event.timeStamp;
+            }
+        }
+
+        function restartReco() {                
+            recognition.start();
+            noRestartReco = false;
+            recognizing = true;
+            setMicActive();
+        }
+
+        function arrowUp() {
+            if (connected) {
+                var speed = speedFactor * linearSpeed;
+                var message = 't^' + speed + '^0.0';
+                sendCommandMessage(message);
+                addLog("Forward command");
+            }
+        }
+
+        function arrowDown() {
+            if (connected) {
+                var speed = speedFactor * linearSpeed;
+                var message = 't^' + -speed + '^0.0';
+                sendCommandMessage(message);
+                addLog("Backward command");
+            }
+        }
+
+        function arrowRight() {
+            if (connected) {
+                var speed = speedFactor * angularSpeed;
+                var message = 't^0.0^' + -speed;
+                sendCommandMessage(message);
+                addLog("Rotate right command");
+            }
+        }
+
+        function arrowLeft() {
+            if (connected) {
+                var speed = speedFactor * angularSpeed;
+                var message = 't^0.0^' + speed;
+                sendCommandMessage(message);
+                addLog("Rotate left command");
+            }
+        }
+
+        function stopButton() {
+            if (connected) {                    
+                var message = 't^0.0^0.0';
+                sendCommandMessage(message);
+                // Also send a cancel mission message
+                sendCommandMessage('c');
+                addLog("Stop/cancel command");
+            }
+        }
+
+
+        function toggleWakeup() {
+            useWakeup = !useWakeup;
+            setWakeupButton();
+        }
+
+
+        function setWakeupButton() {
+            if (useWakeup === false) {
+                document.getElementById("wakeupButton").innerHTML = "Wakeup word is not required";
+                document.getElementById("commandHeader").innerHTML = "<strong>Commands</strong>";
+            } else {
+                document.getElementById("wakeupButton").innerHTML = 'Wakeup word "Robot" or "Roney" is required';
+                document.getElementById("commandHeader").innerHTML = '<strong>Commands--must be preceded by the word "Robot" or "Rodney"</strong>';
+            }
+        }
+
+        function toggleUnrecognized() {
+            showUnrecognized = !showUnrecognized;
+            setshowUnrecognizedButton();
+        }
+
+        function setshowUnrecognizedButton() {
+            if (showUnrecognized === false) {
+                $('#showUnrecognizedButton').html('Not showing unrecognized speech');
+            } else {
+                document.getElementById("showUnrecognizedButton").innerHTML = "Showing unrecognized speech";
+            }
+        }
+
+    </script>
+</body>
+</html>

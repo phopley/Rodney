@@ -18,6 +18,7 @@
 #include <ros/package.h>
 #include <robot_localization/SetPose.h>
 #include <pi_io/gpio_output.h>
+#include <boost/algorithm/string.hpp>
 
 // Constructor 
 RodneyNode::RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private, std::string waypoints_filename)
@@ -28,6 +29,9 @@ RodneyNode::RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private, std::string
 
     joystick_linear_speed_ = 0.0f;
     joystick_angular_speed_ = 0.0f;
+    
+    web_linear_speed_ = 0.0f;
+    web_angular_speed_ = 0.0f;
         
     linear_mission_demand_ = 0.0f;
     angular_mission_demand_ = 0.0f;
@@ -58,12 +62,14 @@ RodneyNode::RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private, std::string
     nh_private_.getParam("/rodney/sounds/filenames", wav_file_names_);
     nh_private_.getParam("/rodney/sounds/text", wav_file_texts_);
      
-    // Subscribe to receive keyboard input, joystick input, mission complete, battery state and remote heartbeat
+    // Subscribe to receive keyboard input, joystick input, mission complete, battery state, 
+    // remote heartbeat and web command topics
     key_sub_ = nh_.subscribe("keyboard/keydown", 5, &RodneyNode::keyboardCallBack, this);
     joy_sub_ = nh_.subscribe("joy", 1, &RodneyNode::joystickCallback, this);
     mission_sub_ = nh_.subscribe("/missions/mission_complete", 5, &RodneyNode::completeCallBack, this);
     battery_status_sub_ = nh_.subscribe("main_battery_status", 1, &RodneyNode::batteryCallback, this);
     remote_heartbeat_sub_ = nh_.subscribe("remote_heartbeat", 1, &RodneyNode::remHeartbeatCallback, this);
+    web_command_sub_ = nh_.subscribe("rodney/web_command", 5, &RodneyNode::webComCallback, this);
     
     // The cmd_vel topic below is the command velocity message to the motor driver.
     // This can be created from either keyboard or game pad input when in manual mode or from the this 
@@ -98,6 +104,121 @@ RodneyNode::RodneyNode(ros::NodeHandle n, ros::NodeHandle n_private, std::string
     missionNotRunning();
     
     last_interaction_time_ = ros::Time::now();
+}
+//---------------------------------------------------------------------------
+
+void RodneyNode::webComCallback(const std_msgs::String::ConstPtr& msg)
+{
+    // First split the command string into vectors. Seperator is '^' character
+    std::string text = msg->data;    
+    std::vector<std::string> results;    
+    boost::split(results, text, [](char c){return c == '^';});
+    
+    std::vector<int>::size_type length = results.size();
+    
+    // check that we have at least one vector
+    if(length > 0)
+    {
+        // Test for teleop command
+        if(results[0] == "t")
+        {
+            // If no other parameters then switch to manual mode
+            if(length == 1)
+            {
+                // Command to switch to manual locomotion
+                if(mission_running_ == true)
+                {
+                    // Cancel the ongoing mission
+                    std_msgs::Empty empty_msg;
+                    cancel_pub_.publish(empty_msg);                        
+                }
+        
+                // Reset speeds to zero           
+                keyboard_linear_speed_ = 0.0f; 
+                keyboard_angular_speed_ = 0.0f;
+                web_linear_speed_ = 0.0f;
+                web_angular_speed_ = 0.0f;
+                
+                manual_locomotion_mode_ = true;        
+            }                        
+            else if((length == 3) && (manual_locomotion_mode_ == true))
+            {
+                // Teleop command should have two more parameters
+                web_linear_speed_ = std::stof(results[1], NULL);
+                web_angular_speed_ = std::stof(results[2], NULL);
+            }
+            else
+            {
+                ; // Do nothing
+            }
+        }
+        else if(results[0] == "M1")
+        {           
+            if(length == 3)
+            {                
+                std_msgs::String mission_msg;
+                mission_msg.data = results[0] + "^" + waypoints_filename_ + "|" + results[1] + "|" + results[2]; 
+                mission_pub_.publish(mission_msg);                    
+                missionRunning();        
+                manual_locomotion_mode_ = false;            
+            }
+        }
+        else if (results[0] == "M2")
+        {        
+            std_msgs::String mission_msg;
+            mission_msg.data = results[0];
+            mission_pub_.publish(mission_msg);                    
+            missionRunning();        
+            manual_locomotion_mode_ = false;   
+        }
+        else if (results[0] == "M4")
+        {
+            std_msgs::String mission_msg;
+            // If length is 1 then the mission is to go home, otherwise got to given waypoint
+            if(length == 1)
+            {
+                mission_msg.data = results[0] + "^" + waypoints_filename_;
+            }
+            else
+            {
+                mission_msg.data = results[0] + "^" + waypoints_filename_ + "|" + results[1];                
+            }            
+            
+            mission_pub_.publish(mission_msg);                    
+            missionRunning();        
+            manual_locomotion_mode_ = false;            
+        }
+        else if(results[0] == "c")
+        {
+            // command to cancel mission
+            if(mission_running_ == true)
+            {
+                // Cancel the ongoing mission
+                std_msgs::Empty empty_msg;
+                cancel_pub_.publish(empty_msg);                                                       
+            } 
+        }
+        else if(results[0] == "a")
+        {
+            if(mission_running_ == true)
+            {
+                std_msgs::Empty empty_msg;
+                ack_pub_.publish(empty_msg);
+            }
+        }
+        else if(results[0] == "J3")
+        {
+            if(manual_locomotion_mode_ == true)
+            {
+                // It's a move head command which can be passed straight on
+                std_msgs::String mission_msg;   
+                mission_msg.data = text;
+                mission_pub_.publish(mission_msg);
+            }
+        }    
+        
+        last_interaction_time_ = ros::Time::now();   
+    }
 }
 //---------------------------------------------------------------------------
 
@@ -209,6 +330,8 @@ void RodneyNode::joystickCallback(const sensor_msgs::Joy::ConstPtr& msg)
         // Reset speeds to zero           
         keyboard_linear_speed_ = 0.0f; 
         keyboard_angular_speed_ = 0.0f;
+        web_linear_speed_ = 0.0f;
+        web_angular_speed_ = 0.0f;
         
         manual_locomotion_mode_ = true;                
         
@@ -352,7 +475,7 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
     else if((msg->code == keyboard::Key::KEY_m) && ((msg->modifiers & ~RodneyNode::SHIFT_CAPS_NUM_LOCK_) == 0))
     {
         // 'm' or 'M', set locomotion mode to manual (any missions going to auto should set manual_locomotion_mode_ to false)
-        // When in manual mode user can teleop Rodney with keyboard or joystick
+        // When in manual mode user can teleop Rodney with keyboard, joystick or web
         if(mission_running_ == true)
         {
             // Cancel the ongoing mission
@@ -363,6 +486,9 @@ void RodneyNode::keyboardCallBack(const keyboard::Key::ConstPtr& msg)
         // Reset speeds to zero           
         keyboard_linear_speed_ = 0.0f; 
         keyboard_angular_speed_ = 0.0f;
+        web_linear_speed_ = 0.0f;
+        web_angular_speed_ = 0.0f;
+        
         
         manual_locomotion_mode_ = true;        
         
@@ -742,16 +868,27 @@ void RodneyNode::sendTwist(void)
     // If in manual locomotion mode use keyboard or joystick data
     if(manual_locomotion_mode_ == true)
     {
-        // Only allow stored keyboard or joystick values to set  
+        // Only allow stored keyboard, joystick or web values to set  
         // the velocities if the remote heartbeat is running
         if((ros::Time::now() - remote_heartbeat_time_).toSec() < 1.0)
         {        
-            // Publish message based on keyboard or joystick speeds
+            // Publish message based on keyboard, joystick or web speeds
+            // First priority is keyboard, if non zero use keyboard values
             if((keyboard_linear_speed_ == 0) && (keyboard_angular_speed_ == 0))
             {
-                // Use joystick values
-                target_twist.linear.x = joystick_linear_speed_;
-                target_twist.angular.z = joystick_angular_speed_;            
+                // Second priority is joystick, if non zero use joystick values
+                if((joystick_linear_speed_ == 0) && (joystick_angular_speed_ == 0))
+                {
+                    // Use the web values
+                    target_twist.linear.x = web_linear_speed_;
+                    target_twist.angular.z = web_angular_speed_;
+                }
+                else
+                {
+                    // Use joystick values
+                    target_twist.linear.x = joystick_linear_speed_;
+                    target_twist.angular.z = joystick_angular_speed_;
+                }
             }
             else
             {
@@ -762,7 +899,7 @@ void RodneyNode::sendTwist(void)
         }
         else
         {
-            // Lost connection with remote workstation so zero the velocities
+            // Lost connection with remote workstation or web browser so zero the velocities
             target_twist.linear.x = 0.0;
             target_twist.angular.z = 0.0; 
         }

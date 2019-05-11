@@ -47,6 +47,7 @@ private:
     ros::Subscriber demand_sub_;        // Topic for autonomous motor demands
     ros::Subscriber battery_status_sub_;// Topic to monitor battery status for the main battery
     ros::Subscriber remote_heartbeat_sub_;  // Topic to monitor the remote heartbeat when teleoping
+    ros::Subscriber web_command_sub_;   // Topic for web control
     ros::Subscriber gpio_sub_;          // Topic to monitor for changes in Rapsberry Pi GPIO input
     ros::Time last_twist_send_time_;    // Time of previous message
     ros::Time last_battery_warn_;       // Time of the last spoken battery warning message
@@ -80,9 +81,11 @@ private:
     float linear_set_speed_;            // Current linear set speed for keyboard manual mode locomoton
     float angular_set_speed_;           // Current angular set speed for keboard manual mode locomoton   
     float keyboard_linear_speed_;       // Linear speed from keyboard
-    float keyboard_angular_speed_;      // Anular speed from keyboard
+    float keyboard_angular_speed_;      // Angular speed from keyboard
     float joystick_linear_speed_;       // Linear speed from joystick/game pad
-    float joystick_angular_speed_;      // Anular speed from joystick/game pad
+    float joystick_angular_speed_;      // Angular speed from joystick/game pad
+    float web_linear_speed_;            // Linear speed from web page
+    float web_angular_speed_;           // Angular speed from web page
     float max_linear_speed_;            // Max linear speed in manual mode (teleop)
     float max_angular_speed_;           // Max angular speed in manual mode (teleop)
     float linear_mission_demand_;       // Linear speed demand when autonomous
@@ -100,6 +103,7 @@ private:
                                            keyboard::Key::MODIFIER_LSHIFT | keyboard::Key::MODIFIER_RSHIFT);
     const unsigned int MAX_AXES_VALUE_ = 32767; 
                 
+    void webComCallback(const std_msgs::String::ConstPtr& msg);          
     void keyboardCallBack(const keyboard::Key::ConstPtr& msg);
     void joystickCallback(const sensor_msgs::Joy::ConstPtr& msg);
     void completeCallBack(const std_msgs::String::ConstPtr& msg);

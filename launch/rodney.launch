@@ -89,5 +89,9 @@
       <remap from="cmd_vel" to="demand_vel"/>
     </node>   
   </group>
+  
+  <!-- Web control -->
+  <!-- Launch rosbridge from its launch files -->
+  <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />  
    
 </launch>
