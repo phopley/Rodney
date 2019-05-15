@@ -303,7 +303,7 @@
             </p>
             <p id="info_allow">Click the "Allow" button to enable your microphone. Using the https version helps avoid this.</p>
             <p id="info_denied">Permission to use microphone was denied.</p>
-            <p id="info_blocked">Permission to use microphone is blocked. To change, go to chrome://settings/contentExceptions#media-stream</p>
+            <p id="info_blocked">Permission to use microphone is blocked.</p>
             <p id="info_upgrade">This browser doesn't support the Web Speech API. Use <a href="//www.google.com/chrome">Chrome</a> version 25 or later.</p>
         </div>
         <div class="modal" id="helpModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
@@ -322,8 +322,8 @@
                         <p>stop, halt, cancel</p>
                         <p>faster, speed up</p>
                         <p>slower, slow down</p>
-                        <p>camera left, camera right, camera up, camera down, camera forward, camera centre</p>
-                        <p>head left, head right, head up, head down, head forward, head centre</p>
+                        <p>camera left, camera right, camera up, camera down, camera forward, camera centre, camera ahead</p>
+                        <p>look left, look right, look up, look down, look forward, look centre, look ahead</p>
                         <p>manual mode</p>
                         <p>go home, go to ____ (Mission 4)</p>
                         <p>acknowledge</p>                        
@@ -431,6 +431,14 @@
         var wakeup = ["robot", "rodney"];            
         var showUnrecognized = false;
             
+        function hasGetUserMedia() {
+            return !!(navigator.mediaDevices &&
+              navigator.mediaDevices.getUserMedia);
+        }
+        
+        if (hasGetUserMedia()) {
+            navigator.mediaDevices.getUserMedia(constraints);
+        }                              
 
         function takeMessage() {
             // Mission 1
@@ -751,6 +759,7 @@
                     console.log('onstart');
                     setMicActive();
                 };
+                
                 recognition.onerror = function (event) {
                     console.log('speech recognition error:' + ' ' + event.error);
 
@@ -864,7 +873,7 @@
                                         break testCandidate;
                                         
                                     case "camera":
-                                    case "head":
+                                    case "look":
                                         if (words.length != 2) {                                                
                                             commandFound = false;
                                             break testCandidate;
@@ -887,6 +896,7 @@
                                             case "foreword":
                                             case "centre":
                                             case "center":
+                                            case "ahead":
                                                 headCentre();
                                                 break camswitch;
                                             default:
