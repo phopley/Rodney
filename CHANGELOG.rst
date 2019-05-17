@@ -4,7 +4,8 @@ Changelog for package rodney
 
 Unreleased
 ------------------
-* Add control from web browser page control
+* Added control from web browser page control
+* Added scripts for start up from service
 
 1.2.0 (2019-05-02)
 ------------------

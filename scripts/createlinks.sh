@@ -5,8 +5,8 @@ ln -s ~/git/face_recognition ~/rodney_ws/src
 ln -s ~/git/face_recognition_msgs ~/rodney_ws/src
 ln -s ~/git/head_control ~/rodney_ws/src
 ln -s ~/git/imu_calib ~/rodney_ws/src
-ln -s ~/git/joystick ~/rodney_ws/src
 ln -s ~/git/pan_tilt ~/rodney_ws/src
+ln -s ~/git/pi_io.git ~/rodney_ws/src
 ln -s ~/git/rodney ~/rodney_ws/src
 ln -s ~/git/rodney_missions ~/rodney_ws/src
 ln -s ~/git/ros-keyboard ~/rodney_ws/src

@@ -1,0 +1,7 @@
+[Unit]
+Description=Rodney launch
+[Service]
+Type=simple
+ExecStart=/home/ubuntu/rodney_ws/src/rodney/scripts/startup.sh
+[Install]
+WantedBy=default.target
